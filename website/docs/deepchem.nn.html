@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>deepchem.nn package &#8212; deepchem 1.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="deepchem.rl package" href="deepchem.rl.html" />
+    <link rel="prev" title="deepchem.molnet.tests package" href="deepchem.molnet.tests.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">deepchem.nn package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.activations">deepchem.nn.activations module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.constraints">deepchem.nn.constraints module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.copy">deepchem.nn.copy module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.initializations">deepchem.nn.initializations module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.layers">deepchem.nn.layers module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.model_ops">deepchem.nn.model_ops module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.objectives">deepchem.nn.objectives module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.regularizers">deepchem.nn.regularizers module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn.weave_layers">deepchem.nn.weave_layers module</a></li>
+<li><a class="reference internal" href="#module-deepchem.nn">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-nn-package">
+<h1>deepchem.nn package<a class="headerlink" href="#deepchem-nn-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deepchem.nn.activations">
+<span id="deepchem-nn-activations-module"></span><h2>deepchem.nn.activations module<a class="headerlink" href="#module-deepchem.nn.activations" title="Permalink to this headline">¶</a></h2>
+<p>Activations for models.</p>
+<dl class="function">
+<dt id="deepchem.nn.activations.elu">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">elu</code><span class="sig-paren">(</span><em>x</em>, <em>alpha=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#elu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.elu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.get">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">get</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.get_from_module">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">get_from_module</code><span class="sig-paren">(</span><em>identifier</em>, <em>module_params</em>, <em>module_name</em>, <em>instantiate=False</em>, <em>kwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#get_from_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.get_from_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a class of function member of a module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>identifier</strong> (<em>the object to retrieve. It could be specified</em>) – by name (as a string), or by dict. In any other case,
+identifier itself will be returned without any changes.</li>
+<li><strong>module_params</strong> (<em>the members of a module</em>) – (e.g. the output of globals()).</li>
+<li><strong>module_name</strong> (<em>string; the name of the target module. Only used</em>) – to format error messages.</li>
+<li><strong>instantiate</strong> (<em>whether to instantiate the returned object</em>) – (if it’s a class).</li>
+<li><strong>kwargs</strong> (<em>a dictionary of keyword arguments to pass to the</em>) – class constructor if <cite>instantiate</cite> is <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">The target object.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError: if the identifier cannot be found.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.hard_sigmoid">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">hard_sigmoid</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#hard_sigmoid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.hard_sigmoid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The hard sigmoidal activation function</p>
+<p>Piecewise-linear approximation to sigmoid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>tf.Tensor</em>) – Input tensor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.linear">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">linear</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#linear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>A linear activation function.</p>
+<p>Note that a linear activation function is simply the identity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>tf.Tensor</em>) – Input tensor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.relu">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">relu</code><span class="sig-paren">(</span><em>x</em>, <em>alpha=0.0</em>, <em>max_value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#relu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.relu" title="Permalink to this definition">¶</a></dt>
+<dd><p>The rectified linear activation function</p>
+<p>Wrapper around model_ops.relu.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>tf.Tensor</em>) – Input tensor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.selu">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">selu</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#selu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.selu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.sigmoid">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">sigmoid</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#sigmoid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.sigmoid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sigmoidal activation function</p>
+<p>Wrapper around tf.nn.sigmoid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>tf.Tensor</em>) – Input tensor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.softmax">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">softmax</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#softmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.softmax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.softplus">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">softplus</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#softplus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.softplus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.softsign">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">softsign</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#softsign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.softsign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.activations.tanh">
+<code class="descclassname">deepchem.nn.activations.</code><code class="descname">tanh</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/activations.html#tanh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.activations.tanh" title="Permalink to this definition">¶</a></dt>
+<dd><p>The hyperbolic tanget activation function</p>
+<p>Wrapper around tf.nn.tanh.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>tf.Tensor</em>) – Input tensor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.nn.constraints">
+<span id="deepchem-nn-constraints-module"></span><h2>deepchem.nn.constraints module<a class="headerlink" href="#module-deepchem.nn.constraints" title="Permalink to this headline">¶</a></h2>
+<p>Place constraints on models.</p>
+<dl class="class">
+<dt id="deepchem.nn.constraints.Constraint">
+<em class="property">class </em><code class="descclassname">deepchem.nn.constraints.</code><code class="descname">Constraint</code><a class="reference internal" href="_modules/deepchem/nn/constraints.html#Constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.constraints.Constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.nn.constraints.MaxNorm">
+<em class="property">class </em><code class="descclassname">deepchem.nn.constraints.</code><code class="descname">MaxNorm</code><span class="sig-paren">(</span><em>m=2</em>, <em>axis=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/constraints.html#MaxNorm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.constraints.MaxNorm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.nn.constraints.Constraint" title="deepchem.nn.constraints.Constraint"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.constraints.Constraint</span></code></a></p>
+<p>MaxNorm weight constraint.</p>
+<p>Constrains the weights incident to each hidden unit
+to have a norm less than or equal to a desired value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>m</strong> (<em>the maximum norm for the incoming weights.</em>) – </li>
+<li><strong>axis</strong> (<em>integer</em><em>, </em><em>axis along which to calculate weight norms.</em>) – For instance, in a <cite>Dense</cite> layer the weight matrix
+has shape (input_dim, output_dim),
+set axis to 0 to constrain each weight vector
+of length <cite>(input_dim,)</cite>.</li>
+<li><strong>References</strong> (<em>#</em>) – <ul>
+<li>[Dropout: A Simple Way to Prevent Neural Networks from Overfitting Srivastava, Hinton, et al. 2014](<a class="reference external" href="http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf">http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf</a>)</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.nn.constraints.NonNeg">
+<em class="property">class </em><code class="descclassname">deepchem.nn.constraints.</code><code class="descname">NonNeg</code><a class="reference internal" href="_modules/deepchem/nn/constraints.html#NonNeg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.constraints.NonNeg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.nn.constraints.Constraint" title="deepchem.nn.constraints.Constraint"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.constraints.Constraint</span></code></a></p>
+<p>Constrains the weights to be non-negative.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.nn.constraints.UnitNorm">
+<em class="property">class </em><code class="descclassname">deepchem.nn.constraints.</code><code class="descname">UnitNorm</code><span class="sig-paren">(</span><em>axis=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/constraints.html#UnitNorm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.constraints.UnitNorm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.nn.constraints.Constraint" title="deepchem.nn.constraints.Constraint"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.constraints.Constraint</span></code></a></p>
+<p>Constrains the weights incident to each hidden unit to have unit norm.</p>
+<dl class="docutils">
+<dt># Arguments</dt>
+<dd><dl class="first last docutils">
+<dt>axis: integer, axis along which to calculate weight norms.</dt>
+<dd>For instance, in a <cite>Dense</cite> layer the weight matrix
+has shape <cite>(input_dim, output_dim)</cite>,
+set <cite>axis</cite> to <cite>0</cite> to constrain each weight vector
+of length <cite>(input_dim,)</cite>.
+In a <cite>Convolution2D</cite> layer with <cite>dim_ordering=”tf”</cite>,
+the weight tensor has shape
+<cite>(rows, cols, input_depth, output_depth)</cite>,
+set <cite>axis</cite> to <cite>[0, 1, 2]</cite>
+to constrain the weights of each filter tensor of size
+<cite>(rows, cols, input_depth)</cite>.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.constraints.get">
+<code class="descclassname">deepchem.nn.constraints.</code><code class="descname">get</code><span class="sig-paren">(</span><em>identifier</em>, <em>kwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/constraints.html#get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.constraints.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.nn.constraints.maxnorm">
+<code class="descclassname">deepchem.nn.constraints.</code><code class="descname">maxnorm</code><a class="headerlink" href="#deepchem.nn.constraints.maxnorm" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#deepchem.nn.constraints.MaxNorm" title="deepchem.nn.constraints.MaxNorm"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.constraints.MaxNorm</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.nn.constraints.nonneg">
+<code class="descclassname">deepchem.nn.constraints.</code><code class="descname">nonneg</code><a class="headerlink" href="#deepchem.nn.constraints.nonneg" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#deepchem.nn.constraints.NonNeg" title="deepchem.nn.constraints.NonNeg"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.constraints.NonNeg</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.nn.constraints.unitnorm">
+<code class="descclassname">deepchem.nn.constraints.</code><code class="descname">unitnorm</code><a class="headerlink" href="#deepchem.nn.constraints.unitnorm" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#deepchem.nn.constraints.UnitNorm" title="deepchem.nn.constraints.UnitNorm"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.constraints.UnitNorm</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.nn.copy">
+<span id="deepchem-nn-copy-module"></span><h2>deepchem.nn.copy module<a class="headerlink" href="#module-deepchem.nn.copy" title="Permalink to this headline">¶</a></h2>
+<p>Copies Classes from keras to remove dependency.</p>
+<p>Most of this code is copied over from Keras. Hoping to use as a staging
+area while we remove our Keras dependency.</p>
+</div>
+<div class="section" id="module-deepchem.nn.initializations">
+<span id="deepchem-nn-initializations-module"></span><h2>deepchem.nn.initializations module<a class="headerlink" href="#module-deepchem.nn.initializations" title="Permalink to this headline">¶</a></h2>
+<p>Ops for tensor initialization</p>
+<dl class="function">
+<dt id="deepchem.nn.initializations.get">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">get</code><span class="sig-paren">(</span><em>identifier</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.get_fans">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">get_fans</code><span class="sig-paren">(</span><em>shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#get_fans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.get_fans" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.glorot_normal">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">glorot_normal</code><span class="sig-paren">(</span><em>shape</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#glorot_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.glorot_normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Glorot normal variance scaling initializer.</p>
+<dl class="docutils">
+<dt># References</dt>
+<dd>Glorot &amp; Bengio, AISTATS 2010</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.glorot_uniform">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">glorot_uniform</code><span class="sig-paren">(</span><em>shape</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#glorot_uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.glorot_uniform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.he_normal">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">he_normal</code><span class="sig-paren">(</span><em>shape</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#he_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.he_normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>He normal variance scaling initializer.</p>
+<dl class="docutils">
+<dt># References</dt>
+<dd>He et al., <a class="reference external" href="http://arxiv.org/abs/1502.01852">http://arxiv.org/abs/1502.01852</a></dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.he_uniform">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">he_uniform</code><span class="sig-paren">(</span><em>shape</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#he_uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.he_uniform" title="Permalink to this definition">¶</a></dt>
+<dd><p>He uniform variance scaling initializer.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.identity">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">identity</code><span class="sig-paren">(</span><em>shape</em>, <em>scale=1</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.identity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.lecun_uniform">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">lecun_uniform</code><span class="sig-paren">(</span><em>shape</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#lecun_uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.lecun_uniform" title="Permalink to this definition">¶</a></dt>
+<dd><p>LeCun uniform variance scaling initializer.</p>
+<dl class="docutils">
+<dt># References</dt>
+<dd>LeCun 98, Efficient Backprop,
+<a class="reference external" href="http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf">http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf</a></dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.normal">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">normal</code><span class="sig-paren">(</span><em>shape</em>, <em>scale=0.05</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.normal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.one">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">one</code><span class="sig-paren">(</span><em>shape</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#one"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.one" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.orthogonal">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">orthogonal</code><span class="sig-paren">(</span><em>shape</em>, <em>scale=1.1</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#orthogonal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.orthogonal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthogonal initializer.</p>
+<dl class="docutils">
+<dt># References</dt>
+<dd>Saxe et al., <a class="reference external" href="http://arxiv.org/abs/1312.6120">http://arxiv.org/abs/1312.6120</a></dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.uniform">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">uniform</code><span class="sig-paren">(</span><em>shape</em>, <em>scale=0.05</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.uniform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.initializations.zero">
+<code class="descclassname">deepchem.nn.initializations.</code><code class="descname">zero</code><span class="sig-paren">(</span><em>shape</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/initializations.html#zero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.initializations.zero" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.nn.layers">
+<span id="deepchem-nn-layers-module"></span><h2>deepchem.nn.layers module<a class="headerlink" href="#module-deepchem.nn.layers" title="Permalink to this headline">¶</a></h2>
+<p>Custom Keras Layers.</p>
+<dl class="function">
+<dt id="deepchem.nn.layers.affine">
+<code class="descclassname">deepchem.nn.layers.</code><code class="descname">affine</code><span class="sig-paren">(</span><em>x</em>, <em>W</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/layers.html#affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.layers.affine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.layers.cos">
+<code class="descclassname">deepchem.nn.layers.</code><code class="descname">cos</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/layers.html#cos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.layers.cos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.layers.tf_affine">
+<code class="descclassname">deepchem.nn.layers.</code><code class="descname">tf_affine</code><span class="sig-paren">(</span><em>x</em>, <em>vm</em>, <em>scope</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/layers.html#tf_affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.layers.tf_affine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.nn.model_ops">
+<span id="deepchem-nn-model-ops-module"></span><h2>deepchem.nn.model_ops module<a class="headerlink" href="#module-deepchem.nn.model_ops" title="Permalink to this headline">¶</a></h2>
+<p>Ops for graph construction.</p>
+<p>Large amounts of code borrowed from Keras. Will try to incorporate into
+DeepChem properly.</p>
+<dl class="function">
+<dt id="deepchem.nn.model_ops.add_bias">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">add_bias</code><span class="sig-paren">(</span><em>tensor</em>, <em>init=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#add_bias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.add_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a bias term to a tensor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tensor</strong> (<em>tf.Tensor</em>) – Variable tensor.</li>
+<li><strong>init</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – Bias initializer. Defaults to zero.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Name for this op. Defaults to tensor.op.name.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A biased tensor with the same shape as the input tensor.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tf.Tensor</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.binary_crossentropy">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">binary_crossentropy</code><span class="sig-paren">(</span><em>output</em>, <em>target</em>, <em>from_logits=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#binary_crossentropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.binary_crossentropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binary crossentropy between an output tensor and a target tensor.</p>
+<dl class="docutils">
+<dt># Arguments</dt>
+<dd><p class="first">output: A tensor.
+target: A tensor with the same shape as <cite>output</cite>.
+from_logits: Whether <cite>output</cite> is expected to be a logits tensor.</p>
+<blockquote class="last">
+<div>By default, we consider that <cite>output</cite>
+encodes a probability distribution.</div></blockquote>
+</dd>
+<dt># Returns</dt>
+<dd>A tensor.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.cast_to_floatx">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">cast_to_floatx</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#cast_to_floatx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.cast_to_floatx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cast a Numpy array to the default Keras float type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>Numpy array.</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">The same Numpy array, cast to its new type.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.categorical_crossentropy">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">categorical_crossentropy</code><span class="sig-paren">(</span><em>output</em>, <em>target</em>, <em>from_logits=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#categorical_crossentropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.categorical_crossentropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Categorical crossentropy between an output tensor
+and a target tensor, where the target is a tensor of the same
+shape as the output.</p>
+<p># TODO(rbharath): Should probably swap this over to tf mode.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.clip">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">clip</code><span class="sig-paren">(</span><em>x</em>, <em>min_value</em>, <em>max_value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#clip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.clip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Element-wise value clipping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">A tensor.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.concatenate">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">concatenate</code><span class="sig-paren">(</span><em>tensors</em>, <em>axis=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#concatenate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.concatenate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenates a list of tensors alongside the specified axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">A tensor.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.cosine_distances">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">cosine_distances</code><span class="sig-paren">(</span><em>test</em>, <em>support</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#cosine_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.cosine_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes pairwise cosine distances between provided tensors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>test</strong> (<em>tf.Tensor</em>) – Of shape (n_test, n_feat)</li>
+<li><strong>support</strong> (<em>tf.Tensor</em>) – Of shape (n_support, n_feat)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Of shape (n_test, n_support)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tf.Tensor</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.dot">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">dot</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies 2 tensors (and/or variables) and returns a <em>tensor</em>.
+When attempting to multiply a ND tensor
+with a ND tensor, it reproduces the Theano behavior.
+(e.g. (2, 3).(4, 3, 5) = (2, 4, 5))</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>Tensor</em><em> or </em><em>variable.</em>) – </li>
+<li><strong>y</strong> (<em>Tensor</em><em> or </em><em>variable.</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tensor, dot product of x and y.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.dropout">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">dropout</code><span class="sig-paren">(</span><em>tensor</em>, <em>dropout_prob</em>, <em>training=True</em>, <em>training_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#dropout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.dropout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random dropout.</p>
+<p>This implementation supports “always-on” dropout (training_only=False), which
+can be used to calculate model uncertainty. See Gal and Ghahramani,
+<a class="reference external" href="http://arxiv.org/abs/1506.02142">http://arxiv.org/abs/1506.02142</a>.</p>
+<dl class="docutils">
+<dt>NOTE(user): To simplify the implementation, I have chosen not to reverse</dt>
+<dd>the scaling that occurs in tf.nn.dropout when using dropout during
+inference. This shouldn’t be an issue since the activations will be scaled
+by the same constant in both training and inference. This means that there
+are no training-time differences between networks that use dropout during
+inference and those that do not.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tensor</strong> (<em>tf.Tensor</em>) – Input tensor.</li>
+<li><strong>dropout_prob</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – Float giving dropout probability for weights (NOT keep probability).</li>
+<li><strong>training_only</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – Boolean. If True (standard dropout), apply dropout only
+during training. If False, apply dropout during inference as well.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A tensor with the same shape as the input tensor.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tf.Tensor</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.elu">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">elu</code><span class="sig-paren">(</span><em>x</em>, <em>alpha=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#elu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.elu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exponential linear unit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>A tensor</em><em> or </em><em>variable to compute the activation function for.</em>) – </li>
+<li><strong>alpha</strong> (<em>A scalar</em><em>, </em><em>slope of positive section.</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tensor.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.epsilon">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">epsilon</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#epsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.epsilon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the fuzz
+factor used in numeric expressions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">A float.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.euclidean_distance">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">euclidean_distance</code><span class="sig-paren">(</span><em>test</em>, <em>support</em>, <em>max_dist_sq=20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#euclidean_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.euclidean_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes pairwise euclidean distances between provided tensors</p>
+<p>TODO(rbharath): BROKEN! THIS DOESN’T WORK!</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>test</strong> (<em>tf.Tensor</em>) – Of shape (n_test, n_feat)</li>
+<li><strong>support</strong> (<em>tf.Tensor</em>) – Of shape (n_support, n_feat)</li>
+<li><strong>max_dist_sq</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum pairwise distance allowed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Of shape (n_test, n_support)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tf.Tensor</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.fully_connected_layer">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">fully_connected_layer</code><span class="sig-paren">(</span><em>tensor</em>, <em>size=None</em>, <em>weight_init=None</em>, <em>bias_init=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#fully_connected_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.fully_connected_layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fully connected layer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tensor</strong> (<em>tf.Tensor</em>) – Input tensor.</li>
+<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Number of output nodes for this layer.</li>
+<li><strong>weight_init</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – Weight initializer.</li>
+<li><strong>bias_init</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – Bias initializer.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Name for this op. Defaults to ‘fully_connected’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new tensor representing the output of the fully connected layer.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">tf.Tensor</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> – If input tensor is not 2D.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.get_dtype">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">get_dtype</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#get_dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.get_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dtype of a Keras tensor or variable, as a string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>Tensor</em><em> or </em><em>variable.</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">String, dtype of <cite>x</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.get_ndim">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">get_ndim</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#get_ndim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.get_ndim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of axes in a tensor, as an integer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>Tensor</em><em> or </em><em>variable.</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Integer (scalar), number of axes.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.hard_sigmoid">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">hard_sigmoid</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#hard_sigmoid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.hard_sigmoid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Segment-wise linear approximation of sigmoid.</p>
+<p>Faster than sigmoid. Returns 0. if x &lt; -2.5, 1. if x &gt; 2.5.
+In -2.5 &lt;= x &lt;= 2.5, returns 0.2 * x + 0.5.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>A tensor</em><em> or </em><em>variable.</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">A tensor.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.int_shape">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">int_shape</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#int_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.int_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the shape of a Keras tensor or a Keras variable as a tuple of
+integers or None entries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>Tensor</em><em> or </em><em>variable.</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">A tuple of integers (or None entries)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.l2_normalize">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">l2_normalize</code><span class="sig-paren">(</span><em>x</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#l2_normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.l2_normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes a tensor wrt the L2 norm alongside the specified axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>input tensor.</em>) – </li>
+<li><strong>axis</strong> (<em>axis along which to perform normalization.</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tensor.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.logits">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">logits</code><span class="sig-paren">(</span><em>features</em>, <em>num_classes=2</em>, <em>weight_init=None</em>, <em>bias_init=None</em>, <em>dropout_prob=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#logits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.logits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a logits tensor for a single classification task.</p>
+<p>You almost certainly don’t want dropout on there – it’s like randomly setting
+the (unscaled) probability of a target class to 0.5.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>features</strong> – A 2D tensor with dimensions batch_size x num_features.</li>
+<li><strong>num_classes</strong> – Number of classes for each task.</li>
+<li><strong>weight_init</strong> – Weight initializer.</li>
+<li><strong>bias_init</strong> – Bias initializer.</li>
+<li><strong>dropout_prob</strong> – Float giving dropout probability for weights (NOT keep
+probability).</li>
+<li><strong>name</strong> – Name for this op.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A logits tensor with shape batch_size x num_classes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.lrelu">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">lrelu</code><span class="sig-paren">(</span><em>alpha=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#lrelu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.lrelu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a leaky rectified linear unit function.</p>
+<p>This function returns a new function that implements the LReLU with a
+specified alpha.  The returned value can be used as an activation function in
+network layers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – the slope of the function when x&lt;0</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">a function f(x) that returns alpha*x when x&lt;0, and x when x&gt;0.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.max">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">max</code><span class="sig-paren">(</span><em>x</em>, <em>axis=None</em>, <em>keepdims=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum value in a tensor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>A tensor</em><em> or </em><em>variable.</em>) – </li>
+<li><strong>axis</strong> (<em>An integer</em><em>, </em><em>the axis to find maximum values.</em>) – </li>
+<li><strong>keepdims</strong> (<em>A boolean</em><em>, </em><em>whether to keep the dimensions</em><em> or </em><em>not.</em>) – If <cite>keepdims</cite> is <cite>False</cite>, the rank of the tensor is reduced
+by 1. If <cite>keepdims</cite> is <cite>True</cite>,
+the reduced dimension is retained with length 1.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tensor with maximum values of <cite>x</cite>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.mean">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">mean</code><span class="sig-paren">(</span><em>x</em>, <em>axis=None</em>, <em>keepdims=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean of a tensor, alongside the specified axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>A tensor</em><em> or </em><em>variable.</em>) – </li>
+<li><strong>axis</strong> (<em>A list of integer. Axes to compute the mean.</em>) – </li>
+<li><strong>keepdims</strong> (<em>A boolean</em><em>, </em><em>whether to keep the dimensions</em><em> or </em><em>not.</em>) – If keepdims is False, the rank of the tensor is reduced
+by 1 for each entry in axis. If keep_dims is True,
+the reduced dimensions are retained with length 1.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tensor with the mean of elements of x.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.moving_average_update">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">moving_average_update</code><span class="sig-paren">(</span><em>variable</em>, <em>value</em>, <em>momentum</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#moving_average_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.moving_average_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.multitask_logits">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">multitask_logits</code><span class="sig-paren">(</span><em>features</em>, <em>num_tasks</em>, <em>num_classes=2</em>, <em>weight_init=None</em>, <em>bias_init=None</em>, <em>dropout_prob=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#multitask_logits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.multitask_logits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a logit tensor for each classification task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>features</strong> – A 2D tensor with dimensions batch_size x num_features.</li>
+<li><strong>num_tasks</strong> – Number of classification tasks.</li>
+<li><strong>num_classes</strong> – Number of classes for each task.</li>
+<li><strong>weight_init</strong> – Weight initializer.</li>
+<li><strong>bias_init</strong> – Bias initializer.</li>
+<li><strong>dropout_prob</strong> – Float giving dropout probability for weights (NOT keep
+probability).</li>
+<li><strong>name</strong> – Name for this op. Defaults to ‘multitask_logits’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of logit tensors; one for each classification task.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.ones">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">ones</code><span class="sig-paren">(</span><em>shape</em>, <em>dtype=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#ones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.ones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates an all-ones tensor variable and returns it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shape</strong> (<em>Tuple of integers</em><em>, </em><em>shape of returned Keras variable.</em>) – </li>
+<li><strong>dtype</strong> (<em>Tensorflow dtype</em>) – </li>
+<li><strong>name</strong> (<em>String</em><em>, </em><em>name of returned Keras variable.</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A Keras variable, filled with <cite>1.0</cite>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.optimizer">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">optimizer</code><span class="sig-paren">(</span><em>optimizer='adam'</em>, <em>learning_rate=0.001</em>, <em>momentum=0.9</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#optimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create model optimizer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>optimizer</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of optimizer</li>
+<li><strong>learning_rate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – Learning rate for algorithm</li>
+<li><strong>momentum</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – Momentum rate</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">A training Optimizer.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NotImplementedError</span></code> – If an unsupported optimizer is requested.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.random_normal_variable">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">random_normal_variable</code><span class="sig-paren">(</span><em>shape</em>, <em>mean</em>, <em>scale</em>, <em>dtype=tf.float32</em>, <em>name=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#random_normal_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.random_normal_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates an Keras variable filled with
+samples drawn from a normal distribution and returns it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shape</strong> (<em>Tuple of integers</em><em>, </em><em>shape of returned Keras variable.</em>) – </li>
+<li><strong>mean</strong> (<em>Float</em><em>, </em><em>mean of the normal distribution.</em>) – </li>
+<li><strong>scale</strong> (<em>Float</em><em>, </em><em>standard deviation of the normal distribution.</em>) – </li>
+<li><strong>dtype</strong> (<em>Tensorflow dtype</em>) – </li>
+<li><strong>name</strong> (<em>String</em><em>, </em><em>name of returned Keras variable.</em>) – </li>
+<li><strong>seed</strong> (<em>Integer</em><em>, </em><em>random seed.</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tf.Variable, filled with drawn samples.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.random_uniform_variable">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">random_uniform_variable</code><span class="sig-paren">(</span><em>shape</em>, <em>low</em>, <em>high</em>, <em>dtype=tf.float32</em>, <em>name=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#random_uniform_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.random_uniform_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates an variable filled with
+samples drawn from a uniform distribution and returns it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shape</strong> (<em>Tuple of integers</em><em>, </em><em>shape of returned variable.</em>) – </li>
+<li><strong>low</strong> (<em>Float</em><em>, </em><em>lower boundary of the output inteval.</em>) – </li>
+<li><strong>high</strong> (<em>Float</em><em>, </em><em>upper boundary of the output interval.</em>) – </li>
+<li><strong>dtype</strong> (<em>Tensorflow dtype</em>) – </li>
+<li><strong>name</strong> (<em>String</em><em>, </em><em>name of returned variable.</em>) – </li>
+<li><strong>seed</strong> (<em>Integer</em><em>, </em><em>random seed.</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tf.Variable, filled with drawn samples.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.relu">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">relu</code><span class="sig-paren">(</span><em>x</em>, <em>alpha=0.0</em>, <em>max_value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#relu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.relu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rectified linear unit.
+With default values, it returns element-wise <cite>max(x, 0)</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>A tensor</em><em> or </em><em>variable.</em>) – </li>
+<li><strong>alpha</strong> (<em>A scalar</em><em>, </em><em>slope of negative section</em><em> (</em><em>default=`0.`</em><em>)</em><em></em>) – </li>
+<li><strong>max_value</strong> (<em>Saturation threshold.</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tensor.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.selu">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">selu</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#selu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.selu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scaled Exponential Linear unit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>A tensor</em><em> or </em><em>variable.</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">A tensor.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ul class="simple">
+<li>[Self-Normalizing Neural Networks](<a class="reference external" href="https://arxiv.org/abs/1706.02515">https://arxiv.org/abs/1706.02515</a>)</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.softmax_N">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">softmax_N</code><span class="sig-paren">(</span><em>tensor</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#softmax_N"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.softmax_N" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply softmax across last dimension of a tensor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tensor</strong> – Input tensor.</li>
+<li><strong>name</strong> – Name for this op. If None, defaults to ‘softmax_N’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A tensor with softmax-normalized values on the last dimension.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.sparse_categorical_crossentropy">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">sparse_categorical_crossentropy</code><span class="sig-paren">(</span><em>output</em>, <em>target</em>, <em>from_logits=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#sparse_categorical_crossentropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.sparse_categorical_crossentropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Categorical crossentropy between an output tensor
+and a target tensor, where the target is an integer tensor.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.sqrt">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">sqrt</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.sqrt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Element-wise square root.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>input tensor.</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">A tensor.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.sum">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">sum</code><span class="sig-paren">(</span><em>x</em>, <em>axis=None</em>, <em>keepdims=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum of the values in a tensor, alongside the specified axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>A tensor</em><em> or </em><em>variable.</em>) – </li>
+<li><strong>axis</strong> (<em>An integer</em><em>, </em><em>the axis to sum over.</em>) – </li>
+<li><strong>keepdims</strong> (<em>A boolean</em><em>, </em><em>whether to keep the dimensions</em><em> or </em><em>not.</em>) – If keepdims is False, the rank of the tensor is reduced
+by 1. If keepdims is True,
+the reduced dimension is retained with length 1.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tensor with sum of x.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.var">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">var</code><span class="sig-paren">(</span><em>x</em>, <em>axis=None</em>, <em>keepdims=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Variance of a tensor, alongside the specified axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>A tensor</em><em> or </em><em>variable.</em>) – </li>
+<li><strong>axis</strong> (<em>An integer</em><em>, </em><em>the axis to compute the variance.</em>) – </li>
+<li><strong>keepdims</strong> (<em>A boolean</em><em>, </em><em>whether to keep the dimensions</em><em> or </em><em>not.</em>) – If keepdims is False, the rank of the tensor is reduced
+by 1. If keepdims is True,
+the reduced dimension is retained with length 1.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A tensor with the variance of elements of <cite>x</cite>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.weight_decay">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">weight_decay</code><span class="sig-paren">(</span><em>penalty_type</em>, <em>penalty</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#weight_decay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.weight_decay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add weight decay.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> – TensorflowGraph.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A scalar tensor containing the weight decay cost.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">NotImplementedError</span></code> – If an unsupported penalty type is requested.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.model_ops.zeros">
+<code class="descclassname">deepchem.nn.model_ops.</code><code class="descname">zeros</code><span class="sig-paren">(</span><em>shape</em>, <em>dtype=tf.float32</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/model_ops.html#zeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.model_ops.zeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates an all-zeros variable and returns it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shape</strong> (<em>Tuple of integers</em><em>, </em><em>shape of returned Keras variable</em>) – </li>
+<li><strong>dtype</strong> (<em>Tensorflow dtype</em>) – </li>
+<li><strong>name</strong> (<em>String</em><em>, </em><em>name of returned Keras variable</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A variable (including Keras metadata), filled with <cite>0.0</cite>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.nn.objectives">
+<span id="deepchem-nn-objectives-module"></span><h2>deepchem.nn.objectives module<a class="headerlink" href="#module-deepchem.nn.objectives" title="Permalink to this headline">¶</a></h2>
+<p>Ops for objectives</p>
+<p>Code borrowed from Keras.</p>
+<dl class="function">
+<dt id="deepchem.nn.objectives.KLD">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">KLD</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.KLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.MAE">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">MAE</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.MAE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.MAPE">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">MAPE</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.MAPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.MSE">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">MSE</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.MSE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.MSLE">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">MSLE</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.MSLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.binary_crossentropy">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">binary_crossentropy</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#binary_crossentropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.binary_crossentropy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.categorical_crossentropy">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">categorical_crossentropy</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#categorical_crossentropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.categorical_crossentropy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.cosine">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">cosine</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.cosine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.cosine_proximity">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">cosine_proximity</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#cosine_proximity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.cosine_proximity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.hinge">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">hinge</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#hinge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.hinge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.kld">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">kld</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.kld" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.kullback_leibler_divergence">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">kullback_leibler_divergence</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#kullback_leibler_divergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.kullback_leibler_divergence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.mae">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">mae</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.mae" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.mape">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">mape</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.mape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.mean_absolute_error">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">mean_absolute_error</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#mean_absolute_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.mean_absolute_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.mean_absolute_percentage_error">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">mean_absolute_percentage_error</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#mean_absolute_percentage_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.mean_absolute_percentage_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.mean_squared_error">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">mean_squared_error</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#mean_squared_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.mean_squared_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.mean_squared_logarithmic_error">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">mean_squared_logarithmic_error</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#mean_squared_logarithmic_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.mean_squared_logarithmic_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.mse">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">mse</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.mse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.msle">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">msle</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.nn.objectives.msle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.poisson">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">poisson</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#poisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.poisson" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.sparse_categorical_crossentropy">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">sparse_categorical_crossentropy</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#sparse_categorical_crossentropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.sparse_categorical_crossentropy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.objectives.squared_hinge">
+<code class="descclassname">deepchem.nn.objectives.</code><code class="descname">squared_hinge</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/objectives.html#squared_hinge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.objectives.squared_hinge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.nn.regularizers">
+<span id="deepchem-nn-regularizers-module"></span><h2>deepchem.nn.regularizers module<a class="headerlink" href="#module-deepchem.nn.regularizers" title="Permalink to this headline">¶</a></h2>
+<p>Ops for regularizers</p>
+<p>Code borrowed from Keras.</p>
+<dl class="attribute">
+<dt id="deepchem.nn.regularizers.ActivityRegularizer">
+<code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">ActivityRegularizer</code><a class="headerlink" href="#deepchem.nn.regularizers.ActivityRegularizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#deepchem.nn.regularizers.L1L2Regularizer" title="deepchem.nn.regularizers.L1L2Regularizer"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.regularizers.L1L2Regularizer</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.nn.regularizers.L1L2Regularizer">
+<em class="property">class </em><code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">L1L2Regularizer</code><span class="sig-paren">(</span><em>l1=0.0</em>, <em>l2=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/regularizers.html#L1L2Regularizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.regularizers.L1L2Regularizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.nn.regularizers.Regularizer" title="deepchem.nn.regularizers.Regularizer"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.regularizers.Regularizer</span></code></a></p>
+<p>Regularizer for L1 and L2 regularization.</p>
+<dl class="docutils">
+<dt># Arguments</dt>
+<dd>l1: Float; L1 regularization factor.
+l2: Float; L2 regularization factor.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.nn.regularizers.Regularizer">
+<em class="property">class </em><code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">Regularizer</code><a class="reference internal" href="_modules/deepchem/nn/regularizers.html#Regularizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.regularizers.Regularizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.nn.regularizers.WeightRegularizer">
+<code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">WeightRegularizer</code><a class="headerlink" href="#deepchem.nn.regularizers.WeightRegularizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#deepchem.nn.regularizers.L1L2Regularizer" title="deepchem.nn.regularizers.L1L2Regularizer"><code class="xref py py-class docutils literal"><span class="pre">deepchem.nn.regularizers.L1L2Regularizer</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.regularizers.activity_l1">
+<code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">activity_l1</code><span class="sig-paren">(</span><em>l=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/regularizers.html#activity_l1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.regularizers.activity_l1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.regularizers.activity_l1l2">
+<code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">activity_l1l2</code><span class="sig-paren">(</span><em>l1=0.01</em>, <em>l2=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/regularizers.html#activity_l1l2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.regularizers.activity_l1l2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.regularizers.activity_l2">
+<code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">activity_l2</code><span class="sig-paren">(</span><em>l=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/regularizers.html#activity_l2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.regularizers.activity_l2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.regularizers.l1">
+<code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">l1</code><span class="sig-paren">(</span><em>l=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/regularizers.html#l1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.regularizers.l1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.regularizers.l1l2">
+<code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">l1l2</code><span class="sig-paren">(</span><em>l1=0.01</em>, <em>l2=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/regularizers.html#l1l2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.regularizers.l1l2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.nn.regularizers.l2">
+<code class="descclassname">deepchem.nn.regularizers.</code><code class="descname">l2</code><span class="sig-paren">(</span><em>l=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/nn/regularizers.html#l2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.nn.regularizers.l2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.nn.weave_layers">
+<span id="deepchem-nn-weave-layers-module"></span><h2>deepchem.nn.weave_layers module<a class="headerlink" href="#module-deepchem.nn.weave_layers" title="Permalink to this headline">¶</a></h2>
+<p>Created on Thu Mar 30 14:02:04 2017</p>
+<p>&#64;author: michael</p>
+</div>
+<div class="section" id="module-deepchem.nn">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.nn" title="Permalink to this headline">¶</a></h2>
+<p>Imports a number of useful deep learning primitives into one place.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.nn.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

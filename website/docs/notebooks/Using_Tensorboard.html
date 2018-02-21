@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Tensorboard in DeepChem &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Using Tensorboard in DeepChem</a><ul>
+<li><a class="reference internal" href="#viewing-the-tensorboard-output">Viewing the Tensorboard output</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="using-tensorboard-in-deepchem">
+<h1>Using Tensorboard in DeepChem<a class="headerlink" href="#using-tensorboard-in-deepchem" title="Permalink to this headline">¶</a></h1>
+<p>DeepChem Neural Networks models are built on top of
+<a class="reference external" href="https://www.tensorflow.org">tensorflow</a>.
+<a class="reference external" href="https://www.tensorflow.org/get_started/summaries_and_tensorboard">Tensorboard</a>
+is a powerful visualization tool in tensorflow for viewing your model
+architecture and performance.</p>
+<p>In this tutorial we will show how to turn on tensorboard logging for our
+models, and go show the network architecture for some of our more
+popular models.</p>
+<p>The first thing we have to do is load a dataset that we will monitor
+model performance over.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
+<span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">from</span> <span class="nn">deepchem.molnet</span> <span class="kn">import</span> <span class="n">load_tox21</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.models.graph_models</span> <span class="kn">import</span> <span class="n">GraphConvTensorGraph</span>
+
+<span class="c1"># Load Tox21 dataset</span>
+<span class="n">tox21_tasks</span><span class="p">,</span> <span class="n">tox21_datasets</span><span class="p">,</span> <span class="n">transformers</span> <span class="o">=</span> <span class="n">load_tox21</span><span class="p">(</span><span class="n">featurizer</span><span class="o">=</span><span class="s1">&#39;GraphConv&#39;</span><span class="p">)</span>
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">tox21_datasets</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+/home/leswing/miniconda3/envs/l25dfIi9oAFfmEN6/lib/python3.5/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from <cite>float</cite> to <cite>np.floating</cite> is deprecated. In future, it will be treated as <cite>np.float64 == np.dtype(float).type</cite>.
+  from ._conv import register_converters as _register_converters
+</pre>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Loading dataset from disk.
+Loading dataset from disk.
+Loading dataset from disk.
+</pre></div>
+</div>
+<p>Now we will create our model with tensorboard on. All we have to do to
+turn tensorboard on is pass the tensorboard=True flag to the constructor
+of our model</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Construct the model with tensorbaord on</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GraphConvTensorGraph</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tox21_tasks</span><span class="p">),</span>  <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;classification&#39;</span><span class="p">,</span> <span class="n">tensorboard</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Fit the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">nb_epoch</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>/home/leswing/miniconda3/envs/l25dfIi9oAFfmEN6/lib/python3.5/site-packages/tensorflow/python/ops/gradients_impl.py:96: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  &quot;Converting sparse IndexedSlices to a dense Tensor of unknown shape. &quot;
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Starting epoch 0
+Starting epoch 1
+Starting epoch 2
+Starting epoch 3
+Starting epoch 4
+Starting epoch 5
+Starting epoch 6
+Starting epoch 7
+Starting epoch 8
+Starting epoch 9
+Ending global_step 630: Average loss 932.451
+TIMING: model fitting took 52.909 s
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="mf">932.4511722625248</span>
+</pre></div>
+</div>
+<div class="section" id="viewing-the-tensorboard-output">
+<h2>Viewing the Tensorboard output<a class="headerlink" href="#viewing-the-tensorboard-output" title="Permalink to this headline">¶</a></h2>
+<p>When tensorboard is turned on we log all the files needed for
+tensorboard in model.model_dir. To launch the tensorboard webserver we
+have to call in a terminal</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span></span><span class="n">tensorboard</span> <span class="o">--</span><span class="n">logdir</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">model_dir</span>
+</pre></div>
+</div>
+<p>This will launch the tensorboard web server on your local computer on
+port 6006. Go to <a class="reference external" href="http://localhost:6006">http://localhost:6006</a> in your web browser to look
+through tensorboard’s UI.</p>
+<p>The first thing you will see is a graph of the loss vs mini-batches. You
+can use this data to determine if your model is still improving it’s
+loss function over time or to find out if your gradients are exploding!.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;assets/tensorboard_landing.png&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/Using_Tensorboard_7_0.png" src="../_images/Using_Tensorboard_7_0.png" />
+<p>If you click “GRAPHS” at the top you can see a visual layout of the
+model. Here is what our GraphConvTensorGraph Model looks like</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;assets/GraphConvArch.png&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/Using_Tensorboard_9_0.png" src="../_images/Using_Tensorboard_9_0.png" />
+<p>The “GraphGather” box is the “Neural Fingerprint” developed by learning
+features of the molecule via graph convolutions.</p>
+<p>Using tensorboard to visualize the model is a fast way to get a high
+level understanding of what a model is made of and how it works!</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/notebooks/Using_Tensorboard.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tensorgraph.tests.test_gan &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html"><span><img src="../../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tensorgraph.tests.test_gan</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph</span> <span class="kn">import</span> <span class="n">layers</span>
+<span class="kn">from</span> <span class="nn">flaky</span> <span class="kn">import</span> <span class="n">flaky</span>
+
+
+<div class="viewcode-block" id="generate_batch"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.generate_batch">[docs]</a><span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Draw training data from a Gaussian distribution, where the mean  is a conditional input.&quot;&quot;&quot;</span>
+  <span class="n">means</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+  <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">means</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">means</span><span class="p">,</span> <span class="n">values</span></div>
+
+
+<div class="viewcode-block" id="generate_data"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.generate_data">[docs]</a><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">gan</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batches</span><span class="p">):</span>
+    <span class="n">means</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">generate_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="p">{</span><span class="n">gan</span><span class="o">.</span><span class="n">data_inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">values</span><span class="p">,</span> <span class="n">gan</span><span class="o">.</span><span class="n">conditional_inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">means</span><span class="p">}</span>
+    <span class="k">yield</span> <span class="n">batch</span></div>
+
+
+<div class="viewcode-block" id="ExampleGAN"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.ExampleGAN">[docs]</a><span class="k">class</span> <span class="nc">ExampleGAN</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">GAN</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExampleGAN.get_noise_input_shape"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.ExampleGAN.get_noise_input_shape">[docs]</a>  <span class="k">def</span> <span class="nf">get_noise_input_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleGAN.get_data_input_shapes"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.ExampleGAN.get_data_input_shapes">[docs]</a>  <span class="k">def</span> <span class="nf">get_data_input_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="ExampleGAN.get_conditional_input_shapes"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.ExampleGAN.get_conditional_input_shapes">[docs]</a>  <span class="k">def</span> <span class="nf">get_conditional_input_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="ExampleGAN.create_generator"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.ExampleGAN.create_generator">[docs]</a>  <span class="k">def</span> <span class="nf">create_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noise_input</span><span class="p">,</span> <span class="n">conditional_inputs</span><span class="p">):</span>
+    <span class="n">gen_in</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Concat</span><span class="p">([</span><span class="n">noise_input</span><span class="p">]</span> <span class="o">+</span> <span class="n">conditional_inputs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="n">gen_in</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="ExampleGAN.create_discriminator"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.ExampleGAN.create_discriminator">[docs]</a>  <span class="k">def</span> <span class="nf">create_discriminator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_inputs</span><span class="p">,</span> <span class="n">conditional_inputs</span><span class="p">):</span>
+    <span class="n">discrim_in</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Concat</span><span class="p">(</span><span class="n">data_inputs</span> <span class="o">+</span> <span class="n">conditional_inputs</span><span class="p">)</span>
+    <span class="n">dense</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="n">discrim_in</span><span class="p">,</span> <span class="n">activation_fn</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="n">dense</span><span class="p">,</span> <span class="n">activation_fn</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TestGAN"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.TestGAN">[docs]</a><span class="k">class</span> <span class="nc">TestGAN</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestGAN.test_cgan"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.TestGAN.test_cgan">[docs]</a>  <span class="k">def</span> <span class="nf">test_cgan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test fitting a conditional GAN.&quot;&quot;&quot;</span>
+
+    <span class="n">gan</span> <span class="o">=</span> <span class="n">ExampleGAN</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.003</span><span class="p">)</span>
+    <span class="n">gan</span><span class="o">.</span><span class="n">fit_gan</span><span class="p">(</span>
+        <span class="n">generate_data</span><span class="p">(</span><span class="n">gan</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">generator_steps</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># See if it has done a plausible job of learning the distribution.</span>
+
+    <span class="n">means</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">predict_gan_generator</span><span class="p">(</span><span class="n">conditional_inputs</span><span class="o">=</span><span class="p">[</span><span class="n">means</span><span class="p">])</span>
+    <span class="n">deltas</span> <span class="o">=</span> <span class="n">values</span> <span class="o">-</span> <span class="n">means</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">deltas</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1.0</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">deltas</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="TestGAN.test_mix_gan"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.TestGAN.test_mix_gan">[docs]</a>  <span class="k">def</span> <span class="nf">test_mix_gan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test a GAN with multiple generators and discriminators.&quot;&quot;&quot;</span>
+
+    <span class="n">gan</span> <span class="o">=</span> <span class="n">ExampleGAN</span><span class="p">(</span><span class="n">n_generators</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_discriminators</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.003</span><span class="p">)</span>
+    <span class="n">gan</span><span class="o">.</span><span class="n">fit_gan</span><span class="p">(</span>
+        <span class="n">generate_data</span><span class="p">(</span><span class="n">gan</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">generator_steps</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># See if it has done a plausible job of learning the distribution.</span>
+
+    <span class="n">means</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+      <span class="n">values</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">predict_gan_generator</span><span class="p">(</span>
+          <span class="n">conditional_inputs</span><span class="o">=</span><span class="p">[</span><span class="n">means</span><span class="p">],</span> <span class="n">generator_index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+      <span class="n">deltas</span> <span class="o">=</span> <span class="n">values</span> <span class="o">-</span> <span class="n">means</span>
+      <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">deltas</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1.0</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">deltas</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span></div>
+
+  <span class="nd">@flaky</span>
+<div class="viewcode-block" id="TestGAN.test_wgan"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_gan.TestGAN.test_wgan">[docs]</a>  <span class="k">def</span> <span class="nf">test_wgan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test fitting a conditional WGAN.&quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">ExampleWGAN</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">WGAN</span><span class="p">):</span>
+
+      <span class="k">def</span> <span class="nf">get_noise_input_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+      <span class="k">def</span> <span class="nf">get_data_input_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+
+      <span class="k">def</span> <span class="nf">get_conditional_input_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+
+      <span class="k">def</span> <span class="nf">create_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noise_input</span><span class="p">,</span> <span class="n">conditional_inputs</span><span class="p">):</span>
+        <span class="n">gen_in</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Concat</span><span class="p">([</span><span class="n">noise_input</span><span class="p">]</span> <span class="o">+</span> <span class="n">conditional_inputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="n">gen_in</span><span class="p">)]</span>
+
+      <span class="k">def</span> <span class="nf">create_discriminator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_inputs</span><span class="p">,</span> <span class="n">conditional_inputs</span><span class="p">):</span>
+        <span class="n">discrim_in</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Concat</span><span class="p">(</span><span class="n">data_inputs</span> <span class="o">+</span> <span class="n">conditional_inputs</span><span class="p">)</span>
+        <span class="n">dense</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="n">discrim_in</span><span class="p">,</span> <span class="n">activation_fn</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="n">dense</span><span class="p">)</span>
+
+    <span class="c1"># We have to set the gradient penalty very small because the generator&#39;s</span>
+    <span class="c1"># output is only a single number, so the default penalty would constrain</span>
+    <span class="c1"># it far too much.</span>
+
+    <span class="n">gan</span> <span class="o">=</span> <span class="n">ExampleWGAN</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.003</span><span class="p">,</span> <span class="n">gradient_penalty</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">gan</span><span class="o">.</span><span class="n">fit_gan</span><span class="p">(</span>
+        <span class="n">generate_data</span><span class="p">(</span><span class="n">gan</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">generator_steps</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># See if it has done a plausible job of learning the distribution.</span>
+
+    <span class="n">means</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">predict_gan_generator</span><span class="p">(</span><span class="n">conditional_inputs</span><span class="o">=</span><span class="p">[</span><span class="n">means</span><span class="p">])</span>
+    <span class="n">deltas</span> <span class="o">=</span> <span class="n">values</span> <span class="o">-</span> <span class="n">means</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">deltas</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1.0</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">deltas</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

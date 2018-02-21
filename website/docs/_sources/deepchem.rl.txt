@@ -1,0 +1,45 @@
+deepchem.rl package
+===================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.rl.envs
+
+Submodules
+----------
+
+deepchem.rl.a3c module
+----------------------
+
+.. automodule:: deepchem.rl.a3c
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.rl.mcts module
+-----------------------
+
+.. automodule:: deepchem.rl.mcts
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.rl.ppo module
+----------------------
+
+.. automodule:: deepchem.rl.ppo
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.rl
+    :members:
+    :undoc-members:
+    :show-inheritance:

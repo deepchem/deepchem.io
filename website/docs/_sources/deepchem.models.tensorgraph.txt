@@ -1,0 +1,134 @@
+deepchem.models.tensorgraph package
+===================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.models.tensorgraph.models
+    deepchem.models.tensorgraph.tests
+
+Submodules
+----------
+
+deepchem.models.tensorgraph.IRV module
+--------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.IRV
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.activations module
+----------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.activations
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.fcnet module
+----------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.fcnet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.graph_layers module
+-----------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.graph_layers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.initializations module
+--------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.initializations
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.layers module
+-----------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.layers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.model_ops module
+--------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.model_ops
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.optimizers module
+---------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.optimizers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.progressive_multitask module
+--------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.progressive_multitask
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.regularizers module
+-----------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.regularizers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.robust_multitask module
+---------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.robust_multitask
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.sequential module
+---------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.sequential
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.symmetry_functions module
+-----------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.symmetry_functions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.tensor_graph module
+-----------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.tensor_graph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.tensorgraph
+    :members:
+    :undoc-members:
+    :show-inheritance:

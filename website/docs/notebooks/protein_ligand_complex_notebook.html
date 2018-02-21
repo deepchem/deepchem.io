@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Basic Protein-Ligand Affinity Models &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Basic Protein-Ligand Affinity Models</a></li>
+<li><a class="reference internal" href="#the-protein-ligand-complex-view">The protein-ligand complex view.</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="basic-protein-ligand-affinity-models">
+<h1>Basic Protein-Ligand Affinity Models<a class="headerlink" href="#basic-protein-ligand-affinity-models" title="Permalink to this headline">¶</a></h1>
+<p>#Tutorial: Use machine learning to model protein-ligand affinity.</p>
+<p>Written by Evan Feinberg and Bharath Ramsundar</p>
+<p>Copyright 2016, Stanford University</p>
+<p>This DeepChem tutorial demonstrates how to use mach.ine learning for
+modeling protein-ligand binding affinity</p>
+<p>Overview:</p>
+<p>In this tutorial, you will trace an arc from loading a raw dataset to
+fitting a cutting edge ML technique for predicting binding affinities.
+This will be accomplished by writing simple commands to access the
+deepchem Python API, encompassing the following broad steps:</p>
+<ol class="arabic simple">
+<li>Loading a chemical dataset, consisting of a series of protein-ligand
+complexes.</li>
+<li>Featurizing each protein-ligand complexes with various featurization
+schemes.</li>
+<li>Fitting a series of models with these featurized protein-ligand
+complexes.</li>
+<li>Visualizing the results.</li>
+</ol>
+<p>First, let’s point to a “dataset” file. This can come in the format of a
+CSV file or Pandas DataFrame. Regardless of file format, it must be
+columnar data, where each row is a molecular system, and each column
+represents a different piece of information about that system. For
+instance, in this example, every row reflects a protein-ligand complex,
+and the following columns are present: a unique complex identifier; the
+SMILES string of the ligand; the binding affinity (Ki) of the ligand to
+the protein in the complex; a Python <code class="docutils literal"><span class="pre">list</span></code> of all lines in a PDB file
+for the protein alone; and a Python <code class="docutils literal"><span class="pre">list</span></code> of all lines in a ligand
+file for the ligand alone.</p>
+<p>This should become clearer with the example. (Make sure to set
+<code class="docutils literal"><span class="pre">DISPLAY</span> <span class="pre">=</span> <span class="pre">True</span></code>)</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
+%pdb off
+# set DISPLAY = True when running tutorial
+DISPLAY = False
+# set PARALLELIZE to true if you want to use ipyparallel
+PARALLELIZE = False
+import warnings
+warnings.filterwarnings(&#39;ignore&#39;)
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Automatic pdb calling has been turned OFF
+</pre></div>
+</div>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils</span> <span class="kn">import</span> <span class="n">download_url</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">download_url</span><span class="p">(</span><span class="s2">&quot;https://s3-us-west-1.amazonaws.com/deepchem.io/datasets/pdbbind_core_df.csv.gz&quot;</span><span class="p">)</span>
+<span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_data_dir</span><span class="p">())</span>
+<span class="n">dataset_file</span><span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_data_dir</span><span class="p">(),</span> <span class="s2">&quot;pdbbind_core_df.csv.gz&quot;</span><span class="p">)</span>
+<span class="n">raw_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">save</span><span class="o">.</span><span class="n">load_from_disk</span><span class="p">(</span><span class="n">dataset_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s see what <code class="docutils literal"><span class="pre">dataset</span></code> looks like:</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Type of dataset is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">raw_dataset</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">raw_dataset</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Shape of dataset is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">raw_dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+Type of dataset is: &lt;class 'pandas.core.frame.DataFrame'&gt;
+  pdb_id                                             smiles  0   2d3u        CC1CCCCC1S(O)(O)NC1CC(C2CCC(CN)CC2)SC1C(O)O
+1   3cyx  CC(C)(C)NC(O)C1CC2CCCCC2C[NH+]1CC(O)C(CC1CCCCC...
+2   3uo4        OC(O)C1CCC(NC2NCCC(NC3CCCCC3C3CCCCC3)N2)CC1
+3   1p1q                         CC1ONC(O)C1CC([NH3+])C(O)O
+4   3ag9  NC(O)C(CCC[NH2+]C([NH3+])[NH3+])NC(O)C(CCC[NH2...
+
+                                          complex_id  0    2d3uCC1CCCCC1S(O)(O)NC1CC(C2CCC(CN)CC2)SC1C(O)O
+1  3cyxCC(C)(C)NC(O)C1CC2CCCCC2C[NH+]1CC(O)C(CC1C...
+2    3uo4OC(O)C1CCC(NC2NCCC(NC3CCCCC3C3CCCCC3)N2)CC1
+3                     1p1qCC1ONC(O)C1CC([NH3+])C(O)O
+4  3ag9NC(O)C(CCC[NH2+]C([NH3+])[NH3+])NC(O)C(CCC...
+
+                                         protein_pdb  0  ['HEADER    2D3U PROTEINn', 'COMPND    2D3U P...
+1  ['HEADER    3CYX PROTEINn', 'COMPND    3CYX P...
+2  ['HEADER    3UO4 PROTEINn', 'COMPND    3UO4 P...
+3  ['HEADER    1P1Q PROTEINn', 'COMPND    1P1Q P...
+4  ['HEADER    3AG9 PROTEINn', 'COMPND    3AG9 P...
+
+                                          ligand_pdb  0  ['COMPND    2d3u ligand n', 'AUTHOR    GENERA...
+1  ['COMPND    3cyx ligand n', 'AUTHOR    GENERA...
+2  ['COMPND    3uo4 ligand n', 'AUTHOR    GENERA...
+3  ['COMPND    1p1q ligand n', 'AUTHOR    GENERA...
+4  ['COMPND    3ag9 ligand n', 'AUTHOR    GENERA...
+
+                                         ligand_mol2  label
+0  ['### n', '### Created by X-TOOL on Thu Aug 2...   6.92
+1  ['### n', '### Created by X-TOOL on Thu Aug 2...   8.00
+2  ['### n', '### Created by X-TOOL on Fri Aug 2...   6.52
+3  ['### n', '### Created by X-TOOL on Thu Aug 2...   4.89
+4  ['### n', '### Created by X-TOOL on Thu Aug 2...   8.05
+Shape of dataset is: (193, 7)
+</pre>
+<p>One of the missions of <code class="docutils literal"><span class="pre">deepchem</span></code> is to form a synapse between the
+chemical and the algorithmic worlds: to be able to leverage the powerful
+and diverse array of tools available in Python to analyze molecules.
+This ethos applies to visual as much as quantitative examination:</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nglview</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">mdtraj</span> <span class="kn">as</span> <span class="nn">md</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">deepchem.utils.visualization</span>
+<span class="c1">#from deepchem.utils.visualization import combine_mdtraj, visualize_complex, convert_lines_to_mdtraj</span>
+
+<span class="k">def</span> <span class="nf">combine_mdtraj</span><span class="p">(</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">):</span>
+  <span class="n">chain</span> <span class="o">=</span> <span class="n">protein</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">add_chain</span><span class="p">()</span>
+  <span class="n">residue</span> <span class="o">=</span> <span class="n">protein</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">add_residue</span><span class="p">(</span><span class="s2">&quot;LIG&quot;</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">resSeq</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">ligand</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+      <span class="n">protein</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="p">,</span> <span class="n">residue</span><span class="p">)</span>
+  <span class="n">protein</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">protein</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span> <span class="n">ligand</span><span class="o">.</span><span class="n">xyz</span><span class="p">])</span>
+  <span class="n">protein</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">create_standard_bonds</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">protein</span>
+
+<span class="k">def</span> <span class="nf">visualize_complex</span><span class="p">(</span><span class="n">complex_mdtraj</span><span class="p">):</span>
+  <span class="n">ligand_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">complex_mdtraj</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="s2">&quot;LIG&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="p">)]</span>
+  <span class="n">binding_pocket_atoms</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">compute_neighbors</span><span class="p">(</span><span class="n">complex_mdtraj</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">ligand_atoms</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">binding_pocket_residues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">complex_mdtraj</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atom</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">resSeq</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">binding_pocket_atoms</span><span class="p">]))</span>
+  <span class="n">binding_pocket_residues</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">binding_pocket_residues</span><span class="p">]</span>
+  <span class="n">binding_pocket_residues</span> <span class="o">=</span> <span class="s2">&quot; or &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">binding_pocket_residues</span><span class="p">)</span>
+
+  <span class="n">traj</span> <span class="o">=</span> <span class="n">nglview</span><span class="o">.</span><span class="n">MDTrajTrajectory</span><span class="p">(</span> <span class="n">complex_mdtraj</span> <span class="p">)</span> <span class="c1"># load file from RCSB PDB</span>
+  <span class="n">ngltraj</span> <span class="o">=</span> <span class="n">nglview</span><span class="o">.</span><span class="n">NGLWidget</span><span class="p">(</span> <span class="n">traj</span> <span class="p">)</span>
+  <span class="n">ngltraj</span><span class="o">.</span><span class="n">representations</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cartoon&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;sele&quot;</span><span class="p">:</span> <span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;residueindex&quot;</span>
+  <span class="p">}</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;licorice&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;sele&quot;</span><span class="p">:</span> <span class="s2">&quot;(not hydrogen) and (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span>  <span class="n">binding_pocket_residues</span>
+  <span class="p">}</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;ball+stick&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;sele&quot;</span><span class="p">:</span> <span class="s2">&quot;LIG&quot;</span>
+  <span class="p">}</span> <span class="p">}</span>
+  <span class="p">]</span>
+  <span class="k">return</span> <span class="n">ngltraj</span>
+
+<span class="k">def</span> <span class="nf">visualize_ligand</span><span class="p">(</span><span class="n">ligand_mdtraj</span><span class="p">):</span>
+  <span class="n">traj</span> <span class="o">=</span> <span class="n">nglview</span><span class="o">.</span><span class="n">MDTrajTrajectory</span><span class="p">(</span> <span class="n">ligand_mdtraj</span> <span class="p">)</span> <span class="c1"># load file from RCSB PDB</span>
+  <span class="n">ngltraj</span> <span class="o">=</span> <span class="n">nglview</span><span class="o">.</span><span class="n">NGLWidget</span><span class="p">(</span> <span class="n">traj</span> <span class="p">)</span>
+  <span class="n">ngltraj</span><span class="o">.</span><span class="n">representations</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;ball+stick&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;sele&quot;</span><span class="p">:</span> <span class="s2">&quot;all&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">]</span>
+  <span class="k">return</span> <span class="n">ngltraj</span>
+
+<span class="k">def</span> <span class="nf">convert_lines_to_mdtraj</span><span class="p">(</span><span class="n">molecule_lines</span><span class="p">):</span>
+  <span class="n">molecule_lines</span> <span class="o">=</span> <span class="n">molecule_lines</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">)</span>
+  <span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+  <span class="n">molecule_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempdir</span><span class="p">,</span> <span class="s2">&quot;molecule.pdb&quot;</span><span class="p">)</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">molecule_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">molecule_lines</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+  <span class="n">molecule_mdtraj</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">molecule_file</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">molecule_mdtraj</span>
+
+<span class="n">first_protein</span><span class="p">,</span> <span class="n">first_ligand</span> <span class="o">=</span> <span class="n">raw_dataset</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;protein_pdb&quot;</span><span class="p">],</span> <span class="n">raw_dataset</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;ligand_pdb&quot;</span><span class="p">]</span>
+<span class="n">protein_mdtraj</span> <span class="o">=</span> <span class="n">convert_lines_to_mdtraj</span><span class="p">(</span><span class="n">first_protein</span><span class="p">)</span>
+<span class="n">ligand_mdtraj</span> <span class="o">=</span> <span class="n">convert_lines_to_mdtraj</span><span class="p">(</span><span class="n">first_ligand</span><span class="p">)</span>
+<span class="n">complex_mdtraj</span> <span class="o">=</span> <span class="n">combine_mdtraj</span><span class="p">(</span><span class="n">protein_mdtraj</span><span class="p">,</span> <span class="n">ligand_mdtraj</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">ngltraj</span> <span class="o">=</span> <span class="n">visualize_complex</span><span class="p">(</span><span class="n">complex_mdtraj</span><span class="p">)</span>
+<span class="n">ngltraj</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>A Jupyter Widget
+</pre></div>
+</div>
+<p>Now that we’re oriented, let’s use ML to do some chemistry.</p>
+<p>So, step (2) will entail featurizing the dataset.</p>
+<p>The available featurizations that come standard with deepchem are ECFP4
+fingerprints, RDKit descriptors, NNScore-style bdescriptors, and hybrid
+binding pocket descriptors. Details can be found on <code class="docutils literal"><span class="pre">deepchem.io</span></code>.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">grid_featurizer</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">feat</span><span class="o">.</span><span class="n">RdkitGridFeaturizer</span><span class="p">(</span>
+    <span class="n">voxel_width</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span> <span class="n">feature_types</span><span class="o">=</span><span class="s2">&quot;voxel_combined&quot;</span><span class="p">,</span>
+    <span class="n">voxel_feature_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ecfp&quot;</span><span class="p">,</span> <span class="s2">&quot;splif&quot;</span><span class="p">,</span> <span class="s2">&quot;hbond&quot;</span><span class="p">,</span> <span class="s2">&quot;pi_stack&quot;</span><span class="p">,</span> <span class="s2">&quot;cation_pi&quot;</span><span class="p">,</span> <span class="s2">&quot;salt_bridge&quot;</span><span class="p">],</span>
+    <span class="n">ecfp_power</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">splif_power</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">compound_featurizer</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">feat</span><span class="o">.</span><span class="n">CircularFingerprint</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note how we separate our featurizers into those that featurize
+individual chemical compounds, compound_featurizers, and those that
+featurize molecular complexes, complex_featurizers.</p>
+<p>Now, let’s perform the actual featurization. Calling
+<code class="docutils literal"><span class="pre">loader.featurize()</span></code> will return an instance of class <code class="docutils literal"><span class="pre">Dataset</span></code>.
+Internally, <code class="docutils literal"><span class="pre">loader.featurize()</span></code> (a) computes the specified features
+on the data, (b) transforms the inputs into <code class="docutils literal"><span class="pre">X</span></code> and <code class="docutils literal"><span class="pre">y</span></code> NumPy arrays
+suitable for ML algorithms, and (c) constructs a <code class="docutils literal"><span class="pre">Dataset()</span></code> instance
+that has useful methods, such as an iterator, over the featurized data.
+This is a little complicated, so we will use MoleculeNet to featurize
+the PDBBind core set for us.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">PDBBIND_tasks</span><span class="p">,</span> <span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">),</span> <span class="n">transformers</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pdbbind_grid</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Loading dataset from disk.
+TIMING: dataset construction took 0.020 s
+Loading dataset from disk.
+TIMING: dataset construction took 0.008 s
+Loading dataset from disk.
+TIMING: dataset construction took 0.008 s
+Loading dataset from disk.
+</pre></div>
+</div>
+<p>Now, we conduct a train-test split. If you’d like, you can choose
+<code class="docutils literal"><span class="pre">splittype=&quot;scaffold&quot;</span></code> instead to perform a train-test split based on
+Bemis-Murcko scaffolds.</p>
+<p>We generate separate instances of the Dataset() object to hermetically
+seal the train dataset from the test dataset. This style lends itself
+easily to validation-set type hyperparameter searches, which we will
+illustate in a separate section of this tutorial.</p>
+<p>The performance of many ML algorithms hinges greatly on careful data
+preprocessing. Deepchem comes standard with a few options for such
+preprocessing.</p>
+<p>Now, we’re ready to do some learning!</p>
+<p>To fit a deepchem model, first we instantiate one of the provided (or
+user-written) model classes. In this case, we have a created a
+convenience class to wrap around any ML model available in Sci-Kit Learn
+that can in turn be used to interoperate with deepchem. To instantiate
+an <code class="docutils literal"><span class="pre">SklearnModel</span></code>, you will need (a) task_types, (b) model_params,
+another <code class="docutils literal"><span class="pre">dict</span></code> as illustrated below, and (c) a <code class="docutils literal"><span class="pre">model_instance</span></code>
+defining the type of model you would like to fit, in this case a
+<code class="docutils literal"><span class="pre">RandomForestRegressor</span></code>.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+
+<span class="n">sklearn_model</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">SklearnModel</span><span class="p">(</span><span class="n">sklearn_model</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deepchem.utils.evaluate</span> <span class="kn">import</span> <span class="n">Evaluator</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">metric</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Metric</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">r2_score</span><span class="p">)</span>
+
+<span class="n">evaluator</span> <span class="o">=</span> <span class="n">Evaluator</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+<span class="n">train_r2score</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">compute_model_performance</span><span class="p">([</span><span class="n">metric</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;RF Train set R^2 </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_r2score</span><span class="p">[</span><span class="s2">&quot;r2_score&quot;</span><span class="p">]))</span>
+
+<span class="n">evaluator</span> <span class="o">=</span> <span class="n">Evaluator</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+<span class="n">valid_r2score</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">compute_model_performance</span><span class="p">([</span><span class="n">metric</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;RF Valid set R^2 </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">valid_r2score</span><span class="p">[</span><span class="s2">&quot;r2_score&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>computed_metrics: [0.88553937155927021]
+RF Train set R^2 0.885539
+computed_metrics: [0.31742980243495422]
+RF Valid set R^2 0.317430
+</pre></div>
+</div>
+<p>In this simple example, in few yet intuitive lines of code, we traced
+the machine learning arc from featurizing a raw dataset to fitting and
+evaluating a model.</p>
+<p>Here, we featurized only the ligand. The signal we observed in R^2
+reflects the ability of circular fingerprints and random forests to
+learn general features that make ligands “drug-like.”</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>[ 5.2497  5.0708  6.2361  7.1606  5.1387  6.6723  6.7259  6.2996  6.5986
+  5.5831  6.7202  6.6823  6.4065  6.1988  6.8872  6.0689  6.7044  7.2988
+  6.6718  6.7882]
+</pre></div>
+</div>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="c1"># TODO(rbharath): This cell visualizes the ligand with highest predicted activity. Commenting it out for now. Fix this later</span>
+<span class="c1">#from deepchem.utils.visualization import visualize_ligand</span>
+
+<span class="c1">#top_ligand = predictions.iloc[0][&#39;ids&#39;]</span>
+<span class="c1">#ligand1 = convert_lines_to_mdtraj(dataset.loc[dataset[&#39;complex_id&#39;]==top_ligand][&#39;ligand_pdb&#39;].values[0])</span>
+<span class="c1">#if DISPLAY:</span>
+<span class="c1">#    ngltraj = visualize_ligand(ligand1)</span>
+<span class="c1">#    ngltraj</span>
+</pre></div>
+</div>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="c1"># TODO(rbharath): This cell visualizes the ligand with lowest predicted activity. Commenting it out for now. Fix this later</span>
+<span class="c1">#worst_ligand = predictions.iloc[predictions.shape[0]-2][&#39;ids&#39;]</span>
+<span class="c1">#ligand1 = convert_lines_to_mdtraj(dataset.loc[dataset[&#39;complex_id&#39;]==worst_ligand][&#39;ligand_pdb&#39;].values[0])</span>
+<span class="c1">#if DISPLAY:</span>
+<span class="c1">#    ngltraj = visualize_ligand(ligand1)</span>
+<span class="c1">#    ngltraj</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-protein-ligand-complex-view">
+<h1>The protein-ligand complex view.<a class="headerlink" href="#the-protein-ligand-complex-view" title="Permalink to this headline">¶</a></h1>
+<p>The preceding simple example, in few yet intuitive lines of code, traces
+the machine learning arc from featurizing a raw dataset to fitting and
+evaluating a model.</p>
+<p>In this next section, we illustrate <code class="docutils literal"><span class="pre">deepchem</span></code>’s modularity, and
+thereby the ease with which one can explore different featurization
+schemes, different models, and combinations thereof, to achieve the best
+performance on a given dataset. We will demonstrate this by examining
+protein-ligand interactions.</p>
+<p>In the previous section, we featurized only the ligand. The signal we
+observed in R^2 reflects the ability of grid fingerprints and random
+forests to learn general features that make ligands “drug-like.” In this
+section, we demonstrate how to use hyperparameter searching to find a
+higher scoring ligands.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rf_model_builder</span><span class="p">(</span><span class="n">model_params</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">):</span>
+  <span class="n">sklearn_model</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">SklearnModel</span><span class="p">(</span><span class="n">sklearn_model</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">)</span>
+
+<span class="n">params_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+    <span class="s2">&quot;max_features&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;sqrt&quot;</span><span class="p">,</span> <span class="s2">&quot;log2&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">metric</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Metric</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">r2_score</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">hyper</span><span class="o">.</span><span class="n">HyperparamOpt</span><span class="p">(</span><span class="n">rf_model_builder</span><span class="p">)</span>
+<span class="n">best_rf</span><span class="p">,</span> <span class="n">best_rf_hyperparams</span><span class="p">,</span> <span class="n">all_rf_results</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">hyperparam_search</span><span class="p">(</span>
+    <span class="n">params_dict</span><span class="p">,</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Fitting model 1/12
+hyperparameters: {&#39;n_estimators&#39;: 10, &#39;max_features&#39;: &#39;auto&#39;}
+computed_metrics: [0.25804004860413576]
+Model 1/12, Metric r2_score, Validation set 0: 0.258040
+    best_validation_score so far: 0.258040
+Fitting model 2/12
+hyperparameters: {&#39;n_estimators&#39;: 10, &#39;max_features&#39;: &#39;sqrt&#39;}
+computed_metrics: [0.31894454238841463]
+Model 2/12, Metric r2_score, Validation set 1: 0.318945
+    best_validation_score so far: 0.318945
+Fitting model 3/12
+hyperparameters: {&#39;n_estimators&#39;: 10, &#39;max_features&#39;: &#39;log2&#39;}
+computed_metrics: [0.40151233479373227]
+Model 3/12, Metric r2_score, Validation set 2: 0.401512
+    best_validation_score so far: 0.401512
+Fitting model 4/12
+hyperparameters: {&#39;n_estimators&#39;: 10, &#39;max_features&#39;: None}
+computed_metrics: [0.2379004574282495]
+Model 4/12, Metric r2_score, Validation set 3: 0.237900
+    best_validation_score so far: 0.401512
+Fitting model 5/12
+hyperparameters: {&#39;n_estimators&#39;: 50, &#39;max_features&#39;: &#39;auto&#39;}
+computed_metrics: [0.31407341153260904]
+Model 5/12, Metric r2_score, Validation set 4: 0.314073
+    best_validation_score so far: 0.401512
+Fitting model 6/12
+hyperparameters: {&#39;n_estimators&#39;: 50, &#39;max_features&#39;: &#39;sqrt&#39;}
+computed_metrics: [0.30561076245035912]
+Model 6/12, Metric r2_score, Validation set 5: 0.305611
+    best_validation_score so far: 0.401512
+Fitting model 7/12
+hyperparameters: {&#39;n_estimators&#39;: 50, &#39;max_features&#39;: &#39;log2&#39;}
+computed_metrics: [0.15265818454692826]
+Model 7/12, Metric r2_score, Validation set 6: 0.152658
+    best_validation_score so far: 0.401512
+Fitting model 8/12
+hyperparameters: {&#39;n_estimators&#39;: 50, &#39;max_features&#39;: None}
+computed_metrics: [0.3023042218537606]
+Model 8/12, Metric r2_score, Validation set 7: 0.302304
+    best_validation_score so far: 0.401512
+Fitting model 9/12
+hyperparameters: {&#39;n_estimators&#39;: 100, &#39;max_features&#39;: &#39;auto&#39;}
+computed_metrics: [0.33459631598792483]
+Model 9/12, Metric r2_score, Validation set 8: 0.334596
+    best_validation_score so far: 0.401512
+Fitting model 10/12
+hyperparameters: {&#39;n_estimators&#39;: 100, &#39;max_features&#39;: &#39;sqrt&#39;}
+computed_metrics: [0.31318915098968536]
+Model 10/12, Metric r2_score, Validation set 9: 0.313189
+    best_validation_score so far: 0.401512
+Fitting model 11/12
+hyperparameters: {&#39;n_estimators&#39;: 100, &#39;max_features&#39;: &#39;log2&#39;}
+computed_metrics: [0.21173765911803388]
+Model 11/12, Metric r2_score, Validation set 10: 0.211738
+    best_validation_score so far: 0.401512
+Fitting model 12/12
+hyperparameters: {&#39;n_estimators&#39;: 100, &#39;max_features&#39;: None}
+computed_metrics: [0.35420481043072938]
+Model 12/12, Metric r2_score, Validation set 11: 0.354205
+    best_validation_score so far: 0.401512
+computed_metrics: [0.83300249084895006]
+Best hyperparameters: (10, &#39;log2&#39;)
+train_score: 0.833002
+validation_score: 0.401512
+</pre></div>
+</div>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span>%matplotlib inline
+
+import matplotlib
+import numpy as np
+import matplotlib.pyplot as plt
+
+rf_predicted_test = best_rf.predict(test_dataset)
+rf_true_test = test_dataset.y
+plt.scatter(rf_predicted_test, rf_true_test)
+plt.xlabel(&#39;Predicted pIC50s&#39;)
+plt.ylabel(&#39;True IC50&#39;)
+plt.title(r&#39;RF predicted IC50 vs. True pIC50&#39;)
+plt.xlim([2, 11])
+plt.ylim([2, 11])
+plt.plot([2, 11], [2, 11], color=&#39;k&#39;)
+plt.show()
+</pre></div>
+</div>
+<img alt="../_images/protein_ligand_complex_notebook_29_0.png" src="../_images/protein_ligand_complex_notebook_29_0.png" />
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/notebooks/protein_ligand_complex_notebook.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

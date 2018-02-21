@@ -1,0 +1,70 @@
+deepchem.models.tests package
+=============================
+
+Submodules
+----------
+
+deepchem.models.tests.test_api module
+-------------------------------------
+
+.. automodule:: deepchem.models.tests.test_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tests.test_generalize module
+--------------------------------------------
+
+.. automodule:: deepchem.models.tests.test_generalize
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tests.test_multitask module
+-------------------------------------------
+
+.. automodule:: deepchem.models.tests.test_multitask
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tests.test_overfit module
+-----------------------------------------
+
+.. automodule:: deepchem.models.tests.test_overfit
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tests.test_predict module
+-----------------------------------------
+
+.. automodule:: deepchem.models.tests.test_predict
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tests.test_reload module
+----------------------------------------
+
+.. automodule:: deepchem.models.tests.test_reload
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tests.test_singletask_to_multitask module
+---------------------------------------------------------
+
+.. automodule:: deepchem.models.tests.test_singletask_to_multitask
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

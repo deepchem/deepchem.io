@@ -1,0 +1,214 @@
+deepchem\.molnet\.load\_function package
+========================================
+
+Submodules
+----------
+
+deepchem\.molnet\.load\_function\.bace\_datasets module
+-------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.bace_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.bace\_features module
+-------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.bace_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.bbbp\_datasets module
+-------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.bbbp_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.chembl\_datasets module
+---------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.chembl_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.chembl\_tasks module
+------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.chembl_tasks
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.clearance\_datasets module
+------------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.clearance_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.clintox\_datasets module
+----------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.clintox_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.delaney\_datasets module
+----------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.delaney_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.hiv\_datasets module
+------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.hiv_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.hopv\_datasets module
+-------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.hopv_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.kaggle\_datasets module
+---------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.kaggle_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.kaggle\_features module
+---------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.kaggle_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.lipo\_datasets module
+-------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.lipo_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.muv\_datasets module
+------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.muv_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.nci\_datasets module
+------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.nci_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.pcba\_datasets module
+-------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.pcba_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.pdbbind\_datasets module
+----------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.pdbbind_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.ppb\_datasets module
+------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.ppb_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.qm7\_datasets module
+------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.qm7_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.qm8\_datasets module
+------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.qm8_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.qm9\_datasets module
+------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.qm9_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.sampl\_datasets module
+--------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.sampl_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.sider\_datasets module
+--------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.sider_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.tox21\_datasets module
+--------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.tox21_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.molnet\.load\_function\.toxcast\_datasets module
+----------------------------------------------------------
+
+.. automodule:: deepchem.molnet.load_function.toxcast_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.molnet.load_function
+    :members:
+    :undoc-members:
+    :show-inheritance:

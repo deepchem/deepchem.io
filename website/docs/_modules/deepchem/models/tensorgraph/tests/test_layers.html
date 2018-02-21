@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tensorgraph.tests.test_layers &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html"><span><img src="../../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tensorgraph.tests.test_layers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">rdkit</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">test_util</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.feat.graph_features</span> <span class="kn">import</span> <span class="n">ConvMolFeaturizer</span>
+<span class="kn">from</span> <span class="nn">deepchem.feat.mol_graphs</span> <span class="kn">import</span> <span class="n">ConvMol</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Add</span><span class="p">,</span> <span class="n">MaxPool2D</span><span class="p">,</span> <span class="n">MaxPool3D</span><span class="p">,</span> <span class="n">GraphCNN</span><span class="p">,</span> <span class="n">GraphEmbedPoolLayer</span><span class="p">,</span> <span class="n">Cast</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">AlphaShareLayer</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">AttnLSTMEmbedding</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">BatchNorm</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">BetaShare</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">CombineMeanStd</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Concat</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Conv1D</span><span class="p">,</span> <span class="n">Squeeze</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Conv2D</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Conv2DTranspose</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Conv3D</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Conv3DTranspose</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Exp</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Flatten</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">GRU</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Gather</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">GraphConv</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">GraphGather</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Input</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">InputFifoQueue</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">InteratomicL2Distances</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">IterRefLSTMEmbedding</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">L2Loss</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">LSTM</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">LSTMStep</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Log</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Multiply</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReduceMean</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReduceSquareDifference</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReduceSum</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReLU</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Repeat</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Reshape</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">SluiceLoss</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Sigmoid</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">SigmoidCrossEntropy</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">SoftMax</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">SoftMaxCrossEntropy</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">StopGradient</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">TensorWrapper</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">TimeSeriesDense</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ToFloat</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Transpose</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">VinaFreeEnergy</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">WeightedError</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">WeightedLinearCombo</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.IRV</span> <span class="kn">import</span> <span class="n">IRVLayer</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.IRV</span> <span class="kn">import</span> <span class="n">IRVRegularize</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.IRV</span> <span class="kn">import</span> <span class="n">Slice</span>
+
+
+<div class="viewcode-block" id="TestLayers"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers">[docs]</a><span class="k">class</span> <span class="nc">TestLayers</span><span class="p">(</span><span class="n">test_util</span><span class="o">.</span><span class="n">TensorFlowTestCase</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Test that layers function as intended.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestLayers.test_conv_1D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_conv_1D">[docs]</a>  <span class="k">def</span> <span class="nf">test_conv_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Conv1D can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">filters</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">kernel_size</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">filters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_dense"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_dense">[docs]</a>  <span class="k">def</span> <span class="nf">test_dense</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Dense can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">in_dim</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">out_dim</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">out_dim</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_flatten"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_flatten">[docs]</a>  <span class="k">def</span> <span class="nf">test_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Flatten can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">in_dim_1</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">in_dim_2</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">out_dim</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">in_dim_1</span><span class="p">,</span> <span class="n">in_dim_2</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_reshape"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_reshape">[docs]</a>  <span class="k">def</span> <span class="nf">test_reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Reshape can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">in_dim_1</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">in_dim_2</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">out_dim</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">in_dim_1</span><span class="p">,</span> <span class="n">in_dim_2</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Reshape</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">))(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_transpose"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_transpose">[docs]</a>  <span class="k">def</span> <span class="nf">test_transpose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Transpose can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">in_dim_1</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">in_dim_2</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">in_dim_1</span><span class="p">,</span> <span class="n">in_dim_2</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Transpose</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">in_dim_2</span><span class="p">,</span> <span class="n">in_dim_1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_combine_mean_std"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_combine_mean_std">[docs]</a>  <span class="k">def</span> <span class="nf">test_combine_mean_std</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Transpose can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">mean_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+    <span class="n">std_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">mean_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">mean_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">std_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">std_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">CombineMeanStd</span><span class="p">()(</span><span class="n">mean_tensor</span><span class="p">,</span> <span class="n">std_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">dim</span><span class="p">,)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_repeat"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_repeat">[docs]</a>  <span class="k">def</span> <span class="nf">test_repeat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Repeat can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">in_dim</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_repeat</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Repeat</span><span class="p">(</span><span class="n">n_repeat</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_gather"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_gather">[docs]</a>  <span class="k">def</span> <span class="nf">test_gather</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Gather can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Gather</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="p">[[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">]])(</span><span class="n">in_tensor</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">([</span><span class="n">in_tensor</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">in_tensor</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span> <span class="n">out_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Gather</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]))</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">([</span><span class="n">in_tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">in_tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]],</span> <span class="n">out_tensor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_gru"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_gru">[docs]</a>  <span class="k">def</span> <span class="nf">test_gru</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that GRU can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_hidden</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">n_repeat</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">n_steps</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">GRU</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_lstm"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_lstm">[docs]</a>  <span class="k">def</span> <span class="nf">test_lstm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that LSTM can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_hidden</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">n_repeat</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">n_steps</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">LSTM</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_time_series_dense"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_time_series_dense">[docs]</a>  <span class="k">def</span> <span class="nf">test_time_series_dense</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that TimeSeriesDense can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_hidden</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">out_channels</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_repeat</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">n_steps</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">TimeSeriesDense</span><span class="p">(</span><span class="n">out_channels</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_input"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_input">[docs]</a>  <span class="k">def</span> <span class="nf">test_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Input can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">in_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">in_shape</span><span class="p">)()</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_l2_loss"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_l2_loss">[docs]</a>  <span class="k">def</span> <span class="nf">test_l2_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that L2Loss can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">guess_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="n">label_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">guess_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">guess_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">label_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">label_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">L2Loss</span><span class="p">()(</span><span class="n">guess_tensor</span><span class="p">,</span> <span class="n">label_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_relu"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_relu">[docs]</a>  <span class="k">def</span> <span class="nf">test_relu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Sigmoid can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">ReLU</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_sigmoid"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_sigmoid">[docs]</a>  <span class="k">def</span> <span class="nf">test_sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Sigmoid can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Sigmoid</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_softmax"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_softmax">[docs]</a>  <span class="k">def</span> <span class="nf">test_softmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Softmax can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">SoftMax</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_concat"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_concat">[docs]</a>  <span class="k">def</span> <span class="nf">test_concat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Concat can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="n">in_tensor_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor_1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">in_tensor_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor_2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Concat</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">in_tensor_1</span><span class="p">,</span> <span class="n">in_tensor_2</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_constant"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_constant">[docs]</a>  <span class="k">def</span> <span class="nf">test_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Constant can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">value</span><span class="p">)()</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_variable"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_variable">[docs]</a>  <span class="k">def</span> <span class="nf">test_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Variable can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">value</span><span class="p">)()</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_stop_gradient"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_stop_gradient">[docs]</a>  <span class="k">def</span> <span class="nf">test_stop_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that StopGradient can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">StopGradient</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">in_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">(),</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_add"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_add">[docs]</a>  <span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Add can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">value1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">value2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">value3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Add</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value1</span><span class="p">),</span>
+                                          <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value2</span><span class="p">),</span>
+                                          <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value3</span><span class="p">))</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">value1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">value2</span> <span class="o">+</span> <span class="n">value3</span><span class="p">,</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_multiply"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_multiply">[docs]</a>  <span class="k">def</span> <span class="nf">test_multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Multiply can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">value1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">value2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">value3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Multiply</span><span class="p">()(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value1</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value2</span><span class="p">),</span>
+                              <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value3</span><span class="p">))</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">value1</span> <span class="o">*</span> <span class="n">value2</span> <span class="o">*</span> <span class="n">value3</span><span class="p">,</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_log"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_log">[docs]</a>  <span class="k">def</span> <span class="nf">test_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Log can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">Log</span><span class="p">()(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">result</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_exp"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_exp">[docs]</a>  <span class="k">def</span> <span class="nf">test_exp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Exp can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">Exp</span><span class="p">()(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_interatomic_distances"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_interatomic_distances">[docs]</a>  <span class="k">def</span> <span class="nf">test_interatomic_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that the interatomic distance calculation works.&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N_atoms</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">))</span>
+
+      <span class="n">coords_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+      <span class="n">nbr_list_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">nbr_list</span><span class="p">)</span>
+
+      <span class="n">dist_tensor</span> <span class="o">=</span> <span class="n">InteratomicL2Distances</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span>
+                                           <span class="n">ndim</span><span class="p">)(</span><span class="n">coords_tensor</span><span class="p">,</span> <span class="n">nbr_list_tensor</span><span class="p">)</span>
+
+      <span class="n">dists</span> <span class="o">=</span> <span class="n">dist_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">dists</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_sigmoid_cross_entropy"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_sigmoid_cross_entropy">[docs]</a>  <span class="k">def</span> <span class="nf">test_sigmoid_cross_entropy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that SigmoidCrossEntropy can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">logit_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="n">label_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">))</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">logit_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">logit_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">label_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">label_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">SigmoidCrossEntropy</span><span class="p">()(</span><span class="n">label_tensor</span><span class="p">,</span> <span class="n">logit_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_softmax_cross_entropy"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_softmax_cross_entropy">[docs]</a>  <span class="k">def</span> <span class="nf">test_softmax_cross_entropy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that SoftMaxCrossEntropy can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">logit_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="n">label_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">logit_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">logit_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">label_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">label_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">SoftMaxCrossEntropy</span><span class="p">()(</span><span class="n">logit_tensor</span><span class="p">,</span> <span class="n">label_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_reduce_mean"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_reduce_mean">[docs]</a>  <span class="k">def</span> <span class="nf">test_reduce_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that ReduceMean can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">ReduceMean</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_to_float"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_to_float">[docs]</a>  <span class="k">def</span> <span class="nf">test_to_float</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that ToFloat can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">ToFloat</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_reduce_sum"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_reduce_sum">[docs]</a>  <span class="k">def</span> <span class="nf">test_reduce_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that ReduceSum can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">ReduceSum</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_reduce_square_difference"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_reduce_square_difference">[docs]</a>  <span class="k">def</span> <span class="nf">test_reduce_square_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that ReduceSquareDifference can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="n">in_tensor_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor_1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">in_tensor_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor_2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">ReduceSquareDifference</span><span class="p">()(</span><span class="n">in_tensor_1</span><span class="p">,</span> <span class="n">in_tensor_2</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_conv_2D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_conv_2D">[docs]</a>  <span class="k">def</span> <span class="nf">test_conv_2D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Conv2D can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">out_channels</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Conv2D</span><span class="p">(</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_conv_3D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_conv_3D">[docs]</a>  <span class="k">def</span> <span class="nf">test_conv_3D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Conv3D can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">out_channels</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Conv3D</span><span class="p">(</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span>
+                                  <span class="n">out_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_conv_2D_transpose"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_conv_2D_transpose">[docs]</a>  <span class="k">def</span> <span class="nf">test_conv_2D_transpose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Conv2DTranspose can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">out_channels</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Conv2DTranspose</span><span class="p">(</span>
+          <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span>
+                                  <span class="n">out_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_conv_3D_transpose"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_conv_3D_transpose">[docs]</a>  <span class="k">def</span> <span class="nf">test_conv_3D_transpose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Conv3DTranspose can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">out_channels</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Conv3DTranspose</span><span class="p">(</span>
+          <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">))(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span>
+                                  <span class="n">out_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_maxpool2D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_maxpool2D">[docs]</a>  <span class="k">def</span> <span class="nf">test_maxpool2D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that MaxPool2D can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">MaxPool2D</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_max_pool_3D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_max_pool_3D">[docs]</a>  <span class="k">def</span> <span class="nf">test_max_pool_3D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that MaxPool3D can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">MaxPool3D</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_input_fifo_queue"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_input_fifo_queue">[docs]</a>  <span class="k">def</span> <span class="nf">test_input_fifo_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test InputFifoQueue can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="n">tf</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">TensorWrapper</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;input&quot;</span><span class="p">)</span>
+      <span class="n">InputFifoQueue</span><span class="p">([(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)],</span> <span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">])(</span><span class="n">in_tensor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_graph_conv"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_graph_conv">[docs]</a>  <span class="k">def</span> <span class="nf">test_graph_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that GraphConv can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">out_channels</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">n_atoms</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># In CCC and C, there are 4 atoms</span>
+    <span class="n">raw_smiles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CCC&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">]</span>
+    <span class="n">mols</span> <span class="o">=</span> <span class="p">[</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">raw_smiles</span><span class="p">]</span>
+    <span class="n">featurizer</span> <span class="o">=</span> <span class="n">ConvMolFeaturizer</span><span class="p">()</span>
+    <span class="n">mols</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span>
+    <span class="n">multi_mol</span> <span class="o">=</span> <span class="n">ConvMol</span><span class="o">.</span><span class="n">agglomerate_mols</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">multi_mol</span><span class="o">.</span><span class="n">get_atom_features</span><span class="p">()</span>
+    <span class="n">degree_slice</span> <span class="o">=</span> <span class="n">multi_mol</span><span class="o">.</span><span class="n">deg_slice</span>
+    <span class="n">membership</span> <span class="o">=</span> <span class="n">multi_mol</span><span class="o">.</span><span class="n">membership</span>
+    <span class="n">deg_adjs</span> <span class="o">=</span> <span class="n">multi_mol</span><span class="o">.</span><span class="n">get_deg_adjacency_lists</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">atom_features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">degree_slice</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">degree_slice</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+      <span class="n">membership</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">membership</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+      <span class="n">deg_adjs_tf</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">deg_adj</span> <span class="ow">in</span> <span class="n">deg_adjs</span><span class="p">:</span>
+        <span class="n">deg_adjs_tf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">deg_adj</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">))</span>
+      <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">degree_slice</span><span class="p">,</span> <span class="n">membership</span><span class="p">]</span> <span class="o">+</span> <span class="n">deg_adjs_tf</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">GraphConv</span><span class="p">(</span><span class="n">out_channels</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_lstm_step"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_lstm_step">[docs]</a>  <span class="k">def</span> <span class="nf">test_lstm_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that LSTMStep computation works properly.&quot;&quot;&quot;</span>
+    <span class="n">max_depth</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_test</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_feat</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="n">state_zero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="n">state_one</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">state_zero</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">state_zero</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">state_one</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">state_one</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+      <span class="n">lstm</span> <span class="o">=</span> <span class="n">LSTMStep</span><span class="p">(</span><span class="n">n_feat</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_feat</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">lstm</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">state_zero</span><span class="p">,</span> <span class="n">state_one</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">h_out</span><span class="p">,</span> <span class="n">h_copy_out</span><span class="p">,</span> <span class="n">c_out</span> <span class="o">=</span> <span class="p">(</span><span class="n">out_tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">(),</span> <span class="n">out_tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">(),</span>
+                                  <span class="n">out_tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span>
+      <span class="k">assert</span> <span class="n">h_out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">h_copy_out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">c_out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_attn_lstm_embedding"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_attn_lstm_embedding">[docs]</a>  <span class="k">def</span> <span class="nf">test_attn_lstm_embedding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that attention LSTM computation works properly.&quot;&quot;&quot;</span>
+    <span class="n">max_depth</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_test</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_support</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">n_feat</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="n">test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="n">support</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_support</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">test</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">support</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+      <span class="n">attn_embedding_layer</span> <span class="o">=</span> <span class="n">AttnLSTMEmbedding</span><span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_support</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">,</span>
+                                               <span class="n">max_depth</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">attn_embedding_layer</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">support</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">test_out</span><span class="p">,</span> <span class="n">support_out</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">(),</span> <span class="n">out_tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">test_out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">support_out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_support</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_iter_ref_lstm_embedding"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_iter_ref_lstm_embedding">[docs]</a>  <span class="k">def</span> <span class="nf">test_iter_ref_lstm_embedding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that IterRef LSTM computation works properly.&quot;&quot;&quot;</span>
+    <span class="n">max_depth</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_test</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_support</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">n_feat</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="n">test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="n">support</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_support</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">test</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">support</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+      <span class="n">iter_ref_embedding_layer</span> <span class="o">=</span> <span class="n">IterRefLSTMEmbedding</span><span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_support</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">,</span>
+                                                      <span class="n">max_depth</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">iter_ref_embedding_layer</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">support</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">test_out</span><span class="p">,</span> <span class="n">support_out</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">(),</span> <span class="n">out_tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">test_out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">support_out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_support</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span></div>
+
+  <span class="c1"># TODO(rbharath): This test should pass. Fix it!</span>
+  <span class="c1"># def test_graph_pool(self):</span>
+  <span class="c1">#  &quot;&quot;&quot;Test that GraphPool can be invoked.&quot;&quot;&quot;</span>
+  <span class="c1">#  out_channels = 2</span>
+  <span class="c1">#  n_atoms = 4 # In CCC and C, there are 4 atoms</span>
+  <span class="c1">#  raw_smiles = [&#39;CCC&#39;, &#39;C&#39;]</span>
+  <span class="c1">#  mols = [rdkit.Chem.MolFromSmiles(s) for s in raw_smiles]</span>
+  <span class="c1">#  featurizer = ConvMolFeaturizer()</span>
+  <span class="c1">#  mols = featurizer.featurize(mols)</span>
+  <span class="c1">#  multi_mol = ConvMol.agglomerate_mols(mols)</span>
+  <span class="c1">#  atom_features = multi_mol.get_atom_features()</span>
+  <span class="c1">#  degree_slice = multi_mol.deg_slice</span>
+  <span class="c1">#  membership = multi_mol.membership</span>
+  <span class="c1">#  deg_adjs = multi_mol.get_deg_adjacency_lists()[1:]</span>
+
+  <span class="c1">#  with self.test_session() as sess:</span>
+  <span class="c1">#    atom_features = tf.convert_to_tensor(atom_features, dtype=tf.float32)</span>
+  <span class="c1">#    degree_slice = tf.convert_to_tensor(degree_slice, dtype=tf.int32)</span>
+  <span class="c1">#    membership = tf.convert_to_tensor(membership, dtype=tf.int32)</span>
+  <span class="c1">#    deg_adjs_tf = []</span>
+  <span class="c1">#    for deg_adj in deg_adjs:</span>
+  <span class="c1">#      deg_adjs_tf.append(tf.convert_to_tensor(deg_adj, dtype=tf.int32))</span>
+  <span class="c1">#    args = [atom_features, degree_slice, membership] + deg_adjs_tf</span>
+  <span class="c1">#    out_tensor = GraphPool(out_channels)(*args)</span>
+  <span class="c1">#    sess.run(tf.global_variables_initializer())</span>
+  <span class="c1">#    out_tensor = out_tensor.eval()</span>
+  <span class="c1">#    assert out_tensor.shape == (n_atoms, out_channels)</span>
+
+<div class="viewcode-block" id="TestLayers.test_graph_gather"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_graph_gather">[docs]</a>  <span class="k">def</span> <span class="nf">test_graph_gather</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that GraphGather can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">75</span>
+    <span class="n">n_atoms</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># In CCC and C, there are 4 atoms</span>
+    <span class="n">raw_smiles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CCC&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">]</span>
+    <span class="n">mols</span> <span class="o">=</span> <span class="p">[</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">raw_smiles</span><span class="p">]</span>
+    <span class="n">featurizer</span> <span class="o">=</span> <span class="n">ConvMolFeaturizer</span><span class="p">()</span>
+    <span class="n">mols</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span>
+    <span class="n">multi_mol</span> <span class="o">=</span> <span class="n">ConvMol</span><span class="o">.</span><span class="n">agglomerate_mols</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">multi_mol</span><span class="o">.</span><span class="n">get_atom_features</span><span class="p">()</span>
+    <span class="n">degree_slice</span> <span class="o">=</span> <span class="n">multi_mol</span><span class="o">.</span><span class="n">deg_slice</span>
+    <span class="n">membership</span> <span class="o">=</span> <span class="n">multi_mol</span><span class="o">.</span><span class="n">membership</span>
+    <span class="n">deg_adjs</span> <span class="o">=</span> <span class="n">multi_mol</span><span class="o">.</span><span class="n">get_deg_adjacency_lists</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">atom_features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">degree_slice</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">degree_slice</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+      <span class="n">membership</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">membership</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+      <span class="n">deg_adjs_tf</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">deg_adj</span> <span class="ow">in</span> <span class="n">deg_adjs</span><span class="p">:</span>
+        <span class="n">deg_adjs_tf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">deg_adj</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">))</span>
+      <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">degree_slice</span><span class="p">,</span> <span class="n">membership</span><span class="p">]</span> <span class="o">+</span> <span class="n">deg_adjs_tf</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">GraphGather</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="c1"># TODO(rbharath): Why is it 2*n_features instead of n_features?</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_batch_norm"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_batch_norm">[docs]</a>  <span class="k">def</span> <span class="nf">test_batch_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that BatchNorm can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">BatchNorm</span><span class="p">()(</span><span class="n">in_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_weighted_error"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_weighted_error">[docs]</a>  <span class="k">def</span> <span class="nf">test_weighted_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that WeightedError can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">guess_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="n">label_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">guess_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">guess_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">label_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">label_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">WeightedError</span><span class="p">()(</span><span class="n">guess_tensor</span><span class="p">,</span> <span class="n">label_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_vina_free_energy"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_vina_free_energy">[docs]</a>  <span class="k">def</span> <span class="nf">test_vina_free_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that VinaFreeEnergy can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">n_atoms</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">m_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">X_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span>
+    <span class="n">Z_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">n_atoms</span><span class="p">))</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">X_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">X_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">Z_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">Z_tensor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">VinaFreeEnergy</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">m_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                  <span class="n">stop</span><span class="p">)(</span><span class="n">X_tensor</span><span class="p">,</span> <span class="n">Z_tensor</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_weighted_linear_combo"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_weighted_linear_combo">[docs]</a>  <span class="k">def</span> <span class="nf">test_weighted_linear_combo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that WeightedLinearCombo can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">in_tensor_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="n">in_tensor_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">in_tensor_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor_1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">in_tensor_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">in_tensor_2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">WeightedLinearCombo</span><span class="p">()(</span><span class="n">in_tensor_1</span><span class="p">,</span> <span class="n">in_tensor_2</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_reshape_inputs"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_reshape_inputs">[docs]</a>  <span class="k">def</span> <span class="nf">test_reshape_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that layers can automatically reshape inconsistent inputs.&quot;&quot;&quot;</span>
+    <span class="n">value1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">value2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">ReduceSquareDifference</span><span class="p">()(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value1</span><span class="p">),</span>
+                                            <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value2</span><span class="p">))</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="n">diff</span> <span class="o">=</span> <span class="n">value1</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="n">value2</span>
+      <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">diff</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="p">(</span><span class="n">loss</span> <span class="o">-</span> <span class="n">result</span><span class="p">)</span> <span class="o">/</span> <span class="n">loss</span> <span class="o">&lt;</span> <span class="mf">1e-6</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_cast"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_cast">[docs]</a>  <span class="k">def</span> <span class="nf">test_cast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that layers can automatically reshape inconsistent inputs.&quot;&quot;&quot;</span>
+    <span class="n">value1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Cast</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value1</span><span class="p">))</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_squeeze_inputs"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_squeeze_inputs">[docs]</a>  <span class="k">def</span> <span class="nf">test_squeeze_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that layers can automatically reshape inconsistent inputs.&quot;&quot;&quot;</span>
+    <span class="n">value1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Squeeze</span><span class="p">(</span><span class="n">squeeze_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">value1</span><span class="p">))</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_convert_to_tensor"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_convert_to_tensor">[docs]</a>  <span class="k">def</span> <span class="nf">test_convert_to_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test implicit conversion of Layers to Tensors.&quot;&quot;&quot;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">]))</span>
+    <span class="n">v</span><span class="o">.</span><span class="n">create_tensor</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="mf">1.5</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">gradients</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+      <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_alpha_share_layer"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_alpha_share_layer">[docs]</a>  <span class="k">def</span> <span class="nf">test_alpha_share_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that alpha share works correctly&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">test_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+    <span class="n">test_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">test_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">test_1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">test_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">test_2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">AlphaShareLayer</span><span class="p">()(</span><span class="n">test_1</span><span class="p">,</span> <span class="n">test_2</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">test_1_out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="n">test_2_out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">test_1</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">test_1_out_tensor</span><span class="o">.</span><span class="n">shape</span>
+      <span class="k">assert</span> <span class="n">test_2</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">test_2_out_tensor</span><span class="o">.</span><span class="n">shape</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_beta_share"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_beta_share">[docs]</a>  <span class="k">def</span> <span class="nf">test_beta_share</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that beta share works correctly&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">test_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+    <span class="n">test_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">test_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">test_1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">test_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">test_2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">BetaShare</span><span class="p">()(</span><span class="n">test_1</span><span class="p">,</span> <span class="n">test_2</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">test_1</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span>
+      <span class="k">assert</span> <span class="n">test_2</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_sluice_loss"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_sluice_loss">[docs]</a>  <span class="k">def</span> <span class="nf">test_sluice_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test the sluice loss function&quot;&quot;&quot;</span>
+    <span class="n">input1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">input2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">input1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">input1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">input2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">input2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">output_tensor</span> <span class="o">=</span> <span class="n">SluiceLoss</span><span class="p">()(</span><span class="n">input1</span><span class="p">,</span> <span class="n">input2</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="k">assert</span> <span class="n">output_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="o">==</span> <span class="mf">40.0</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_graphcnn"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_graphcnn">[docs]</a>  <span class="k">def</span> <span class="nf">test_graphcnn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Test GraphCNN Layer From https://arxiv.org/abs/1703.00792&quot;&quot;&quot;</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">adjs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">GraphCNN</span><span class="p">(</span><span class="n">num_filters</span><span class="o">=</span><span class="mi">6</span><span class="p">)(</span><span class="n">V</span><span class="p">,</span> <span class="n">adjs</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_graphcnnpool"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_graphcnnpool">[docs]</a>  <span class="k">def</span> <span class="nf">test_graphcnnpool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Test GraphCNNPool Layer From https://arxiv.org/abs/1703.00792&quot;&quot;&quot;</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">adjs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">vertex_props</span><span class="p">,</span> <span class="n">adjs</span> <span class="o">=</span> <span class="n">GraphEmbedPoolLayer</span><span class="p">(</span><span class="n">num_vertices</span><span class="o">=</span><span class="mi">6</span><span class="p">)(</span><span class="n">V</span><span class="p">,</span> <span class="n">adjs</span><span class="p">)</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">vertex_props</span><span class="p">,</span> <span class="n">adjs</span> <span class="o">=</span> <span class="n">vertex_props</span><span class="o">.</span><span class="n">eval</span><span class="p">(),</span> <span class="n">adjs</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">vertex_props</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">adjs</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_slice"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_slice">[docs]</a>  <span class="k">def</span> <span class="nf">test_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that Slice can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">test_tensor_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">test_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">test_tensor_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">Slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="n">test_tensor</span><span class="p">)</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">test_tensor_input</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TestLayers.test_IRV"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_layers.TestLayers.test_IRV">[docs]</a>  <span class="k">def</span> <span class="nf">test_IRV</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that IRVLayer and IRVRegularize can be invoked.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_tasks</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="n">n_tasks</span>
+    <span class="n">test_tensor_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">test_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">test_tensor_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">irv_layer</span> <span class="o">=</span> <span class="n">IRVLayer</span><span class="p">(</span><span class="n">n_tasks</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+      <span class="n">irv_layer</span><span class="o">.</span><span class="n">create_tensor</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">test_tensor</span><span class="p">])</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">irv_layer</span><span class="o">.</span><span class="n">out_tensor</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">out_tensor</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_tasks</span><span class="p">)</span>
+      <span class="n">irv_reg</span> <span class="o">=</span> <span class="n">IRVRegularize</span><span class="p">(</span><span class="n">irv_layer</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)()</span>
+      <span class="k">assert</span> <span class="n">irv_reg</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">0</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

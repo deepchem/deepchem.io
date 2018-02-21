@@ -1,0 +1,69 @@
+deepchem\.utils package
+=======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.utils.test
+
+Submodules
+----------
+
+deepchem\.utils\.conformers module
+----------------------------------
+
+.. automodule:: deepchem.utils.conformers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.utils\.evaluate module
+--------------------------------
+
+.. automodule:: deepchem.utils.evaluate
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.utils\.mol\_xyz\_util module
+--------------------------------------
+
+.. automodule:: deepchem.utils.mol_xyz_util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.utils\.rdkit\_util module
+-----------------------------------
+
+.. automodule:: deepchem.utils.rdkit_util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.utils\.save module
+----------------------------
+
+.. automodule:: deepchem.utils.save
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.utils\.visualization module
+-------------------------------------
+
+.. automodule:: deepchem.utils.visualization
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:

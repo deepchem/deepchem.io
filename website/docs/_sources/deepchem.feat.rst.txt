@@ -1,0 +1,133 @@
+deepchem\.feat package
+======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.feat.tests
+
+Submodules
+----------
+
+deepchem\.feat\.adjacency\_fingerprints module
+----------------------------------------------
+
+.. automodule:: deepchem.feat.adjacency_fingerprints
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.atomic\_coordinates module
+------------------------------------------
+
+.. automodule:: deepchem.feat.atomic_coordinates
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.base\_classes module
+------------------------------------
+
+.. automodule:: deepchem.feat.base_classes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.basic module
+----------------------------
+
+.. automodule:: deepchem.feat.basic
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.binding\_pocket\_features module
+------------------------------------------------
+
+.. automodule:: deepchem.feat.binding_pocket_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.coulomb\_matrices module
+----------------------------------------
+
+.. automodule:: deepchem.feat.coulomb_matrices
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.fingerprints module
+-----------------------------------
+
+.. automodule:: deepchem.feat.fingerprints
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.graph\_features module
+--------------------------------------
+
+.. automodule:: deepchem.feat.graph_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.mol\_graphs module
+----------------------------------
+
+.. automodule:: deepchem.feat.mol_graphs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.nnscore\_utils module
+-------------------------------------
+
+.. automodule:: deepchem.feat.nnscore_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.one\_hot module
+-------------------------------
+
+.. automodule:: deepchem.feat.one_hot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.raw\_featurizer module
+--------------------------------------
+
+.. automodule:: deepchem.feat.raw_featurizer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.rdkit\_grid\_featurizer module
+----------------------------------------------
+
+.. automodule:: deepchem.feat.rdkit_grid_featurizer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.feat\.test\_one\_hot module
+-------------------------------------
+
+.. automodule:: deepchem.feat.test_one_hot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.feat
+    :members:
+    :undoc-members:
+    :show-inheritance:

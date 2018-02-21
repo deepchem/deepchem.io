@@ -1,0 +1,70 @@
+deepchem.molnet package
+=======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.molnet.load_function
+    deepchem.molnet.tests
+
+Submodules
+----------
+
+deepchem.molnet.check_availability module
+-----------------------------------------
+
+.. automodule:: deepchem.molnet.check_availability
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.molnet.dnasim module
+-----------------------------
+
+.. automodule:: deepchem.molnet.dnasim
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.molnet.preset_hyper_parameters module
+----------------------------------------------
+
+.. automodule:: deepchem.molnet.preset_hyper_parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.molnet.run_benchmark module
+------------------------------------
+
+.. automodule:: deepchem.molnet.run_benchmark
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.molnet.run_benchmark_low_data module
+---------------------------------------------
+
+.. automodule:: deepchem.molnet.run_benchmark_low_data
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.molnet.run_benchmark_models module
+-------------------------------------------
+
+.. automodule:: deepchem.molnet.run_benchmark_models
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.molnet
+    :members:
+    :undoc-members:
+    :show-inheritance:

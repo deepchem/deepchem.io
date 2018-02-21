@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.rl.a3c &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="deepchem.rl" href="../rl.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.rl.a3c</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Asynchronous Advantage Actor-Critic (A3C) algorithm for reinforcement learning.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.models</span> <span class="kn">import</span> <span class="n">TensorGraph</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.optimizers</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Feature</span><span class="p">,</span> <span class="n">Weights</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Layer</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+
+<div class="viewcode-block" id="A3CLossDiscrete"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3CLossDiscrete">[docs]</a><span class="k">class</span> <span class="nc">A3CLossDiscrete</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;This layer computes the loss function for A3C with discrete action spaces.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_weight</span><span class="p">,</span> <span class="n">entropy_weight</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">A3CLossDiscrete</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">value_weight</span> <span class="o">=</span> <span class="n">value_weight</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">entropy_weight</span> <span class="o">=</span> <span class="n">entropy_weight</span>
+
+<div class="viewcode-block" id="A3CLossDiscrete.create_tensor"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3CLossDiscrete.create_tensor">[docs]</a>  <span class="k">def</span> <span class="nf">create_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">reward</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">advantage</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">layer</span><span class="o">.</span><span class="n">out_tensor</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_layers</span>
+    <span class="p">]</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+    <span class="n">log_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+    <span class="n">policy_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span>
+        <span class="n">advantage</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">action</span> <span class="o">*</span> <span class="n">log_prob</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">value_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">reward</span> <span class="o">-</span> <span class="n">value</span><span class="p">))</span>
+    <span class="n">entropy</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">prob</span> <span class="o">*</span> <span class="n">log_prob</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">out_tensor</span> <span class="o">=</span> <span class="n">policy_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_weight</span> <span class="o">*</span> <span class="n">value_loss</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_weight</span> <span class="o">*</span> <span class="n">entropy</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_tensor</span></div></div>
+
+
+<div class="viewcode-block" id="A3CLossContinuous"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3CLossContinuous">[docs]</a><span class="k">class</span> <span class="nc">A3CLossContinuous</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;This layer computes the loss function for A3C with continuous action spaces.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_weight</span><span class="p">,</span> <span class="n">entropy_weight</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">A3CLossContinuous</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">value_weight</span> <span class="o">=</span> <span class="n">value_weight</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">entropy_weight</span> <span class="o">=</span> <span class="n">entropy_weight</span>
+
+<div class="viewcode-block" id="A3CLossContinuous.create_tensor"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3CLossContinuous.create_tensor">[docs]</a>  <span class="k">def</span> <span class="nf">create_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">reward</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">advantage</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">layer</span><span class="o">.</span><span class="n">out_tensor</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_layers</span>
+    <span class="p">]</span>
+    <span class="n">distrib</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+    <span class="n">reduce_axes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+    <span class="n">log_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">distrib</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">action</span><span class="p">),</span> <span class="n">reduce_axes</span><span class="p">)</span>
+    <span class="n">policy_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">advantage</span> <span class="o">*</span> <span class="n">log_prob</span><span class="p">)</span>
+    <span class="n">value_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">reward</span> <span class="o">-</span> <span class="n">value</span><span class="p">))</span>
+    <span class="n">entropy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">distrib</span><span class="o">.</span><span class="n">entropy</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">out_tensor</span> <span class="o">=</span> <span class="n">policy_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_weight</span> <span class="o">*</span> <span class="n">value_loss</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_weight</span> <span class="o">*</span> <span class="n">entropy</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_tensor</span></div></div>
+
+
+<div class="viewcode-block" id="A3C"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3C">[docs]</a><span class="k">class</span> <span class="nc">A3C</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Implements the Asynchronous Advantage Actor-Critic (A3C) algorithm for reinforcement learning.</span>
+
+<span class="sd">  The algorithm is described in Mnih et al, &quot;Asynchronous Methods for Deep Reinforcement Learning&quot;</span>
+<span class="sd">  (https://arxiv.org/abs/1602.01783).  This class supports environments with both discrete and</span>
+<span class="sd">  continuous action spaces.  For discrete action spaces, the &quot;action&quot; argument passed to the</span>
+<span class="sd">  environment is an integer giving the index of the action to perform.  The policy must output</span>
+<span class="sd">  a vector called &quot;action_prob&quot; giving the probability of taking each action.  For continous</span>
+<span class="sd">  action spaces, the action is an array where each element is chosen independently from a</span>
+<span class="sd">  normal distribution.  The policy must output two arrays of the same shape: &quot;action_mean&quot;</span>
+<span class="sd">  gives the mean value for each element, and &quot;action_std&quot; gives the standard deviation for</span>
+<span class="sd">  each element.  In either case, the policy must also output a scalar called &quot;value&quot; which</span>
+<span class="sd">  is an estimate of the value function for the current state.</span>
+
+<span class="sd">  The algorithm optimizes all outputs at once using a loss that is the sum of three terms:</span>
+
+<span class="sd">  1. The policy loss, which seeks to maximize the discounted reward for each action.</span>
+<span class="sd">  2. The value loss, which tries to make the value estimate match the actual discounted reward</span>
+<span class="sd">     that was attained at each step.</span>
+<span class="sd">  3. An entropy term to encourage exploration.</span>
+
+<span class="sd">  This class supports Generalized Advantage Estimation as described in Schulman et al., &quot;High-Dimensional</span>
+<span class="sd">  Continuous Control Using Generalized Advantage Estimation&quot; (https://arxiv.org/abs/1506.02438).</span>
+<span class="sd">  This is a method of trading off bias and variance in the advantage estimate, which can sometimes</span>
+<span class="sd">  improve the rate of convergance.  Use the advantage_lambda parameter to adjust the tradeoff.</span>
+
+<span class="sd">  This class supports Hindsight Experience Replay as described in Andrychowicz et al., &quot;Hindsight</span>
+<span class="sd">  Experience Replay&quot; (https://arxiv.org/abs/1707.01495).  This is a method that can enormously</span>
+<span class="sd">  accelerate learning when rewards are very rare.  It requires that the environment state contains</span>
+<span class="sd">  information about the goal the agent is trying to achieve.  Each time it generates a rollout, it</span>
+<span class="sd">  processes that rollout twice: once using the actual goal the agent was pursuing while generating</span>
+<span class="sd">  it, and again using the final state of that rollout as the goal.  This guarantees that half of</span>
+<span class="sd">  all rollouts processed will be ones that achieved their goals, and hence received a reward.</span>
+
+<span class="sd">  To use this feature, specify use_hindsight=True to the constructor.  The environment must have</span>
+<span class="sd">  a method defined as follows:</span>
+
+<span class="sd">  def apply_hindsight(self, states, actions, goal):</span>
+<span class="sd">    ...</span>
+<span class="sd">    return new_states, rewards</span>
+
+<span class="sd">  The method receives the list of states generated during the rollout, the action taken for each one,</span>
+<span class="sd">  and a new goal state.  It should generate a new list of states that are identical to the input ones,</span>
+<span class="sd">  except specifying the new goal.  It should return that list of states, and the rewards that would</span>
+<span class="sd">  have been received for taking the specified actions from those states.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">env</span><span class="p">,</span>
+               <span class="n">policy</span><span class="p">,</span>
+               <span class="n">max_rollout_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+               <span class="n">discount_factor</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span>
+               <span class="n">advantage_lambda</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span>
+               <span class="n">value_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+               <span class="n">entropy_weight</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+               <span class="n">optimizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">model_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">use_hindsight</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an object for optimizing a policy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    env: Environment</span>
+<span class="sd">      the Environment to interact with</span>
+<span class="sd">    policy: Policy</span>
+<span class="sd">      the Policy to optimize.  Its create_layers() method must return a dict containing the</span>
+<span class="sd">      keys &#39;action_prob&#39; and &#39;value&#39; (for discrete action spaces) or &#39;action_mean&#39;, &#39;action_std&#39;,</span>
+<span class="sd">      and &#39;value&#39; (for continuous action spaces)</span>
+<span class="sd">    max_rollout_length: int</span>
+<span class="sd">      the maximum length of rollouts to generate</span>
+<span class="sd">    discount_factor: float</span>
+<span class="sd">      the discount factor to use when computing rewards</span>
+<span class="sd">    advantage_lambda: float</span>
+<span class="sd">      the parameter for trading bias vs. variance in Generalized Advantage Estimation</span>
+<span class="sd">    value_weight: float</span>
+<span class="sd">      a scale factor for the value loss term in the loss function</span>
+<span class="sd">    entropy_weight: float</span>
+<span class="sd">      a scale factor for the entropy term in the loss function</span>
+<span class="sd">    optimizer: Optimizer</span>
+<span class="sd">      the optimizer to use.  If None, a default optimizer is used.</span>
+<span class="sd">    model_dir: str</span>
+<span class="sd">      the directory in which the model will be saved.  If None, a temporary directory will be created.</span>
+<span class="sd">    use_hindsight: bool</span>
+<span class="sd">      if True, use Hindsight Experience Replay</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_env</span> <span class="o">=</span> <span class="n">env</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_policy</span> <span class="o">=</span> <span class="n">policy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_rollout_length</span> <span class="o">=</span> <span class="n">max_rollout_length</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">discount_factor</span> <span class="o">=</span> <span class="n">discount_factor</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">advantage_lambda</span> <span class="o">=</span> <span class="n">advantage_lambda</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">value_weight</span> <span class="o">=</span> <span class="n">value_weight</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">entropy_weight</span> <span class="o">=</span> <span class="n">entropy_weight</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">use_hindsight</span> <span class="o">=</span> <span class="n">use_hindsight</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_state_is_list</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">state_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">collections</span><span class="o">.</span><span class="n">Sequence</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">optimizer</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">beta1</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">beta2</span><span class="o">=</span><span class="mf">0.999</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_graph</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s1">&#39;global&#39;</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rewards</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actions</span><span class="p">,</span>
+       <span class="bp">self</span><span class="o">.</span><span class="n">_action_mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_action_std</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span>
+       <span class="bp">self</span><span class="o">.</span><span class="n">_advantages</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rewards</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actions</span><span class="p">,</span>
+       <span class="bp">self</span><span class="o">.</span><span class="n">_action_prob</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_advantages</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_rnn_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">rnn_zero_states</span>
+
+  <span class="k">def</span> <span class="nf">_build_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf_graph</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Construct a TensorGraph containing the policy and loss calculations.&quot;&quot;&quot;</span>
+    <span class="n">state_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">state_shape</span>
+    <span class="n">state_dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">state_dtype</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_is_list</span><span class="p">:</span>
+      <span class="n">state_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">state_shape</span><span class="p">]</span>
+      <span class="n">state_dtype</span> <span class="o">=</span> <span class="p">[</span><span class="n">state_dtype</span><span class="p">]</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">state_shape</span><span class="p">,</span> <span class="n">state_dtype</span><span class="p">):</span>
+      <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">as_dtype</span><span class="p">(</span><span class="n">d</span><span class="p">)))</span>
+    <span class="n">policy_layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_policy</span><span class="o">.</span><span class="n">create_layers</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">policy_layers</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    <span class="n">rewards</span> <span class="o">=</span> <span class="n">Weights</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,))</span>
+    <span class="n">advantages</span> <span class="o">=</span> <span class="n">Weights</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,))</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">TensorGraph</span><span class="p">(</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_rollout_length</span><span class="p">,</span>
+        <span class="n">use_queue</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+        <span class="n">graph</span><span class="o">=</span><span class="n">tf_graph</span><span class="p">,</span>
+        <span class="n">model_dir</span><span class="o">=</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+      <span class="n">graph</span><span class="o">.</span><span class="n">_add_layer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;action_prob&#39;</span> <span class="ow">in</span> <span class="n">policy_layers</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">continuous</span> <span class="o">=</span> <span class="bp">False</span>
+      <span class="n">action_prob</span> <span class="o">=</span> <span class="n">policy_layers</span><span class="p">[</span><span class="s1">&#39;action_prob&#39;</span><span class="p">]</span>
+      <span class="n">actions</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">n_actions</span><span class="p">))</span>
+      <span class="n">loss</span> <span class="o">=</span> <span class="n">A3CLossDiscrete</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">value_weight</span><span class="p">,</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">entropy_weight</span><span class="p">,</span>
+          <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">rewards</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">action_prob</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">advantages</span><span class="p">])</span>
+      <span class="n">graph</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">action_prob</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">continuous</span> <span class="o">=</span> <span class="bp">True</span>
+      <span class="n">action_mean</span> <span class="o">=</span> <span class="n">policy_layers</span><span class="p">[</span><span class="s1">&#39;action_mean&#39;</span><span class="p">]</span>
+      <span class="n">action_std</span> <span class="o">=</span> <span class="n">policy_layers</span><span class="p">[</span><span class="s1">&#39;action_std&#39;</span><span class="p">]</span>
+      <span class="n">actions</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">action_shape</span><span class="p">))</span>
+      <span class="n">loss</span> <span class="o">=</span> <span class="n">A3CLossContinuous</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">value_weight</span><span class="p">,</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">entropy_weight</span><span class="p">,</span>
+          <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span>
+              <span class="n">rewards</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">action_mean</span><span class="p">,</span> <span class="n">action_std</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">advantages</span>
+          <span class="p">])</span>
+      <span class="n">graph</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">action_mean</span><span class="p">)</span>
+      <span class="n">graph</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">action_std</span><span class="p">)</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">set_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">):</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">graph</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">action_mean</span><span class="p">,</span> <span class="n">action_std</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">advantages</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">graph</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">action_prob</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">advantages</span>
+
+<div class="viewcode-block" id="A3C.fit"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3C.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+          <span class="n">total_steps</span><span class="p">,</span>
+          <span class="n">max_checkpoints_to_keep</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+          <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+          <span class="n">restore</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Train the policy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    total_steps: int</span>
+<span class="sd">      the total number of time steps to perform on the environment, across all rollouts</span>
+<span class="sd">      on all threads</span>
+<span class="sd">    max_checkpoints_to_keep: int</span>
+<span class="sd">      the maximum number of checkpoint files to keep.  When this number is reached, older</span>
+<span class="sd">      files are deleted.</span>
+<span class="sd">    checkpoint_interval: float</span>
+<span class="sd">      the time interval at which to save checkpoints, measured in seconds</span>
+<span class="sd">    restore: bool</span>
+<span class="sd">      if True, restore the model from the most recent checkpoint and continue training</span>
+<span class="sd">      from there.  If False, retrain the model from scratch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">step_count</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">workers</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()):</span>
+        <span class="n">workers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_Worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="k">if</span> <span class="n">restore</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">worker</span> <span class="ow">in</span> <span class="n">workers</span><span class="p">:</span>
+        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">worker</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+            <span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">worker</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">step_count</span><span class="p">,</span> <span class="n">total_steps</span><span class="p">))</span>
+        <span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thread</span><span class="p">)</span>
+        <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+      <span class="n">variables</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">GraphKeys</span><span class="o">.</span><span class="n">GLOBAL_VARIABLES</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+      <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">max_to_keep</span><span class="o">=</span><span class="n">max_checkpoints_to_keep</span><span class="p">)</span>
+      <span class="n">checkpoint_index</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">threads</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">threads</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">isAlive</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+          <span class="n">threads</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint_interval</span><span class="p">)</span>
+        <span class="n">checkpoint_index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">save_file</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="n">checkpoint_index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+          <span class="k">break</span></div>
+
+<div class="viewcode-block" id="A3C.predict"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3C.predict">[docs]</a>  <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">use_saved_states</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">save_states</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the policy&#39;s output predictions for a state.</span>
+
+<span class="sd">    If the policy involves recurrent layers, this method can preserve their internal</span>
+<span class="sd">    states between calls.  Use the use_saved_states and save_states arguments to specify</span>
+<span class="sd">    how it should behave.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    state: array</span>
+<span class="sd">      the state of the environment for which to generate predictions</span>
+<span class="sd">    use_saved_states: bool</span>
+<span class="sd">      if True, the states most recently saved by a previous call to predict() or select_action()</span>
+<span class="sd">      will be used as the initial states.  If False, the internal states of all recurrent layers</span>
+<span class="sd">      will be set to all zeros before computing the predictions.</span>
+<span class="sd">    save_states: bool</span>
+<span class="sd">      if True, the internal states of all recurrent layers at the end of the calculation</span>
+<span class="sd">      will be saved, and any previously saved states will be discarded.  If False, the</span>
+<span class="sd">      states at the end of the calculation will be discarded, and any previously saved</span>
+<span class="sd">      states will be kept.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    the array of action probabilities, and the estimated value function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_action_mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_action_std</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_action_prob</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_outputs</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">use_saved_states</span><span class="p">,</span> <span class="n">save_states</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="A3C.select_action"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3C.select_action">[docs]</a>  <span class="k">def</span> <span class="nf">select_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">state</span><span class="p">,</span>
+                    <span class="n">deterministic</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                    <span class="n">use_saved_states</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">save_states</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Select an action to perform based on the environment&#39;s state.</span>
+
+<span class="sd">    If the policy involves recurrent layers, this method can preserve their internal</span>
+<span class="sd">    states between calls.  Use the use_saved_states and save_states arguments to specify</span>
+<span class="sd">    how it should behave.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    state: array</span>
+<span class="sd">      the state of the environment for which to select an action</span>
+<span class="sd">    deterministic: bool</span>
+<span class="sd">      if True, always return the best action (that is, the one with highest probability).</span>
+<span class="sd">      If False, randomly select an action based on the computed probabilities.</span>
+<span class="sd">    use_saved_states: bool</span>
+<span class="sd">      if True, the states most recently saved by a previous call to predict() or select_action()</span>
+<span class="sd">      will be used as the initial states.  If False, the internal states of all recurrent layers</span>
+<span class="sd">      will be set to all zeros before computing the predictions.</span>
+<span class="sd">    save_states: bool</span>
+<span class="sd">      if True, the internal states of all recurrent layers at the end of the calculation</span>
+<span class="sd">      will be saved, and any previously saved states will be discarded.  If False, the</span>
+<span class="sd">      states at the end of the calculation will be discarded, and any previously saved</span>
+<span class="sd">      states will be kept.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    the index of the selected action</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+      <span class="n">tensors</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_action_mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_action_std</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">tensors</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_action_prob</span><span class="p">]</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_outputs</span><span class="p">(</span><span class="n">tensors</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">use_saved_states</span><span class="p">,</span>
+                                    <span class="n">save_states</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_action_from_outputs</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">deterministic</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="A3C.restore"><a class="viewcode-back" href="../../../deepchem.rl.html#deepchem.rl.a3c.A3C.restore">[docs]</a>  <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reload the model parameters from the most recent checkpoint file.&quot;&quot;&quot;</span>
+    <span class="n">last_checkpoint</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">latest_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">last_checkpoint</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No checkpoint found&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">variables</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">GraphKeys</span><span class="o">.</span><span class="n">GLOBAL_VARIABLES</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+      <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+      <span class="n">saver</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">,</span> <span class="n">last_checkpoint</span><span class="p">)</span></div>
+
+  <span class="k">def</span> <span class="nf">_create_feed_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">use_saved_states</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a feed dict for use by predict() or select_action().&quot;&quot;&quot;</span>
+    <span class="n">feed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">f</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+                     <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">,</span> <span class="n">state</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">use_saved_states</span><span class="p">:</span>
+      <span class="n">rnn_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rnn_states</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">rnn_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">rnn_zero_states</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">rnn_initial_states</span><span class="p">,</span> <span class="n">rnn_states</span><span class="p">):</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="n">placeholder</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">feed_dict</span>
+
+  <span class="k">def</span> <span class="nf">_predict_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">use_saved_states</span><span class="p">,</span> <span class="n">save_states</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute a set of outputs for a state. &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_is_list</span><span class="p">:</span>
+      <span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="p">]</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">feed_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_feed_dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">use_saved_states</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">save_states</span><span class="p">:</span>
+        <span class="n">tensors</span> <span class="o">=</span> <span class="n">outputs</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">rnn_final_states</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">tensors</span> <span class="o">=</span> <span class="n">outputs</span>
+      <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tensors</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">save_states</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rnn_states</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">outputs</span><span class="p">):]</span>
+      <span class="k">return</span> <span class="n">results</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">outputs</span><span class="p">)]</span>
+
+  <span class="k">def</span> <span class="nf">_select_action_from_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">deterministic</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given the policy outputs, select an action to perform.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+      <span class="n">action_mean</span><span class="p">,</span> <span class="n">action_std</span> <span class="o">=</span> <span class="n">outputs</span>
+      <span class="k">if</span> <span class="n">deterministic</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">action_mean</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">action_mean</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">action_std</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">action_prob</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="k">if</span> <span class="n">deterministic</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">action_prob</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">action_prob</span> <span class="o">=</span> <span class="n">action_prob</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">action_prob</span><span class="p">)),</span> <span class="n">p</span><span class="o">=</span><span class="n">action_prob</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">_Worker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;A Worker object is created for each training thread.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a3c</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span> <span class="o">=</span> <span class="n">a3c</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="s1">&#39;worker</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">index</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">a3c</span><span class="o">.</span><span class="n">_env</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">a3c</span><span class="o">.</span><span class="n">_build_graph</span><span class="p">(</span><span class="n">a3c</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s1">&#39;Graph&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">a3c</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rewards</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_std</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">advantages</span> <span class="o">=</span> <span class="n">fields</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rewards</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_prob</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">advantages</span> <span class="o">=</span> <span class="n">fields</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">rnn_zero_states</span>
+    <span class="k">with</span> <span class="n">a3c</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">local_vars</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">GraphKeys</span><span class="o">.</span><span class="n">TRAINABLE_VARIABLES</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+      <span class="n">global_vars</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">GraphKeys</span><span class="o">.</span><span class="n">TRAINABLE_VARIABLES</span><span class="p">,</span>
+                                      <span class="s1">&#39;global&#39;</span><span class="p">)</span>
+      <span class="n">gradients</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gradients</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">local_vars</span><span class="p">)</span>
+      <span class="n">grads_and_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradients</span><span class="p">,</span> <span class="n">global_vars</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">train_op</span> <span class="o">=</span> <span class="n">a3c</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s1">&#39;Optimizer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span>
+          <span class="n">grads_and_vars</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">update_local_variables</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">group</span><span class="p">(</span>
+          <span class="o">*</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="k">for</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">local_vars</span><span class="p">,</span> <span class="n">global_vars</span><span class="p">)])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">global_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_global_step</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_count</span><span class="p">,</span> <span class="n">total_steps</span><span class="p">):</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">while</span> <span class="n">step_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">total_steps</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_local_variables</span><span class="p">)</span>
+        <span class="n">initial_rnn_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rnn_states</span>
+        <span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_rollout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_rollout</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span>
+                             <span class="n">initial_rnn_states</span><span class="p">,</span> <span class="n">step_count</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">use_hindsight</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">process_rollout_with_hindsight</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span>
+                                              <span class="n">initial_rnn_states</span><span class="p">,</span> <span class="n">step_count</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">step_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">create_rollout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate a rollout.&quot;&quot;&quot;</span>
+    <span class="n">n_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">n_actions</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">_session</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rewards</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Generate the rollout.</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">max_rollout_length</span><span class="p">):</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">terminated</span><span class="p">:</span>
+        <span class="k">break</span>
+      <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">state</span>
+      <span class="n">states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+      <span class="n">feed_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_feed_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+        <span class="n">tensors</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">action_mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_std</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">tensors</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">action_prob</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+      <span class="n">results</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+          <span class="n">tensors</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">rnn_final_states</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+      <span class="n">value</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">rnn_states</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tensors</span><span class="p">):]</span>
+      <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">_select_action_from_outputs</span><span class="p">(</span><span class="n">results</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                                                    <span class="bp">False</span><span class="p">)</span>
+      <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+      <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+      <span class="n">rewards</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">))</span>
+
+    <span class="c1"># Compute an estimate of the reward for the rest of the episode.</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">terminated</span><span class="p">:</span>
+      <span class="n">feed_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_feed_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+      <span class="n">final_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">discount_factor</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span>
+          <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">feed_dict</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">final_value</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">final_value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">terminated</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">rnn_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">rnn_zero_states</span>
+    <span class="k">return</span> <span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="n">rewards</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">process_rollout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span>
+                      <span class="n">initial_rnn_states</span><span class="p">,</span> <span class="n">step_count</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Train the network based on a rollout.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Compute the discounted rewards and advantages.</span>
+
+    <span class="n">discounted_rewards</span> <span class="o">=</span> <span class="n">rewards</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">discounted_rewards</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">advantages</span> <span class="o">=</span> <span class="n">rewards</span> <span class="o">-</span> <span class="n">values</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">discount_factor</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rewards</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+      <span class="n">discounted_rewards</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span>
+                         <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">discount_factor</span> <span class="o">*</span> <span class="n">discounted_rewards</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+      <span class="n">advantages</span><span class="p">[</span>
+          <span class="n">j</span> <span class="o">-</span>
+          <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">discount_factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">advantage_lambda</span> <span class="o">*</span> <span class="n">advantages</span><span class="p">[</span>
+              <span class="n">j</span><span class="p">]</span>
+
+    <span class="c1"># Record the actions, converting to one-hot if necessary.</span>
+
+    <span class="n">actions_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+        <span class="n">actions_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">n_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">n_actions</span>
+      <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_actions</span><span class="p">)</span>
+        <span class="n">a</span><span class="p">[</span><span class="n">action</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">actions_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="c1"># Rearrange the states into the proper set of arrays.</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">_state_is_list</span><span class="p">:</span>
+      <span class="n">state_arrays</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">))]</span>
+      <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">)):</span>
+          <span class="n">state_arrays</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">state_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">states</span><span class="p">]</span>
+
+    <span class="c1"># Build the feed dict and apply gradients.</span>
+
+    <span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">placeholder</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">rnn_initial_states</span><span class="p">,</span>
+                                  <span class="n">initial_rnn_states</span><span class="p">):</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="n">placeholder</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="n">state_arrays</span><span class="p">):</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rewards</span><span class="p">]</span> <span class="o">=</span> <span class="n">discounted_rewards</span>
+    <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">]</span> <span class="o">=</span> <span class="n">actions_matrix</span>
+    <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">advantages</span><span class="p">]</span> <span class="o">=</span> <span class="n">advantages</span>
+    <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_count</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_op</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">process_rollout_with_hindsight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">initial_rnn_states</span><span class="p">,</span>
+                                     <span class="n">step_count</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a new rollout by applying hindsight to an existing one, then train the network.&quot;&quot;&quot;</span>
+    <span class="n">hindsight_states</span><span class="p">,</span> <span class="n">rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">apply_hindsight</span><span class="p">(</span>
+        <span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">states</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">_state_is_list</span><span class="p">:</span>
+      <span class="n">state_arrays</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">))]</span>
+      <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">hindsight_states</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">)):</span>
+          <span class="n">state_arrays</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">state_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">hindsight_states</span><span class="p">]</span>
+    <span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">placeholder</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">rnn_initial_states</span><span class="p">,</span>
+                                  <span class="n">initial_rnn_states</span><span class="p">):</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="n">placeholder</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="n">state_arrays</span><span class="p">):</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">process_rollout</span><span class="p">(</span><span class="n">hindsight_states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rewards</span><span class="p">),</span>
+                         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="n">initial_rnn_states</span><span class="p">,</span> <span class="n">step_count</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">create_feed_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a feed dict for use during a rollout.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">a3c</span><span class="o">.</span><span class="n">_state_is_list</span><span class="p">:</span>
+      <span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="p">]</span>
+    <span class="n">feed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">f</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+                     <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="n">state</span><span class="p">))</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">rnn_initial_states</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_states</span><span class="p">):</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="n">placeholder</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">feed_dict</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

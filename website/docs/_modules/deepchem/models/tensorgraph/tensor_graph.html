@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tensorgraph.tensor_graph &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tensorgraph.tensor_graph</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.pywrap_tensorflow_internal</span> <span class="kn">import</span> <span class="n">NewCheckpointReader</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.data</span> <span class="kn">import</span> <span class="n">NumpyDataset</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.models</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">InputFifoQueue</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Feature</span><span class="p">,</span> <span class="n">Weights</span><span class="p">,</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.optimizers</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="kn">from</span> <span class="nn">deepchem.trans</span> <span class="kn">import</span> <span class="n">undo_transforms</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils.evaluate</span> <span class="kn">import</span> <span class="n">GeneratorEvaluator</span>
+
+
+<div class="viewcode-block" id="TensorGraph"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph">[docs]</a><span class="k">class</span> <span class="nc">TensorGraph</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">tensorboard</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">tensorboard_log_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+               <span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+               <span class="n">random_seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">use_queue</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+               <span class="n">graph</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+               <span class="n">configproto</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tensorboard: bool</span>
+<span class="sd">      Should we log to model_dir data for tensorboard?</span>
+<span class="sd">    tensorboard_log_frequency: int</span>
+<span class="sd">      How many training batches before logging tensorboard?</span>
+<span class="sd">    batch_size: int</span>
+<span class="sd">      default batch size for training and evaluating</span>
+<span class="sd">    use_queue: boolean</span>
+<span class="sd">      if True when building we will create a tf.FIFO queue, which will hold</span>
+<span class="sd">      all features, weights, and labels.  We will feed the inputs into this</span>
+<span class="sd">      queue in batches of self.batch_size in a separate thread from the</span>
+<span class="sd">      thread training the model.  You cannot use a queue when</span>
+<span class="sd">      batches are not of consistent size</span>
+<span class="sd">    graph: tensorflow.Graph</span>
+<span class="sd">      the Graph in which to create Tensorflow objects.  If None, a new Graph</span>
+<span class="sd">      is created.</span>
+<span class="sd">    learning_rate: float or LearningRateSchedule</span>
+<span class="sd">      the learning rate to use for optimization</span>
+<span class="sd">    configproto: a tf.ConfigProto() object used to create tf.Session()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Layer Management</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">task_weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">submodels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">built</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">queue_installed</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span>
+        <span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">beta1</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">beta2</span><span class="o">=</span><span class="mf">0.999</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">configproto</span> <span class="o">=</span> <span class="n">configproto</span>
+
+    <span class="c1"># Singular place to hold Tensor objects which don&#39;t serialize</span>
+    <span class="c1"># These have to be reconstructed on restoring from pickle</span>
+    <span class="c1"># See TensorGraph._get_tf() for more details on lazy construction</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;FileWriter&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="s2">&quot;Graph&quot;</span><span class="p">:</span> <span class="n">graph</span><span class="p">,</span>
+        <span class="s2">&quot;train_op&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="s2">&quot;summary_op&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tensorboard</span> <span class="o">=</span> <span class="n">tensorboard</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tensorboard_log_frequency</span> <span class="o">=</span> <span class="n">tensorboard_log_frequency</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tensorboard_step</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">global_step</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">use_queue</span> <span class="o">=</span> <span class="n">use_queue</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span> <span class="o">=</span> <span class="n">random_seed</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">TensorGraph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_initial_states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_final_states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_zero_states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_queue</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensorboard</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+          <span class="s2">&quot;Currently TensorGraph cannot both use_queue and tensorboard at the same time&quot;</span>
+      <span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_add_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">layer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">Feature</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">Label</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">Weights</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">task_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+    <span class="k">for</span> <span class="n">in_layer</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">in_layers</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_add_layer</span><span class="p">(</span><span class="n">in_layer</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TensorGraph.fit"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+          <span class="n">dataset</span><span class="p">,</span>
+          <span class="n">nb_epoch</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+          <span class="n">max_checkpoints_to_keep</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+          <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+          <span class="n">deterministic</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+          <span class="n">restore</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+          <span class="n">submodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+          <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Train this model on a dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: Dataset</span>
+<span class="sd">      the Dataset to train on</span>
+<span class="sd">    nb_epoch: int</span>
+<span class="sd">      the number of epochs to train for</span>
+<span class="sd">    max_checkpoints_to_keep: int</span>
+<span class="sd">      the maximum number of checkpoints to keep.  Older checkpoints are discarded.</span>
+<span class="sd">    checkpoint_interval: int</span>
+<span class="sd">      the frequency at which to write checkpoints, measured in training steps.</span>
+<span class="sd">      Set this to 0 to disable automatic checkpointing.</span>
+<span class="sd">    deterministic: bool</span>
+<span class="sd">      if True, the samples are processed in order.  If False, a different random</span>
+<span class="sd">      order is used for each epoch.</span>
+<span class="sd">    restore: bool</span>
+<span class="sd">      if True, restore the model from the most recent checkpoint and continue training</span>
+<span class="sd">      from there.  If False, retrain the model from scratch.</span>
+<span class="sd">    submodel: Submodel</span>
+<span class="sd">      an alternate training objective to use.  This should have been created by</span>
+<span class="sd">      calling create_submodel().</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_generator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_generator</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">nb_epoch</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="n">deterministic</span><span class="p">),</span>
+        <span class="n">max_checkpoints_to_keep</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="p">,</span> <span class="n">restore</span><span class="p">,</span> <span class="n">submodel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.fit_generator"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.fit_generator">[docs]</a>  <span class="k">def</span> <span class="nf">fit_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">feed_dict_generator</span><span class="p">,</span>
+                    <span class="n">max_checkpoints_to_keep</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                    <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                    <span class="n">restore</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                    <span class="n">submodel</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Train this model on data from a generator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    feed_dict_generator: generator</span>
+<span class="sd">      this should generate batches, each represented as a dict that maps</span>
+<span class="sd">      Layers to values.</span>
+<span class="sd">    max_checkpoints_to_keep: int</span>
+<span class="sd">      the maximum number of checkpoints to keep.  Older checkpoints are discarded.</span>
+<span class="sd">    checkpoint_interval: int</span>
+<span class="sd">      the frequency at which to write checkpoints, measured in training steps.</span>
+<span class="sd">      Set this to 0 to disable automatic checkpointing.</span>
+<span class="sd">    restore: bool</span>
+<span class="sd">      if True, restore the model from the most recent checkpoint and continue training</span>
+<span class="sd">      from there.  If False, retrain the model from scratch.</span>
+<span class="sd">    submodel: Submodel</span>
+<span class="sd">      an alternate training objective to use.  This should have been created by</span>
+<span class="sd">      calling create_submodel().</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    the average loss over the most recent checkpoint interval</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">time1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+      <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span>
+      <span class="k">if</span> <span class="n">submodel</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">train_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s1">&#39;train_op&#39;</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">train_op</span> <span class="o">=</span> <span class="n">submodel</span><span class="o">.</span><span class="n">get_train_op</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">submodel</span><span class="o">.</span><span class="n">loss</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+          <span class="n">loss</span> <span class="o">=</span> <span class="n">submodel</span><span class="o">.</span><span class="n">loss</span>
+      <span class="k">if</span> <span class="n">checkpoint_interval</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span>
+            <span class="n">max_to_keep</span><span class="o">=</span><span class="n">max_checkpoints_to_keep</span><span class="p">,</span> <span class="n">save_relative_paths</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">restore</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+      <span class="n">avg_loss</span><span class="p">,</span> <span class="n">n_averaged_batches</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+      <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="n">n_enqueued</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">final_sample</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_installed</span><span class="p">:</span>
+        <span class="n">enqueue_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="n">_enqueue_batch</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feed_dict_generator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">),</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">n_enqueued</span><span class="p">,</span> <span class="n">final_sample</span><span class="p">))</span>
+        <span class="n">enqueue_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">feed_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_feed_dicts</span><span class="p">(</span><span class="n">feed_dict_generator</span><span class="p">,</span> <span class="bp">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_installed</span><span class="p">:</span>
+          <span class="c1"># Don&#39;t let this thread get ahead of the enqueue thread, since if</span>
+          <span class="c1"># we try to read more batches than the total number that get queued,</span>
+          <span class="c1"># this thread will hang indefinitely.</span>
+          <span class="k">while</span> <span class="n">n_enqueued</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">n_samples</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n_samples</span> <span class="o">==</span> <span class="n">final_sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+              <span class="k">break</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">n_samples</span> <span class="o">==</span> <span class="n">final_sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">break</span>
+        <span class="n">n_samples</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">should_log</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tensorboard</span> <span class="ow">and</span>
+                      <span class="n">n_samples</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensorboard_log_frequency</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">fetches</span> <span class="o">=</span> <span class="p">[</span><span class="n">train_op</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">should_log</span><span class="p">:</span>
+          <span class="n">fetches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;summary_op&quot;</span><span class="p">))</span>
+        <span class="n">fetched_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">fetches</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">should_log</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_log_tensorboard</span><span class="p">(</span><span class="n">fetched_values</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">avg_loss</span> <span class="o">+=</span> <span class="n">fetched_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">n_averaged_batches</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_step</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">checkpoint_interval</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_step</span> <span class="o">%</span> <span class="n">checkpoint_interval</span> <span class="o">==</span> <span class="n">checkpoint_interval</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">)</span>
+          <span class="n">avg_loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">avg_loss</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_averaged_batches</span>
+          <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Ending global_step </span><span class="si">%d</span><span class="s1">: Average loss </span><span class="si">%g</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span>
+                                                            <span class="n">avg_loss</span><span class="p">))</span>
+          <span class="n">avg_loss</span><span class="p">,</span> <span class="n">n_averaged_batches</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+      <span class="k">if</span> <span class="n">n_averaged_batches</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">avg_loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">avg_loss</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_averaged_batches</span>
+      <span class="k">if</span> <span class="n">checkpoint_interval</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">n_averaged_batches</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+          <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Ending global_step </span><span class="si">%d</span><span class="s1">: Average loss </span><span class="si">%g</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span>
+                                                            <span class="n">avg_loss</span><span class="p">))</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">)</span>
+        <span class="n">time2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;TIMING: model fitting took </span><span class="si">%0.3f</span><span class="s2"> s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time2</span> <span class="o">-</span> <span class="n">time1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">avg_loss</span></div>
+
+  <span class="k">def</span> <span class="nf">_log_tensorboard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TODO(LESWING) set epoch</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">global_step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">)</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;FileWriter&quot;</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">reopen</span><span class="p">()</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">add_summary</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="n">global_step</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TensorGraph.fit_on_batch"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.fit_on_batch">[docs]</a>  <span class="k">def</span> <span class="nf">fit_on_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">submodel</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">nb_epoch</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">submodel</span><span class="o">=</span><span class="n">submodel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.default_generator"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.default_generator">[docs]</a>  <span class="k">def</span> <span class="nf">default_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">dataset</span><span class="p">,</span>
+                        <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">predict</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                        <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">pad_batches</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;More than one Feature, must use generator&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;More than one Label, must use generator&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_weights</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;More than one Weights, must use generator&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span> <span class="n">ids_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+          <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+          <span class="n">deterministic</span><span class="o">=</span><span class="n">deterministic</span><span class="p">,</span>
+          <span class="n">pad_batches</span><span class="o">=</span><span class="n">pad_batches</span><span class="p">):</span>
+        <span class="n">feed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">y_b</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">X_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">X_b</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_weights</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">w_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">task_weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">w_b</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">initial_state</span><span class="p">,</span> <span class="n">zero_state</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rnn_initial_states</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">rnn_zero_states</span><span class="p">):</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="n">initial_state</span><span class="p">]</span> <span class="o">=</span> <span class="n">zero_state</span>
+        <span class="k">yield</span> <span class="n">feed_dict</span></div>
+
+<div class="viewcode-block" id="TensorGraph.predict_on_generator"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.predict_on_generator">[docs]</a>  <span class="k">def</span> <span class="nf">predict_on_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    generator: Generator</span>
+<span class="sd">      Generator that constructs feed dictionaries for TensorGraph.</span>
+<span class="sd">    transformers: list</span>
+<span class="sd">      List of dc.trans.Transformers.</span>
+<span class="sd">    outputs: object</span>
+<span class="sd">      If outputs is None, then will assume outputs = self.outputs.</span>
+<span class="sd">      If outputs is a Layer/Tensor, then will evaluate and return as a</span>
+<span class="sd">      single ndarray. If outputs is a list of Layers/Tensors, will return a list</span>
+<span class="sd">      of ndarrays.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      y_pred: numpy ndarray of shape (n_samples, n_classes*n_tasks)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">outputs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">outputs</span><span class="p">]</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="c1"># Gather results for each output</span>
+      <span class="n">results</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">]</span>
+      <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="n">n_enqueued</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">final_sample</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_installed</span><span class="p">:</span>
+        <span class="n">enqueue_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="n">_enqueue_batch</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span>
+                  <span class="n">n_enqueued</span><span class="p">,</span> <span class="n">final_sample</span><span class="p">))</span>
+        <span class="n">enqueue_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">feed_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_feed_dicts</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_installed</span><span class="p">:</span>
+          <span class="c1"># Don&#39;t let this thread get ahead of the enqueue thread, since if</span>
+          <span class="c1"># we try to read more batches than the total number that get queued,</span>
+          <span class="c1"># this thread will hang indefinitely.</span>
+          <span class="k">while</span> <span class="n">n_enqueued</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">n_samples</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n_samples</span> <span class="o">==</span> <span class="n">final_sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+              <span class="k">break</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">n_samples</span> <span class="o">==</span> <span class="n">final_sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">break</span>
+        <span class="n">n_samples</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">feed_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed_results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">transformers</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Does not support transformations &quot;</span>
+                             <span class="s2">&quot;for multiple outputs.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">feed_results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="n">result</span> <span class="o">=</span> <span class="n">undo_transforms</span><span class="p">(</span><span class="n">feed_results</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">transformers</span><span class="p">)</span>
+          <span class="n">feed_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feed_results</span><span class="p">):</span>
+          <span class="n">results</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+      <span class="n">final_results</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">result_list</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">final_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">result_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+      <span class="c1"># If only one output, just return array</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">final_results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">final_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">final_results</span></div>
+
+<div class="viewcode-block" id="TensorGraph.predict_proba_on_generator"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.predict_proba_on_generator">[docs]</a>  <span class="k">def</span> <span class="nf">predict_proba_on_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span>
+                                 <span class="n">outputs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      y_pred: numpy ndarray of shape (n_samples, n_classes*n_tasks)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_on_generator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.predict_on_batch"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.predict_on_batch">[docs]</a>  <span class="k">def</span> <span class="nf">predict_on_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates predictions for input samples, processing samples in a batch.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: ndarray</span>
+<span class="sd">      the input data, as a Numpy array.</span>
+<span class="sd">    transformers: List</span>
+<span class="sd">      List of dc.trans.Transformers</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A Numpy array of predictions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_generator</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">predict</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_on_generator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.predict_proba_on_batch"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.predict_proba_on_batch">[docs]</a>  <span class="k">def</span> <span class="nf">predict_proba_on_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates predictions for input samples, processing samples in a batch.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: ndarray</span>
+<span class="sd">      the input data, as a Numpy array.</span>
+<span class="sd">    transformers: List</span>
+<span class="sd">      List of dc.trans.Transformers</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A Numpy array of predictions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_on_batch</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.predict"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.predict">[docs]</a>  <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses self to make predictions on provided Dataset object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: dc.data.Dataset</span>
+<span class="sd">      Dataset to make prediction on</span>
+<span class="sd">    transformers: list</span>
+<span class="sd">      List of dc.trans.Transformers.</span>
+<span class="sd">    outputs: object</span>
+<span class="sd">      If outputs is None, then will assume outputs = self.outputs[0] (single</span>
+<span class="sd">      output). If outputs is a Layer/Tensor, then will evaluate and return as a</span>
+<span class="sd">      single ndarray. If outputs is a list of Layers/Tensors, will return a list</span>
+<span class="sd">      of ndarrays.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    results: numpy ndarray or list of numpy ndarrays</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_generator</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">predict</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_on_generator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.predict_proba"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.predict_proba">[docs]</a>  <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: dc.data.Dataset</span>
+<span class="sd">      Dataset to make prediction on</span>
+<span class="sd">    transformers: list</span>
+<span class="sd">      List of dc.trans.Transformers.</span>
+<span class="sd">    outputs: object</span>
+<span class="sd">      If outputs is None, then will assume outputs = self.outputs[0] (single</span>
+<span class="sd">      output). If outputs is a Layer/Tensor, then will evaluate and return as a</span>
+<span class="sd">      single ndarray. If outputs is a list of Layers/Tensors, will return a list</span>
+<span class="sd">      of ndarrays.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    y_pred: numpy ndarray or list of numpy ndarrays</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_generator</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">predict</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_proba_on_generator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.topsort"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.topsort">[docs]</a>  <span class="k">def</span> <span class="nf">topsort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">add_layers_to_list</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">sorted_layers</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">sorted_layers</span><span class="p">:</span>
+        <span class="k">return</span>
+      <span class="k">for</span> <span class="n">in_layer</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">in_layers</span><span class="p">:</span>
+        <span class="n">add_layers_to_list</span><span class="p">(</span><span class="n">in_layer</span><span class="p">,</span> <span class="n">sorted_layers</span><span class="p">)</span>
+      <span class="n">sorted_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+    <span class="n">sorted_layers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_weights</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+      <span class="n">add_layers_to_list</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">sorted_layers</span><span class="p">)</span>
+    <span class="n">add_layers_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">sorted_layers</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">submodel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">submodels</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">submodel</span><span class="o">.</span><span class="n">loss</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">add_layers_to_list</span><span class="p">(</span><span class="n">submodel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">sorted_layers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sorted_layers</span></div>
+
+<div class="viewcode-block" id="TensorGraph.build"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_training_placeholder</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">())</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">set_random_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_install_queue</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topsort</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+          <span class="n">layer</span><span class="o">.</span><span class="n">create_tensor</span><span class="p">(</span><span class="n">training</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_training_placeholder</span><span class="p">)</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">rnn_initial_states</span> <span class="o">+=</span> <span class="n">layer</span><span class="o">.</span><span class="n">rnn_initial_states</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">rnn_final_states</span> <span class="o">+=</span> <span class="n">layer</span><span class="o">.</span><span class="n">rnn_final_states</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">rnn_zero_states</span> <span class="o">+=</span> <span class="n">layer</span><span class="o">.</span><span class="n">rnn_zero_states</span>
+          <span class="n">layer</span><span class="o">.</span><span class="n">add_summary_to_tg</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">configproto</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">built</span> <span class="o">=</span> <span class="bp">True</span>
+
+      <span class="c1"># Ensure all training operators have been created.</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s1">&#39;train_op&#39;</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">submodel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">submodels</span><span class="p">:</span>
+        <span class="n">train_op</span> <span class="o">=</span> <span class="n">submodel</span><span class="o">.</span><span class="n">get_train_op</span><span class="p">()</span>
+
+      <span class="c1"># Initialize variables.</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">variable_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+          <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_layer_variables</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+          <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">layer</span><span class="o">.</span><span class="n">variable_values</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+      <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">tensorboard</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensorboard</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">tf</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scalar</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+      <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">tensorboard</span><span class="p">:</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">tensor_summary</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">layer</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensorboard</span><span class="p">:</span>
+      <span class="n">writer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;FileWriter&quot;</span><span class="p">)</span>
+      <span class="n">writer</span><span class="o">.</span><span class="n">add_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">))</span>
+      <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># As a sanity check, make sure all tensors have the correct shape.</span>
+
+    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="n">layer</span><span class="o">.</span><span class="n">out_tensor</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">(</span>
+        <span class="p">),</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: Expected shape </span><span class="si">%s</span><span class="s1"> does not match actual shape </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">layer</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">layer</span><span class="o">.</span><span class="n">out_tensor</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
+      <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+  <span class="k">def</span> <span class="nf">_install_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_queue</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_installed</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_weights</span><span class="p">:</span>
+        <span class="n">layer</span><span class="o">.</span><span class="n">pre_queue</span> <span class="o">=</span> <span class="bp">True</span>
+      <span class="k">return</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_weights</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pre_q_inputs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">InputFifoQueue</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="n">pre_q_inputs</span><span class="p">)</span>
+    <span class="n">q</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+      <span class="n">pre_q_input</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">create_pre_q</span><span class="p">()</span>
+      <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pre_q_input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+      <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pre_q_input</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+      <span class="n">pre_q_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pre_q_input</span><span class="p">)</span>
+
+      <span class="n">layer</span><span class="o">.</span><span class="n">in_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_add_layer</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">input_queue</span> <span class="o">=</span> <span class="n">q</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">queue_installed</span> <span class="o">=</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="TensorGraph.set_loss"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.set_loss">[docs]</a>  <span class="k">def</span> <span class="nf">set_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">layer</span></div>
+
+<div class="viewcode-block" id="TensorGraph.add_output"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.add_output">[docs]</a>  <span class="k">def</span> <span class="nf">add_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.set_optimizer"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.set_optimizer">[docs]</a>  <span class="k">def</span> <span class="nf">set_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set the optimizer to use for fitting.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span></div>
+
+<div class="viewcode-block" id="TensorGraph.create_submodel"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.create_submodel">[docs]</a>  <span class="k">def</span> <span class="nf">create_submodel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an alternate objective for training one piece of a TensorGraph.</span>
+
+<span class="sd">    A TensorGraph consists of a set of layers, and specifies a loss function and</span>
+<span class="sd">    optimizer to use for training those layers.  Usually this is sufficient, but</span>
+<span class="sd">    there are cases where you want to train different parts of a model separately.</span>
+<span class="sd">    For example, a GAN consists of a generator and a discriminator.  They are</span>
+<span class="sd">    trained separately, and they use different loss functions.</span>
+
+<span class="sd">    A submodel defines an alternate objective to use in cases like this.  It may</span>
+<span class="sd">    optionally specify any of the following: a subset of layers in the model to</span>
+<span class="sd">    train; a different loss function; and a different optimizer to use.  This</span>
+<span class="sd">    method creates a submodel, which you can then pass to fit() to use it for</span>
+<span class="sd">    training.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    layers: list</span>
+<span class="sd">      the list of layers to train.  If None, all layers in the model will be</span>
+<span class="sd">      trained.</span>
+<span class="sd">    loss: Layer</span>
+<span class="sd">      the loss function to optimize.  If None, the model&#39;s main loss function</span>
+<span class="sd">      will be used.</span>
+<span class="sd">    optimizer: Optimizer</span>
+<span class="sd">      the optimizer to use for training.  If None, the model&#39;s main optimizer</span>
+<span class="sd">      will be used.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    the newly created submodel, which can be passed to any of the fitting</span>
+<span class="sd">    methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Submodels must be created before build() is called.&#39;</span><span class="p">)</span>
+    <span class="n">submodel</span> <span class="o">=</span> <span class="n">Submodel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">submodels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">submodel</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">loss</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_add_layer</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">submodel</span></div>
+
+<div class="viewcode-block" id="TensorGraph.get_pickling_errors"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.get_pickling_errors">[docs]</a>  <span class="k">def</span> <span class="nf">get_pickling_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">seen</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">seen</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">seen</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">state</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+      <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+          <span class="n">seen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+          <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pickling_errors</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">seen</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="TensorGraph.save"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.save">[docs]</a>  <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># Remove out_tensor from the object to be pickled</span>
+    <span class="n">must_restore</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">tensor_objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span>
+    <span class="n">rnn_initial_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rnn_initial_states</span>
+    <span class="n">rnn_final_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rnn_final_states</span>
+    <span class="n">rnn_zero_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rnn_zero_states</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_initial_states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_final_states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_zero_states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">out_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="n">must_restore</span> <span class="o">=</span> <span class="bp">True</span>
+      <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topsort</span><span class="p">():</span>
+        <span class="n">out_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">none_tensors</span><span class="p">())</span>
+      <span class="n">training_placeholder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_training_placeholder</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_training_placeholder</span> <span class="o">=</span> <span class="bp">None</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">built</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="c1"># Pickle itself</span>
+    <span class="n">pickle_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;model.pickle&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_name</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fout</span><span class="p">)</span>
+      <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_pickling_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">e</span>
+
+    <span class="c1"># add out_tensor back to everyone</span>
+    <span class="k">if</span> <span class="n">must_restore</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topsort</span><span class="p">()):</span>
+        <span class="n">layer</span><span class="o">.</span><span class="n">set_tensors</span><span class="p">(</span><span class="n">out_tensors</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_training_placeholder</span> <span class="o">=</span> <span class="n">training_placeholder</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">built</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span> <span class="o">=</span> <span class="n">tensor_objects</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_initial_states</span> <span class="o">=</span> <span class="n">rnn_initial_states</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_final_states</span> <span class="o">=</span> <span class="n">rnn_final_states</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rnn_zero_states</span> <span class="o">=</span> <span class="n">rnn_zero_states</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span></div>
+
+<div class="viewcode-block" id="TensorGraph.evaluate_generator"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.evaluate_generator">[docs]</a>  <span class="k">def</span> <span class="nf">evaluate_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                         <span class="n">feed_dict_generator</span><span class="p">,</span>
+                         <span class="n">metrics</span><span class="p">,</span>
+                         <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span>
+                         <span class="n">labels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                         <span class="n">outputs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                         <span class="n">weights</span><span class="o">=</span><span class="p">[],</span>
+                         <span class="n">per_task_metrics</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span>
+    <span class="n">n_tasks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
+    <span class="n">n_classes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">out_tensor</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">evaluator</span> <span class="o">=</span> <span class="n">GeneratorEvaluator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">feed_dict_generator</span><span class="p">,</span>
+        <span class="n">transformers</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+        <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+        <span class="n">n_tasks</span><span class="o">=</span><span class="n">n_tasks</span><span class="p">,</span>
+        <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">per_task_metrics</span><span class="p">:</span>
+      <span class="n">scores</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">compute_model_performance</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">scores</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">scores</span><span class="p">,</span> <span class="n">per_task_scores</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">compute_model_performance</span><span class="p">(</span>
+          <span class="n">metrics</span><span class="p">,</span> <span class="n">per_task_metrics</span><span class="o">=</span><span class="n">per_task_metrics</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">scores</span><span class="p">,</span> <span class="n">per_task_scores</span></div>
+
+<div class="viewcode-block" id="TensorGraph.get_layer_variables"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.get_layer_variables">[docs]</a>  <span class="k">def</span> <span class="nf">get_layer_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the list of trainable variables in a layer of the graph.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">variable_scope</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+      <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">GraphKeys</span><span class="o">.</span><span class="n">TRAINABLE_VARIABLES</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">layer</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.get_global_step"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.get_global_step">[docs]</a>  <span class="k">def</span> <span class="nf">get_global_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;GlobalStep&quot;</span><span class="p">)</span></div>
+
+  <span class="k">def</span> <span class="nf">_get_tf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fetches underlying TensorFlow primitives.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj: str</span>
+<span class="sd">      If &quot;Graph&quot;, returns tf.Graph instance. If &quot;FileWriter&quot;, returns</span>
+<span class="sd">      tf.summary.FileWriter. If &quot;Optimizer&quot;, returns the optimizer. If</span>
+<span class="sd">      &quot;train_op&quot;, returns the train operation. If &quot;summary_op&quot;, returns the</span>
+<span class="sd">      merged summary. If &quot;GlobalStep&quot; returns the global step.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    TensorFlow Object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">obj</span> <span class="o">==</span> <span class="s2">&quot;Graph&quot;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="s1">&#39;Graph&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">obj</span> <span class="o">==</span> <span class="s2">&quot;FileWriter&quot;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="s1">&#39;FileWriter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">FileWriter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">obj</span> <span class="o">==</span> <span class="s1">&#39;Optimizer&#39;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="s1">&#39;Optimizer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">_create_optimizer</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s1">&#39;GlobalStep&#39;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">obj</span> <span class="o">==</span> <span class="s1">&#39;train_op&#39;</span><span class="p">:</span>
+      <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s1">&#39;Optimizer&#39;</span><span class="p">)</span>
+      <span class="n">global_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s1">&#39;GlobalStep&#39;</span><span class="p">)</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="s1">&#39;train_op&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="n">global_step</span><span class="p">)</span>
+      <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="c1"># The loss doesn&#39;t depend on any variables.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="s1">&#39;train_op&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="n">obj</span> <span class="o">==</span> <span class="s1">&#39;summary_op&#39;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="s1">&#39;summary_op&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">merge_all</span><span class="p">(</span>
+          <span class="n">key</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">GraphKeys</span><span class="o">.</span><span class="n">SUMMARIES</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">obj</span> <span class="o">==</span> <span class="s1">&#39;GlobalStep&#39;</span><span class="p">:</span>
+      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensor_objects</span><span class="p">[</span><span class="s1">&#39;GlobalStep&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">trainable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TensorGraph.save_checkpoint"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.save_checkpoint">[docs]</a>  <span class="k">def</span> <span class="nf">save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_checkpoints_to_keep</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save a checkpoint to disk.</span>
+
+<span class="sd">    Usually you do not need to call this method, since fit() saves checkpoints</span>
+<span class="sd">    automatically.  If you have disabled automatic checkpointing during fitting,</span>
+<span class="sd">    this can be called to manually write checkpoints.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_checkpoints_to_keep: int</span>
+<span class="sd">      the maximum number of checkpoints to keep.  Older checkpoints are discarded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span><span class="n">max_to_keep</span><span class="o">=</span><span class="n">max_checkpoints_to_keep</span><span class="p">)</span>
+    <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.get_checkpoints"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.get_checkpoints">[docs]</a>  <span class="k">def</span> <span class="nf">get_checkpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a list of all available checkpoint files.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_checkpoint_state</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span><span class="o">.</span><span class="n">all_model_checkpoint_paths</span></div>
+
+<div class="viewcode-block" id="TensorGraph.restore"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.restore">[docs]</a>  <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reload the values of all variables from a checkpoint file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    checkpoint: str</span>
+<span class="sd">      the path to the checkpoint file to load.  If this is None, the most recent</span>
+<span class="sd">      checkpoint will be chosen automatically.  Call get_checkpoints() to get a</span>
+<span class="sd">      list of all available checkpoints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">checkpoint</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">latest_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">checkpoint</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No checkpoint found&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">reader</span> <span class="o">=</span> <span class="n">NewCheckpointReader</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">)</span>
+      <span class="n">var_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">reader</span><span class="o">.</span><span class="n">get_variable_to_shape_map</span><span class="p">()])</span>
+      <span class="n">var_map</span> <span class="o">=</span> <span class="p">{</span>
+          <span class="n">x</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">x</span>
+          <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">global_variables</span><span class="p">()</span>
+          <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">var_names</span>
+      <span class="p">}</span>
+      <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span><span class="n">var_list</span><span class="o">=</span><span class="n">var_map</span><span class="p">)</span>
+      <span class="n">saver</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.get_num_tasks"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.get_num_tasks">[docs]</a>  <span class="k">def</span> <span class="nf">get_num_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorGraph.get_pre_q_input"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.get_pre_q_input">[docs]</a>  <span class="k">def</span> <span class="nf">get_pre_q_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_layer</span><span class="p">):</span>
+    <span class="n">layer_name</span> <span class="o">=</span> <span class="n">input_layer</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">pre_q_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_pre_q&quot;</span> <span class="o">%</span> <span class="n">layer_name</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">pre_q_name</span><span class="p">]</span></div>
+
+  <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="TensorGraph.load_from_dir"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TensorGraph.load_from_dir">[docs]</a>  <span class="k">def</span> <span class="nf">load_from_dir</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">restore</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">pickle_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;model.pickle&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_name</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+      <span class="n">tensorgraph</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span>
+      <span class="n">tensorgraph</span><span class="o">.</span><span class="n">built</span> <span class="o">=</span> <span class="bp">False</span>
+      <span class="n">tensorgraph</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">=</span> <span class="n">model_dir</span>
+      <span class="k">if</span> <span class="n">restore</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+          <span class="n">tensorgraph</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+          <span class="k">pass</span>  <span class="c1"># No checkpoint to load</span>
+      <span class="k">return</span> <span class="n">tensorgraph</span></div>
+
+  <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+  <span class="k">def</span> <span class="nf">_create_feed_dicts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">training</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create feed dicts for use in fitting or prediction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    generator: Generator</span>
+<span class="sd">      the feed dict generator that was passed to fit_generator() or predict_on_generator()</span>
+<span class="sd">    training: bool</span>
+<span class="sd">      True during training, False during prediction</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">train_value</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">training</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_installed</span><span class="p">:</span>
+      <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_training_placeholder</span><span class="p">:</span> <span class="n">train_value</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
+      <span class="n">feed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_training_placeholder</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_value</span>
+      <span class="k">yield</span> <span class="n">feed_dict</span></div>
+
+
+<span class="k">def</span> <span class="nf">_enqueue_batch</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">n_enqueued</span><span class="p">,</span> <span class="n">final_sample</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Function to load data into</span>
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  tg</span>
+<span class="sd">  dataset</span>
+<span class="sd">  graph</span>
+<span class="sd">  sess</span>
+
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">with</span> <span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+    <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">feed_dict</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
+      <span class="n">enq</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="n">enq</span><span class="p">[</span><span class="n">tg</span><span class="o">.</span><span class="n">_training_placeholder</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+      <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">tg</span><span class="o">.</span><span class="n">features</span> <span class="o">+</span> <span class="n">tg</span><span class="o">.</span><span class="n">labels</span> <span class="o">+</span> <span class="n">tg</span><span class="o">.</span><span class="n">task_weights</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">feed_dict</span><span class="p">:</span>
+          <span class="n">value</span> <span class="o">=</span> <span class="n">feed_dict</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">layer</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">as_numpy_dtype</span><span class="p">)</span>
+        <span class="n">enq</span><span class="p">[</span><span class="n">tg</span><span class="o">.</span><span class="n">get_pre_q_input</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+      <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">input_queue</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">enq</span><span class="p">)</span>
+      <span class="n">n_enqueued</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">final_sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_enqueued</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="TFWrapper"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.TFWrapper">[docs]</a><span class="k">class</span> <span class="nc">TFWrapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;This class exists as a workaround for Tensorflow objects not being picklable.</span>
+
+<span class="sd">  The job of a TFWrapper is to create Tensorflow objects by passing defined arguments</span>
+<span class="sd">  to a constructor.  There are cases where we really want to store Tensorflow objects</span>
+<span class="sd">  of various sorts (optimizers, initializers, etc.), but we can&#39;t because they cannot</span>
+<span class="sd">  be pickled.  So instead we store a TFWrapper that creates the object when needed.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf_class</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a TFWrapper for constructing a Tensorflow object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tf_class: class</span>
+<span class="sd">      the type of object to create</span>
+<span class="sd">    kwargs:</span>
+<span class="sd">      any other arguments will be passed on to the object&#39;s constructor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tf_class</span> <span class="o">=</span> <span class="n">tf_class</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_class</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Submodel"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.Submodel">[docs]</a><span class="k">class</span> <span class="nc">Submodel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;An alternate objective for training one piece of a TensorGraph.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">layers</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a submodel.</span>
+
+<span class="sd">    In normal use, you should call create_submodel() on the TensorGraph instead</span>
+<span class="sd">    of using this constructor directly.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_train_op</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="Submodel.get_train_op"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.IRV.Submodel.get_train_op">[docs]</a>  <span class="k">def</span> <span class="nf">get_train_op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the Tensorflow operator to use for training.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_op</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="bp">None</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+          <span class="n">variables</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_layer_variables</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">loss</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">optimizer</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span>
+      <span class="c1"># Should we keep a separate global step count for each submodel?</span>
+      <span class="n">global_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s1">&#39;GlobalStep&#39;</span><span class="p">)</span>
+      <span class="n">tf_opt</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">_create_optimizer</span><span class="p">(</span><span class="n">global_step</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_train_op</span> <span class="o">=</span> <span class="n">tf_opt</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">global_step</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_op</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

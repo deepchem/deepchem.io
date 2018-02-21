@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tensorflow.python.framework.test_util &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for tensorflow.python.framework.test_util</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2015 The TensorFlow Authors. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1"># ==============================================================================</span>
+
+<span class="c1"># pylint: disable=invalid-name</span>
+<span class="sd">&quot;&quot;&quot;Test utils for tensorflow.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="n">_portpicker_import_error</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="k">try</span><span class="p">:</span>
+  <span class="kn">import</span> <span class="nn">portpicker</span>  <span class="c1"># pylint: disable=g-import-not-at-top</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">_error</span><span class="p">:</span>
+  <span class="n">_portpicker_import_error</span> <span class="o">=</span> <span class="n">_error</span>
+  <span class="n">portpicker</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="c1"># pylint: disable=g-import-not-at-top</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">descriptor_pool</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">text_format</span>
+
+<span class="kn">from</span> <span class="nn">tensorflow.core.framework</span> <span class="kn">import</span> <span class="n">graph_pb2</span>
+<span class="kn">from</span> <span class="nn">tensorflow.core.protobuf</span> <span class="kn">import</span> <span class="n">config_pb2</span>
+<span class="kn">from</span> <span class="nn">tensorflow.core.protobuf</span> <span class="kn">import</span> <span class="n">rewriter_config_pb2</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python</span> <span class="kn">import</span> <span class="n">pywrap_tensorflow</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.client</span> <span class="kn">import</span> <span class="n">device_lib</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.client</span> <span class="kn">import</span> <span class="n">session</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.eager</span> <span class="kn">import</span> <span class="n">backprop</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.eager</span> <span class="kn">import</span> <span class="n">context</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.eager</span> <span class="kn">import</span> <span class="n">tape</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">device</span> <span class="k">as</span> <span class="n">pydev</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">dtypes</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">ops</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">random_seed</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">versions</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.ops</span> <span class="kn">import</span> <span class="n">array_ops</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.ops</span> <span class="kn">import</span> <span class="n">resource_variable_ops</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.ops</span> <span class="kn">import</span> <span class="n">variables</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.platform</span> <span class="kn">import</span> <span class="n">googletest</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.platform</span> <span class="kn">import</span> <span class="n">tf_logging</span> <span class="k">as</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.training</span> <span class="kn">import</span> <span class="n">server_lib</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.util</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.util</span> <span class="kn">import</span> <span class="n">nest</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.util.protobuf</span> <span class="kn">import</span> <span class="n">compare</span>
+
+
+<span class="k">def</span> <span class="nf">gpu_device_name</span><span class="p">():</span>
+  <span class="sd">&quot;&quot;&quot;Returns the name of a GPU device if available or the empty string.&quot;&quot;&quot;</span>
+  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">device_lib</span><span class="o">.</span><span class="n">list_local_devices</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s2">&quot;GPU&quot;</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s2">&quot;SYCL&quot;</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">compat</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+  <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">assert_ops_in_graph</span><span class="p">(</span><span class="n">expected_ops</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Assert all expected operations are found.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    expected_ops: `dict&lt;string, string&gt;` of op name to op type.</span>
+<span class="sd">    graph: Graph to check.</span>
+<span class="sd">  Returns:</span>
+<span class="sd">    `dict&lt;string, node&gt;` of node name to node.</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    ValueError: If the expected ops are not present in the graph.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">actual_ops</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="n">gd</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">as_graph_def</span><span class="p">()</span>
+  <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">gd</span><span class="o">.</span><span class="n">node</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">expected_ops</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">expected_ops</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">!=</span> <span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected op for node </span><span class="si">%s</span><span class="s2"> is different. </span><span class="si">%s</span><span class="s2"> vs </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                         <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">expected_ops</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">))</span>
+      <span class="n">actual_ops</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span>
+  <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">actual_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not all expected ops are present. Expected </span><span class="si">%s</span><span class="s2">, found </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">expected_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">actual_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+  <span class="k">return</span> <span class="n">actual_ops</span>
+
+
+<span class="k">def</span> <span class="nf">assert_equal_graph_def</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">checkpoint_v2</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Asserts that two `GraphDef`s are (mostly) the same.</span>
+
+<span class="sd">  Compares two `GraphDef` protos for equality, ignoring versions and ordering of</span>
+<span class="sd">  nodes, attrs, and control inputs.  Node names are used to match up nodes</span>
+<span class="sd">  between the graphs, so the naming of nodes must be consistent.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    actual: The `GraphDef` we have.</span>
+<span class="sd">    expected: The `GraphDef` we expected.</span>
+<span class="sd">    checkpoint_v2: boolean determining whether to ignore randomized attribute</span>
+<span class="sd">        values that appear in V2 checkpoints.</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    AssertionError: If the `GraphDef`s do not match.</span>
+<span class="sd">    TypeError: If either argument is not a `GraphDef`.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">graph_pb2</span><span class="o">.</span><span class="n">GraphDef</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected tf.GraphDef for actual, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">graph_pb2</span><span class="o">.</span><span class="n">GraphDef</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected tf.GraphDef for expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">checkpoint_v2</span><span class="p">:</span>
+    <span class="n">_strip_checkpoint_v2_randomized</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="n">_strip_checkpoint_v2_randomized</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+
+  <span class="n">diff</span> <span class="o">=</span> <span class="n">pywrap_tensorflow</span><span class="o">.</span><span class="n">EqualGraphDefWrapper</span><span class="p">(</span><span class="n">actual</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span>
+                                                <span class="n">expected</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+  <span class="k">if</span> <span class="n">diff</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="n">compat</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">assert_meta_graph_protos_equal</span><span class="p">(</span><span class="n">tester</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compares MetaGraphDefs `a` and `b` in unit test class `tester`.&quot;&quot;&quot;</span>
+  <span class="c1"># Carefully check the collection_defs</span>
+  <span class="n">tester</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">collection_def</span><span class="p">),</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">collection_def</span><span class="p">))</span>
+  <span class="n">collection_keys</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">collection_def</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+  <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">collection_keys</span><span class="p">:</span>
+    <span class="n">a_value</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">collection_def</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">b_value</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">collection_def</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">proto_type</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">get_collection_proto_type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">proto_type</span><span class="p">:</span>
+      <span class="n">a_proto</span> <span class="o">=</span> <span class="n">proto_type</span><span class="p">()</span>
+      <span class="n">b_proto</span> <span class="o">=</span> <span class="n">proto_type</span><span class="p">()</span>
+      <span class="c1"># Number of entries in the collections is the same</span>
+      <span class="n">tester</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a_value</span><span class="o">.</span><span class="n">bytes_list</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+                         <span class="nb">len</span><span class="p">(</span><span class="n">b_value</span><span class="o">.</span><span class="n">bytes_list</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">a_value_item</span><span class="p">,</span> <span class="n">b_value_item</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+          <span class="n">a_value</span><span class="o">.</span><span class="n">bytes_list</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+          <span class="n">b_value</span><span class="o">.</span><span class="n">bytes_list</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+        <span class="n">a_proto</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">a_value_item</span><span class="p">)</span>
+        <span class="n">b_proto</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">b_value_item</span><span class="p">)</span>
+        <span class="n">tester</span><span class="o">.</span><span class="n">assertProtoEquals</span><span class="p">(</span><span class="n">a_proto</span><span class="p">,</span> <span class="n">b_proto</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">tester</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">a_value</span><span class="p">,</span> <span class="n">b_value</span><span class="p">)</span>
+  <span class="c1"># Compared the fields directly, remove their raw values from the</span>
+  <span class="c1"># proto comparison below.</span>
+  <span class="n">a</span><span class="o">.</span><span class="n">ClearField</span><span class="p">(</span><span class="s2">&quot;collection_def&quot;</span><span class="p">)</span>
+  <span class="n">b</span><span class="o">.</span><span class="n">ClearField</span><span class="p">(</span><span class="s2">&quot;collection_def&quot;</span><span class="p">)</span>
+  <span class="n">tester</span><span class="o">.</span><span class="n">assertProtoEquals</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+
+<span class="c1"># Matches attributes named via _SHARDED_SUFFIX in</span>
+<span class="c1"># tensorflow/python/training/saver.py</span>
+<span class="n">_SHARDED_SAVE_OP_PATTERN</span> <span class="o">=</span> <span class="s2">&quot;_temp_[0-9a-z]{32}/part&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_strip_checkpoint_v2_randomized</span><span class="p">(</span><span class="n">graph_def</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">graph_def</span><span class="o">.</span><span class="n">node</span><span class="p">:</span>
+    <span class="n">delete_keys</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">attr_key</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">attr</span><span class="p">:</span>
+      <span class="n">attr_tensor_value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="n">attr_key</span><span class="p">]</span><span class="o">.</span><span class="n">tensor</span>
+      <span class="k">if</span> <span class="n">attr_tensor_value</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr_tensor_value</span><span class="o">.</span><span class="n">string_val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">attr_tensor_string_value</span> <span class="o">=</span> <span class="n">attr_tensor_value</span><span class="o">.</span><span class="n">string_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">attr_tensor_string_value</span> <span class="ow">and</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">_SHARDED_SAVE_OP_PATTERN</span><span class="p">,</span> <span class="n">attr_tensor_string_value</span><span class="p">)):</span>
+          <span class="n">delete_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr_key</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">attr_key</span> <span class="ow">in</span> <span class="n">delete_keys</span><span class="p">:</span>
+      <span class="k">del</span> <span class="n">node</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="n">attr_key</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">IsGoogleCudaEnabled</span><span class="p">():</span>
+  <span class="k">return</span> <span class="n">pywrap_tensorflow</span><span class="o">.</span><span class="n">IsGoogleCudaEnabled</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">CudaSupportsHalfMatMulAndConv</span><span class="p">():</span>
+  <span class="k">return</span> <span class="n">pywrap_tensorflow</span><span class="o">.</span><span class="n">CudaSupportsHalfMatMulAndConv</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">NHWCToNCHW</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Converts the input from the NHWC format to NCHW.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    input_tensor: a 4- or 5-D tensor, or an array representing shape</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    converted tensor or shape array</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1"># tensor dim -&gt; new axis order</span>
+  <span class="n">new_axes</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="mi">4</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+      <span class="mi">5</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="n">ndims</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">ndims</span>
+    <span class="k">return</span> <span class="n">array_ops</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">new_axes</span><span class="p">[</span><span class="n">ndims</span><span class="p">])</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">ndims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">input_tensor</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">new_axes</span><span class="p">[</span><span class="n">ndims</span><span class="p">]]</span>
+
+
+<span class="k">def</span> <span class="nf">NHWCToNCHW_VECT_C</span><span class="p">(</span><span class="n">input_shape_or_tensor</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Transforms the input from the NHWC layout to NCHW_VECT_C layout.</span>
+
+<span class="sd">  Note: Does not include quantization or type conversion steps, which should</span>
+<span class="sd">  be applied afterwards.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    input_shape_or_tensor: a 4- or 5-D tensor, or an array representing shape</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    tensor or shape array transformed into NCHW_VECT_C</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    ValueError: if last dimension of `input_shape_or_tensor` is not evenly</span>
+<span class="sd">        divisible by 4.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">permutations</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="mi">6</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]}</span>
+  <span class="n">is_tensor</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape_or_tensor</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+  <span class="n">temp_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_shape_or_tensor</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">is_tensor</span> <span class="k">else</span> <span class="n">input_shape_or_tensor</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">temp_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;Last dimension of input must be evenly divisible by 4 to convert to &quot;</span>
+        <span class="s2">&quot;NCHW_VECT_C.&quot;</span><span class="p">)</span>
+  <span class="n">temp_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">//=</span> <span class="mi">4</span>
+  <span class="n">temp_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+  <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutations</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">temp_shape</span><span class="p">)]</span>
+  <span class="k">if</span> <span class="n">is_tensor</span><span class="p">:</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">array_ops</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">input_shape_or_tensor</span><span class="p">,</span> <span class="n">temp_shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array_ops</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">permutation</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">temp_shape</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">permutation</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">NCHW_VECT_CToNHWC</span><span class="p">(</span><span class="n">input_shape_or_tensor</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Transforms the input from the NCHW_VECT_C layout to NHWC layout.</span>
+
+<span class="sd">  Note: Does not include de-quantization or type conversion steps, which should</span>
+<span class="sd">  be applied beforehand.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    input_shape_or_tensor: a 5- or 6-D tensor, or an array representing shape</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    tensor or shape array transformed into NHWC</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    ValueError: if last dimension of `input_shape_or_tensor` is not 4.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">permutations</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="mi">6</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">]}</span>
+  <span class="n">is_tensor</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape_or_tensor</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+  <span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_shape_or_tensor</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span>
+                 <span class="k">if</span> <span class="n">is_tensor</span> <span class="k">else</span> <span class="n">input_shape_or_tensor</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Last dimension of NCHW_VECT_C must be 4.&quot;</span><span class="p">)</span>
+  <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutations</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)]</span>
+  <span class="n">nhwc_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">input_shape</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">permutation</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+  <span class="n">nhwc_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+  <span class="k">if</span> <span class="n">is_tensor</span><span class="p">:</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">array_ops</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">input_shape_or_tensor</span><span class="p">,</span> <span class="n">permutation</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array_ops</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">nhwc_shape</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">nhwc_shape</span>
+
+
+<span class="k">def</span> <span class="nf">NCHWToNHWC</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Converts the input from the NCHW format to NHWC.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    input_tensor: a 4- or 5-D tensor, or an array representing shape</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    converted tensor or shape array</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1"># tensor dim -&gt; new axis order</span>
+  <span class="n">new_axes</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="mi">4</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+      <span class="mi">5</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="n">ndims</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">ndims</span>
+    <span class="k">return</span> <span class="n">array_ops</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">new_axes</span><span class="p">[</span><span class="n">ndims</span><span class="p">])</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">ndims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">input_tensor</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">new_axes</span><span class="p">[</span><span class="n">ndims</span><span class="p">]]</span>
+
+
+<span class="c1"># TODO(skyewm): remove this eventually</span>
+<span class="c1"># pylint: disable=protected-access</span>
+<span class="k">def</span> <span class="nf">_use_c_api_wrapper</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">use_c_api</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="n">prev_value</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">_USE_C_API</span>
+  <span class="n">ops</span><span class="o">.</span><span class="n">_USE_C_API</span> <span class="o">=</span> <span class="n">use_c_api</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">ops</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">finally</span><span class="p">:</span>
+    <span class="n">ops</span><span class="o">.</span><span class="n">_USE_C_API</span> <span class="o">=</span> <span class="n">prev_value</span>
+<span class="c1"># pylint: disable=protected-access</span>
+
+
+<span class="k">def</span> <span class="nf">c_api_and_cuda_enabled</span><span class="p">():</span>
+  <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">_USE_C_API</span> <span class="ow">and</span> <span class="n">IsGoogleCudaEnabled</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">skip_if</span><span class="p">(</span><span class="n">condition</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Skips the decorated function if condition is or evaluates to True.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    condition: Either an expression that can be used in &quot;if not condition&quot;</span>
+<span class="sd">               statement, or a callable whose result should be a boolean.</span>
+<span class="sd">  Returns:</span>
+<span class="sd">    The wrapped function</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">def</span> <span class="nf">real_skip_if</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">condition</span><span class="p">):</span>
+        <span class="n">skip</span> <span class="o">=</span> <span class="n">condition</span><span class="p">()</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">skip</span> <span class="o">=</span> <span class="n">condition</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">skip</span><span class="p">:</span>
+        <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+  <span class="k">return</span> <span class="n">real_skip_if</span>
+
+
+<span class="c1"># TODO(skyewm): remove this eventually</span>
+<span class="k">def</span> <span class="nf">disable_c_api</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Decorator for disabling the C API on a test.</span>
+
+<span class="sd">  Note this disables the C API after running the test class&#39;s setup/teardown</span>
+<span class="sd">  methods.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    fn: the function to be wrapped</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    The wrapped function</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">_use_c_api_wrapper</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="c1"># TODO(skyewm): remove this eventually</span>
+<span class="k">def</span> <span class="nf">enable_c_api</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Decorator for enabling the C API on a test.</span>
+
+<span class="sd">  Note this enables the C API after running the test class&#39;s setup/teardown</span>
+<span class="sd">  methods.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    fn: the function to be wrapped</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    The wrapped function</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">_use_c_api_wrapper</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="c1"># This decorator is a hacky way to run all the test methods in a decorated</span>
+<span class="c1"># class with and without C API enabled.</span>
+<span class="c1"># TODO(iga): Remove this and its uses once we switch to using C API by default.</span>
+<span class="k">def</span> <span class="nf">with_c_api</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Adds methods that call original methods but with C API enabled.</span>
+
+<span class="sd">  Note this enables the C API in new methods after running the test class&#39;s</span>
+<span class="sd">  setup method. This can be a problem if some objects are created in it</span>
+<span class="sd">  before the C API is enabled.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    cls: class to decorate</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    cls with new test methods added</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">):</span>
+      <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;WithCApi&quot;</span><span class="p">,</span> <span class="n">enable_c_api</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+  <span class="k">return</span> <span class="bp">cls</span>
+
+
+<span class="k">class</span> <span class="nc">IsolateTest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;A context manager which isolates resources in its block.</span>
+
+<span class="sd">  Provides an Eager-agnostic abstraction for preventing the sharing of</span>
+<span class="sd">  variables and other resources.</span>
+
+<span class="sd">  In graph mode, resource handle ops are only executed in a particular Session,</span>
+<span class="sd">  isolating them from resources with the same name in other Graphs. In Eager,</span>
+<span class="sd">  separate Sessions do not exist, so resources (particularly ResourceVariables)</span>
+<span class="sd">  would be shared implicitly if a resource of the same name were created</span>
+<span class="sd">  anywhere in a Python process. Multiple handles to the same resource would</span>
+<span class="sd">  cause several issues, and so this type of sharing will raise an exception.</span>
+
+<span class="sd">  Using resources with the same name in a single Python process may be useful</span>
+<span class="sd">  (especially for unit tests), so this context manager provides an abstraction</span>
+<span class="sd">  for isolating resources. Using a resource created in one Isolation environment</span>
+<span class="sd">  in another is an error.</span>
+
+<span class="sd">  Example usage in Eager mode:</span>
+
+<span class="sd">  ```python</span>
+<span class="sd">  import tensorflow as tf</span>
+<span class="sd">  # Import subject to change</span>
+<span class="sd">  from tensorflow.contrib.eager.python import tfe</span>
+
+<span class="sd">  tfe.enable_eager_execution()</span>
+
+<span class="sd">  for hyperparameter in [1, 2, 3]:</span>
+<span class="sd">    with tfe.IsolateTest():</span>
+<span class="sd">      v = tfe.Variable(name=&quot;v&quot;, initial_value=hyperparameter)</span>
+<span class="sd">      # train model, test results ...</span>
+<span class="sd">  ```</span>
+
+<span class="sd">  IsolateTest is currently exposed through contrib.eager, but it creates a new</span>
+<span class="sd">  default Graph and provides equivalent safety in graph mode.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">in_eager_mode</span><span class="p">()</span> <span class="ow">and</span> <span class="n">tape</span><span class="o">.</span><span class="n">could_possibly_record</span><span class="p">():</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot isolate Eager execution with an active tape.&quot;</span><span class="p">)</span>
+    <span class="c1"># In Eager, Graphs set a container which isolates resources, and maintain a</span>
+    <span class="c1"># VariableStore which caches ResourceVariable objects created through</span>
+    <span class="c1"># get_variable. So setting the default Graph has the side effect of</span>
+    <span class="c1"># isolating Eager resources.</span>
+    <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">eager_mode</span><span class="p">():</span>
+      <span class="c1"># Create the graph in Eager mode, as this provides stricter semantics</span>
+      <span class="c1"># (i.e. has a unique container prefix). This prevents implicit sharing</span>
+      <span class="c1"># when a Graph-mode graph is created and then Eager mode is enabled (an</span>
+      <span class="c1"># error through enable_eager_execution, but common with context managers</span>
+      <span class="c1"># in unit tests).</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_graph_as_default_context_manager</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span><span class="o">.</span><span class="n">as_default</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_graph_as_default_context_manager</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_arg</span><span class="p">,</span> <span class="n">value_arg</span><span class="p">,</span> <span class="n">traceback_arg</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph_as_default_context_manager</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span>
+        <span class="n">type_arg</span><span class="p">,</span> <span class="n">value_arg</span><span class="p">,</span> <span class="n">traceback_arg</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">assert_no_new_tensors</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Decorator for asserting that no new Tensors persist after a test.</span>
+
+<span class="sd">  Mainly useful for checking that code using the Python C API has correctly</span>
+<span class="sd">  manipulated reference counts.</span>
+
+<span class="sd">  Clears the caches that it knows about, runs the garbage collector, then checks</span>
+<span class="sd">  that there are no Tensor or Tensor-like objects still around. This includes</span>
+<span class="sd">  Tensors to which something still has a reference (e.g. from missing</span>
+<span class="sd">  Py_DECREFs) and uncollectable cycles (i.e. Python reference cycles where one</span>
+<span class="sd">  of the objects has __del__ defined).</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    f: The test case to run.</span>
+<span class="sd">  Returns:</span>
+<span class="sd">    The decorated test case.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds existing Tensors, runs the test, checks for new Tensors.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_is_tensor</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">variables</span><span class="o">.</span><span class="n">Variable</span><span class="p">))</span>
+      <span class="k">except</span> <span class="ne">ReferenceError</span><span class="p">:</span>
+        <span class="c1"># If the object no longer exists, we don&#39;t care about it.</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="n">tensors_before</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">gc</span><span class="o">.</span><span class="n">get_objects</span><span class="p">()</span> <span class="k">if</span> <span class="n">_is_tensor</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="n">outside_container_prefix</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">get_default_graph</span><span class="p">()</span><span class="o">.</span><span class="n">_container_prefix</span>
+    <span class="k">with</span> <span class="n">IsolateTest</span><span class="p">():</span>
+      <span class="c1"># Run the test in a new graph so that collections get cleared when it&#39;s</span>
+      <span class="c1"># done, but inherit the container prefix so that we can print the values</span>
+      <span class="c1"># of variables which get leaked when executing eagerly.</span>
+      <span class="n">ops</span><span class="o">.</span><span class="n">get_default_graph</span><span class="p">()</span><span class="o">.</span><span class="n">_container_prefix</span> <span class="o">=</span> <span class="n">outside_container_prefix</span>
+      <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="c1"># Make an effort to clear caches, which would otherwise look like leaked</span>
+    <span class="c1"># Tensors.</span>
+    <span class="n">backprop</span><span class="o">.</span><span class="n">_last_zero</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span>
+    <span class="n">backprop</span><span class="o">.</span><span class="n">_shape_dtype</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">get_default_context</span><span class="p">()</span><span class="o">.</span><span class="n">scalar_cache</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+    <span class="n">tensors_after</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">gc</span><span class="o">.</span><span class="n">get_objects</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">_is_tensor</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">id</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tensors_before</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">tensors_after</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> Tensors not deallocated after test: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+          <span class="nb">len</span><span class="p">(</span><span class="n">tensors_after</span><span class="p">),</span>
+          <span class="nb">str</span><span class="p">(</span><span class="n">tensors_after</span><span class="p">),</span>
+      <span class="p">)))</span>
+
+  <span class="k">return</span> <span class="n">decorator</span>
+
+
+<span class="k">def</span> <span class="nf">assert_no_garbage_created</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Test method decorator to assert that no garbage has been created.</span>
+
+<span class="sd">  Note that this decorator sets DEBUG_SAVEALL, which in some Python interpreters</span>
+<span class="sd">  cannot be un-set (i.e. will disable garbage collection for any other unit</span>
+<span class="sd">  tests in the same file/shard).</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    f: The function to decorate.</span>
+<span class="sd">  Returns:</span>
+<span class="sd">    The decorated function.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets DEBUG_SAVEALL, runs the test, and checks for new garbage.&quot;&quot;&quot;</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">disable</span><span class="p">()</span>
+    <span class="n">previous_debug_flags</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">get_debug</span><span class="p">()</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">DEBUG_SAVEALL</span><span class="p">)</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+    <span class="n">previous_garbage</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">garbage</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+    <span class="c1"># This will fail if any garbage has been created, typically because of a</span>
+    <span class="c1"># reference cycle.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">previous_garbage</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">garbage</span><span class="p">))</span>
+    <span class="c1"># TODO(allenl): Figure out why this debug flag reset doesn&#39;t work. It would</span>
+    <span class="c1"># be nice to be able to decorate arbitrary tests in a large test suite and</span>
+    <span class="c1"># not hold on to every object in other tests.</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">previous_debug_flags</span><span class="p">)</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">decorator</span>
+
+
+<span class="k">def</span> <span class="nf">run_in_graph_and_eager_modes</span><span class="p">(</span>
+    <span class="n">__unused__</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">graph</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">use_gpu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">force_gpu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">reset_test</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">assert_no_eager_garbage</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Runs the test in both graph and eager modes.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    __unused__: Prevents sliently skipping tests.</span>
+<span class="sd">    graph: Optional graph to use during the returned session.</span>
+<span class="sd">    config: An optional config_pb2.ConfigProto to use to configure the</span>
+<span class="sd">      session.</span>
+<span class="sd">    use_gpu: If True, attempt to run as many ops as possible on GPU.</span>
+<span class="sd">    force_gpu: If True, pin all ops to `/device:GPU:0`.</span>
+<span class="sd">    reset_test: If True, tearDown and SetUp the test case again.</span>
+<span class="sd">    assert_no_eager_garbage: If True, sets DEBUG_SAVEALL on the garbage</span>
+<span class="sd">      collector and asserts that no extra garbage has been created when running</span>
+<span class="sd">      the test in eager mode. This will fail if there are reference cycles</span>
+<span class="sd">      (e.g. a = []; a.append(a)). Off by default because some tests may create</span>
+<span class="sd">      garbage for legitimate reasons (e.g. they define a class which inherits</span>
+<span class="sd">      from `object`), and because DEBUG_SAVEALL is sticky in some Python</span>
+<span class="sd">      interpreters (meaning that tests which rely on objects being collected</span>
+<span class="sd">      elsewhere in the unit test file will not work). Additionally, checks that</span>
+<span class="sd">      nothing still has a reference to Tensors that the test allocated.</span>
+<span class="sd">  Returns:</span>
+<span class="sd">    Returns a decorator that will run the decorated test function</span>
+<span class="sd">        using both a graph and using eager execution.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">assert</span> <span class="ow">not</span> <span class="n">__unused__</span><span class="p">,</span> <span class="s2">&quot;Add () after run_in_graph_and_eager_modes.&quot;</span>
+
+  <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test method decorator.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">decorated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Decorated the test method.&quot;&quot;&quot;</span>
+      <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">graph_mode</span><span class="p">():</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">use_gpu</span><span class="p">,</span> <span class="n">force_gpu</span><span class="p">):</span>
+          <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="n">reset_test</span><span class="p">:</span>
+        <span class="c1"># This decorator runs the wrapped test twice.</span>
+        <span class="c1"># Reset the test environment between runs.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tearDown</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+
+      <span class="k">def</span> <span class="nf">run_eager_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">force_gpu</span><span class="p">:</span>
+          <span class="n">gpu_name</span> <span class="o">=</span> <span class="n">gpu_device_name</span><span class="p">()</span>
+          <span class="k">if</span> <span class="ow">not</span> <span class="n">gpu_name</span><span class="p">:</span>
+            <span class="n">gpu_name</span> <span class="o">=</span> <span class="s2">&quot;/device:GPU:0&quot;</span>
+          <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">gpu_name</span><span class="p">):</span>
+            <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">use_gpu</span><span class="p">:</span>
+          <span class="c1"># TODO(xpan): Support softplacement and gpu by default when available.</span>
+          <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;/device:CPU:0&quot;</span><span class="p">):</span>
+            <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="n">assert_no_eager_garbage</span><span class="p">:</span>
+        <span class="n">run_eager_mode</span> <span class="o">=</span> <span class="n">assert_no_new_tensors</span><span class="p">(</span>
+            <span class="n">assert_no_garbage_created</span><span class="p">(</span><span class="n">run_eager_mode</span><span class="p">))</span>
+
+      <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">eager_mode</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">IsolateTest</span><span class="p">():</span>
+          <span class="n">run_eager_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">decorated</span>
+  <span class="k">return</span> <span class="n">decorator</span>
+
+
+<span class="k">def</span> <span class="nf">is_gpu_available</span><span class="p">(</span><span class="n">cuda_only</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">min_cuda_compute_capability</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns whether TensorFlow can access a GPU.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    cuda_only: limit the search to CUDA gpus.</span>
+<span class="sd">    min_cuda_compute_capability: a (major,minor) pair that indicates the minimum</span>
+<span class="sd">      CUDA compute capability required, or None if no requirement.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    True iff a gpu device of the requested kind is available.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">compute_capability_from_device_desc</span><span class="p">(</span><span class="n">device_desc</span><span class="p">):</span>
+    <span class="c1"># TODO(jingyue): The device description generator has to be in sync with</span>
+    <span class="c1"># this file. Another option is to put compute capability in</span>
+    <span class="c1"># DeviceAttributes, but I avoided that to keep DeviceAttributes</span>
+    <span class="c1"># target-independent. Reconsider this option when we have more things like</span>
+    <span class="c1"># this to keep in sync.</span>
+    <span class="c1"># LINT.IfChange</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;compute capability: (\d+)\.(\d+)&quot;</span><span class="p">,</span> <span class="n">device_desc</span><span class="p">)</span>
+    <span class="c1"># LINT.ThenChange(//tensorflow/core/\</span>
+    <span class="c1">#                 common_runtime/gpu/gpu_device.cc)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+      <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+  <span class="k">for</span> <span class="n">local_device</span> <span class="ow">in</span> <span class="n">device_lib</span><span class="o">.</span><span class="n">list_local_devices</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">local_device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s2">&quot;GPU&quot;</span><span class="p">:</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">min_cuda_compute_capability</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span>
+          <span class="n">compute_capability_from_device_desc</span><span class="p">(</span><span class="n">local_device</span><span class="o">.</span><span class="n">physical_device_desc</span><span class="p">)</span>
+          <span class="o">&gt;=</span> <span class="n">min_cuda_compute_capability</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="n">local_device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s2">&quot;SYCL&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cuda_only</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">True</span>
+  <span class="k">return</span> <span class="bp">False</span>
+
+
+<span class="nd">@contextlib.contextmanager</span>
+<span class="k">def</span> <span class="nf">device</span><span class="p">(</span><span class="n">use_gpu</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Uses gpu when requested and available.&quot;&quot;&quot;</span>
+  <span class="k">if</span> <span class="n">use_gpu</span> <span class="ow">and</span> <span class="n">is_gpu_available</span><span class="p">():</span>
+    <span class="n">dev</span> <span class="o">=</span> <span class="s2">&quot;/device:GPU:0&quot;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">dev</span> <span class="o">=</span> <span class="s2">&quot;/device:CPU:0&quot;</span>
+  <span class="k">with</span> <span class="n">ops</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">dev</span><span class="p">):</span>
+    <span class="k">yield</span>
+
+
+<span class="k">class</span> <span class="nc">TensorFlowTestCase</span><span class="p">(</span><span class="n">googletest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Base class for tests that need to test TensorFlow.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodName</span><span class="o">=</span><span class="s2">&quot;runTest&quot;</span><span class="p">):</span>  <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">TensorFlowTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">methodName</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_threads</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_tempdir</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_cached_session</span> <span class="o">=</span> <span class="bp">None</span>
+
+  <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_ClearCachedSession</span><span class="p">()</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_seed</span><span class="o">.</span><span class="n">DEFAULT_GRAPH_SEED</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_seed</span><span class="o">.</span><span class="n">DEFAULT_GRAPH_SEED</span><span class="p">)</span>
+    <span class="c1"># Note: The following line is necessary because some test methods may error</span>
+    <span class="c1"># out from within nested graph contexts (e.g., via assertRaises and</span>
+    <span class="c1"># assertRaisesRegexp), which may leave ops._default_graph_stack non-empty</span>
+    <span class="c1"># under certain versions of Python. That would cause</span>
+    <span class="c1"># ops.reset_default_graph() to throw an exception if the stack were not</span>
+    <span class="c1"># cleared first.</span>
+    <span class="n">ops</span><span class="o">.</span><span class="n">_default_graph_stack</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>  <span class="c1"># pylint: disable=protected-access</span>
+    <span class="n">ops</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+    <span class="n">random_seed</span><span class="o">.</span><span class="n">set_random_seed</span><span class="p">(</span><span class="n">random_seed</span><span class="o">.</span><span class="n">DEFAULT_GRAPH_SEED</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threads</span><span class="p">:</span>
+      <span class="n">thread</span><span class="o">.</span><span class="n">check_termination</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_ClearCachedSession</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">_ClearCachedSession</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_cached_session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_cached_session</span> <span class="o">=</span> <span class="bp">None</span>
+
+  <span class="k">def</span> <span class="nf">get_temp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a unique temporary directory for the test to use.</span>
+
+<span class="sd">    If you call this method multiple times during in a test, it will return the</span>
+<span class="sd">    same folder. However, across different runs the directories will be</span>
+<span class="sd">    different. This will ensure that across different runs tests will not be</span>
+<span class="sd">    able to pollute each others environment.</span>
+<span class="sd">    If you need multiple unique directories within a single test, you should</span>
+<span class="sd">    use tempfile.mkdtemp as follows:</span>
+<span class="sd">      tempfile.mkdtemp(dir=self.get_temp_dir()):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      string, the path to the unique temporary directory created for this test.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tempdir</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">googletest</span><span class="o">.</span><span class="n">GetTempDir</span><span class="p">())</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tempdir</span>
+
+  <span class="k">def</span> <span class="nf">_AssertProtoEquals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that a and b are the same proto.</span>
+
+<span class="sd">    Uses ProtoEq() first, as it returns correct results</span>
+<span class="sd">    for floating point attributes, and then use assertProtoEqual()</span>
+<span class="sd">    in case of failure as it provides good error messages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      a: a proto.</span>
+<span class="sd">      b: another proto.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">compare</span><span class="o">.</span><span class="n">ProtoEq</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+      <span class="n">compare</span><span class="o">.</span><span class="n">assertProtoEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">normalize_numbers</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">assertProtoEquals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_message_maybe_ascii</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that message is same as parsed expected_message_ascii.</span>
+
+<span class="sd">    Creates another prototype of message, reads the ascii message into it and</span>
+<span class="sd">    then compares them using self._AssertProtoEqual().</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      expected_message_maybe_ascii: proto message in original or ascii form.</span>
+<span class="sd">      message: the message to validate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expected_message_maybe_ascii</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)):</span>
+      <span class="n">expected_message</span> <span class="o">=</span> <span class="n">expected_message_maybe_ascii</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_AssertProtoEquals</span><span class="p">(</span><span class="n">expected_message</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expected_message_maybe_ascii</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+      <span class="n">expected_message</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)()</span>
+      <span class="n">text_format</span><span class="o">.</span><span class="n">Merge</span><span class="p">(</span><span class="n">expected_message_maybe_ascii</span><span class="p">,</span> <span class="n">expected_message</span><span class="p">,</span>
+                        <span class="n">descriptor_pool</span><span class="o">=</span><span class="n">descriptor_pool</span><span class="o">.</span><span class="n">Default</span><span class="p">())</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_AssertProtoEquals</span><span class="p">(</span><span class="n">expected_message</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Can&#39;t compare protos of type </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">expected_message_maybe_ascii</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)))</span>
+
+  <span class="k">def</span> <span class="nf">assertProtoEqualsVersion</span><span class="p">(</span>
+      <span class="bp">self</span><span class="p">,</span>
+      <span class="n">expected</span><span class="p">,</span>
+      <span class="n">actual</span><span class="p">,</span>
+      <span class="n">producer</span><span class="o">=</span><span class="n">versions</span><span class="o">.</span><span class="n">GRAPH_DEF_VERSION</span><span class="p">,</span>
+      <span class="n">min_consumer</span><span class="o">=</span><span class="n">versions</span><span class="o">.</span><span class="n">GRAPH_DEF_VERSION_MIN_CONSUMER</span><span class="p">):</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="s2">&quot;versions { producer: </span><span class="si">%d</span><span class="s2"> min_consumer: </span><span class="si">%d</span><span class="s2"> };</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">producer</span><span class="p">,</span> <span class="n">min_consumer</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertProtoEquals</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">actual</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">assertStartsWith</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actual</span><span class="p">,</span> <span class="n">expected_start</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Assert that actual.startswith(expected_start) is True.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      actual: str</span>
+<span class="sd">      expected_start: str</span>
+<span class="sd">      msg: Optional message to report on failure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">actual</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">expected_start</span><span class="p">):</span>
+      <span class="n">fail_msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> does not start with </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected_start</span><span class="p">)</span>
+      <span class="n">fail_msg</span> <span class="o">+=</span> <span class="s2">&quot; : </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="k">if</span> <span class="n">msg</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">fail_msg</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_eval_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">tensor</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">EagerTensor</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">resource_variable_ops</span><span class="o">.</span><span class="n">ResourceVariable</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">read_value</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_helper</span><span class="p">(</span><span class="n">tensor</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported type </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">tensor</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">_eval_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensors</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">tensors</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">nest</span><span class="o">.</span><span class="n">map_structure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eval_tensor</span><span class="p">,</span> <span class="n">tensors</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Evaluates tensors and returns numpy values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      tensors: A Tensor or a nested list/tuple of Tensors.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      tensors numpy values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">in_eager_mode</span><span class="p">():</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_helper</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">sess</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">get_default_session</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">sess</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+          <span class="k">return</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span>
+
+  <span class="c1"># pylint: disable=g-doc-return-or-yield</span>
+  <span class="nd">@contextlib.contextmanager</span>
+  <span class="k">def</span> <span class="nf">test_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">graph</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                   <span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                   <span class="n">use_gpu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                   <span class="n">force_gpu</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a TensorFlow Session for use in executing tests.</span>
+
+<span class="sd">    This method should be used for all functional tests.</span>
+
+<span class="sd">    This method behaves different than session.Session: for performance reasons</span>
+<span class="sd">    `test_session` will by default (if `graph` is None) reuse the same session</span>
+<span class="sd">    across tests. This means you may want to either call the function</span>
+<span class="sd">    `reset_default_graph()` before tests, or if creating an explicit new graph,</span>
+<span class="sd">    pass it here (simply setting it with `as_default()` won&#39;t do it), which will</span>
+<span class="sd">    trigger the creation of a new session.</span>
+
+<span class="sd">    Use the `use_gpu` and `force_gpu` options to control where ops are run. If</span>
+<span class="sd">    `force_gpu` is True, all ops are pinned to `/device:GPU:0`. Otherwise, if `use_gpu`</span>
+<span class="sd">    is True, TensorFlow tries to run as many ops on the GPU as possible. If both</span>
+<span class="sd">    `force_gpu and `use_gpu` are False, all ops are pinned to the CPU.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    ```python</span>
+<span class="sd">    class MyOperatorTest(test_util.TensorFlowTestCase):</span>
+<span class="sd">      def testMyOperator(self):</span>
+<span class="sd">        with self.test_session(use_gpu=True):</span>
+<span class="sd">          valid_input = [1.0, 2.0, 3.0, 4.0, 5.0]</span>
+<span class="sd">          result = MyOperator(valid_input).eval()</span>
+<span class="sd">          self.assertEqual(result, [1.0, 2.0, 3.0, 5.0, 8.0]</span>
+<span class="sd">          invalid_input = [-1.0, 2.0, 7.0]</span>
+<span class="sd">          with self.assertRaisesOpError(&quot;negative input not supported&quot;):</span>
+<span class="sd">            MyOperator(invalid_input).eval()</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      graph: Optional graph to use during the returned session.</span>
+<span class="sd">      config: An optional config_pb2.ConfigProto to use to configure the</span>
+<span class="sd">        session.</span>
+<span class="sd">      use_gpu: If True, attempt to run as many ops as possible on GPU.</span>
+<span class="sd">      force_gpu: If True, pin all ops to `/device:GPU:0`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      A Session object that should be used as a context manager to surround</span>
+<span class="sd">      the graph building and execution code in a test case.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.test_session&quot;</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">skipTest</span><span class="p">(</span><span class="s2">&quot;Not a test.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prepare_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Returns a config for sessions.</span>
+
+<span class="sd">      Args:</span>
+<span class="sd">        config: An optional config_pb2.ConfigProto to use to configure the</span>
+<span class="sd">          session.</span>
+<span class="sd">      Returns:</span>
+<span class="sd">        A config_pb2.ConfigProto object.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">config_pb2</span><span class="o">.</span><span class="n">ConfigProto</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">allow_soft_placement</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">force_gpu</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">gpu_options</span><span class="o">.</span><span class="n">per_process_gpu_memory_fraction</span> <span class="o">=</span> <span class="mf">0.3</span>
+      <span class="k">elif</span> <span class="n">force_gpu</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">allow_soft_placement</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">config_pb2</span><span class="o">.</span><span class="n">ConfigProto</span><span class="p">()</span><span class="o">.</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">allow_soft_placement</span> <span class="o">=</span> <span class="bp">False</span>
+      <span class="c1"># Don&#39;t perform optimizations for tests so we don&#39;t inadvertently run</span>
+      <span class="c1"># gpu ops on cpu</span>
+      <span class="n">config</span><span class="o">.</span><span class="n">graph_options</span><span class="o">.</span><span class="n">optimizer_options</span><span class="o">.</span><span class="n">opt_level</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+      <span class="n">config</span><span class="o">.</span><span class="n">graph_options</span><span class="o">.</span><span class="n">rewrite_options</span><span class="o">.</span><span class="n">constant_folding</span> <span class="o">=</span> <span class="p">(</span>
+          <span class="n">rewriter_config_pb2</span><span class="o">.</span><span class="n">RewriterConfig</span><span class="o">.</span><span class="n">OFF</span><span class="p">)</span>
+      <span class="n">config</span><span class="o">.</span><span class="n">graph_options</span><span class="o">.</span><span class="n">rewrite_options</span><span class="o">.</span><span class="n">arithmetic_optimization</span> <span class="o">=</span> <span class="p">(</span>
+          <span class="n">rewriter_config_pb2</span><span class="o">.</span><span class="n">RewriterConfig</span><span class="o">.</span><span class="n">OFF</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">config</span>
+
+    <span class="k">if</span> <span class="n">graph</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_session</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_session</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span>
+            <span class="n">graph</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">prepare_config</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
+      <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_session</span>
+      <span class="k">with</span> <span class="n">sess</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">(),</span> <span class="n">sess</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">force_gpu</span><span class="p">:</span>
+          <span class="c1"># Use the name of an actual device if one is detected, or &#39;/device:GPU:0&#39;</span>
+          <span class="c1"># otherwise</span>
+          <span class="n">gpu_name</span> <span class="o">=</span> <span class="n">gpu_device_name</span><span class="p">()</span>
+          <span class="k">if</span> <span class="ow">not</span> <span class="n">gpu_name</span><span class="p">:</span>
+            <span class="n">gpu_name</span> <span class="o">=</span> <span class="s2">&quot;/device:GPU:0&quot;</span>
+          <span class="k">with</span> <span class="n">sess</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">gpu_name</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">sess</span>
+        <span class="k">elif</span> <span class="n">use_gpu</span><span class="p">:</span>
+          <span class="k">yield</span> <span class="n">sess</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="k">with</span> <span class="n">sess</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;/cpu:0&quot;</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">sess</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">prepare_config</span><span class="p">(</span><span class="n">config</span><span class="p">))</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">force_gpu</span><span class="p">:</span>
+          <span class="c1"># Use the name of an actual device if one is detected, or &#39;/device:GPU:0&#39;</span>
+          <span class="c1"># otherwise</span>
+          <span class="n">gpu_name</span> <span class="o">=</span> <span class="n">gpu_device_name</span><span class="p">()</span>
+          <span class="k">if</span> <span class="ow">not</span> <span class="n">gpu_name</span><span class="p">:</span>
+            <span class="n">gpu_name</span> <span class="o">=</span> <span class="s2">&quot;/device:GPU:0&quot;</span>
+          <span class="k">with</span> <span class="n">sess</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">gpu_name</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">sess</span>
+        <span class="k">elif</span> <span class="n">use_gpu</span><span class="p">:</span>
+          <span class="k">yield</span> <span class="n">sess</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="k">with</span> <span class="n">sess</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;/cpu:0&quot;</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">sess</span>
+
+  <span class="c1"># pylint: enable=g-doc-return-or-yield</span>
+
+  <span class="k">class</span> <span class="nc">_CheckedThread</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A wrapper class for Thread that asserts successful completion.</span>
+
+<span class="sd">    This class should be created using the TensorFlowTestCase.checkedThread()</span>
+<span class="sd">    method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">testcase</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Constructs a new instance of _CheckedThread.</span>
+
+<span class="sd">      Args:</span>
+<span class="sd">        testcase: The TensorFlowTestCase for which this thread is being created.</span>
+<span class="sd">        target: A callable object representing the code to be executed in the</span>
+<span class="sd">          thread.</span>
+<span class="sd">        args: A tuple of positional arguments that will be passed to target.</span>
+<span class="sd">        kwargs: A dictionary of keyword arguments that will be passed to target.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_testcase</span> <span class="o">=</span> <span class="n">testcase</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">target</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_args</span> <span class="o">=</span> <span class="p">()</span> <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">args</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">kwargs</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_protected_run</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_exception</span> <span class="o">=</span> <span class="bp">None</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">_is_thread_joined</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">_protected_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Target for the wrapper thread. Sets self._exception on failure.&quot;&quot;&quot;</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+      <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exception</span> <span class="o">=</span> <span class="n">e</span>
+
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Starts the thread&#39;s activity.</span>
+
+<span class="sd">      This must be called at most once per _CheckedThread object. It arranges</span>
+<span class="sd">      for the object&#39;s target to be invoked in a separate thread of control.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Blocks until the thread terminates.</span>
+
+<span class="sd">      Raises:</span>
+<span class="sd">        self._testcase.failureException: If the thread terminates with due to</span>
+<span class="sd">          an exception.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_is_thread_joined</span> <span class="o">=</span> <span class="bp">True</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_testcase</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="s2">&quot;Error in checkedThread: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_exception</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">is_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Returns whether the thread is alive.</span>
+
+<span class="sd">      This method returns True just before the run() method starts</span>
+<span class="sd">      until just after the run() method terminates.</span>
+
+<span class="sd">      Returns:</span>
+<span class="sd">        True if the thread is alive, otherwise False.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">check_termination</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Returns whether the checked thread was properly used and did terminate.</span>
+
+<span class="sd">      Every checked thread should be &quot;join&quot;ed after starting, and before the</span>
+<span class="sd">      test tears down. If it is not joined, it is possible the thread will hang</span>
+<span class="sd">      and cause flaky failures in tests.</span>
+
+<span class="sd">      Raises:</span>
+<span class="sd">        self._testcase.failureException: If check_termination was called before</span>
+<span class="sd">        thread was joined.</span>
+
+<span class="sd">        RuntimeError: If the thread is not terminated. This means thread was not</span>
+<span class="sd">        joined with the main thread.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_thread_joined</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+          <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+              <span class="s2">&quot;Thread was not joined with main thread, and is still running &quot;</span>
+              <span class="s2">&quot;when the test finished.&quot;</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_testcase</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="s2">&quot;A checked thread was not joined.&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">checkedThread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a Thread wrapper that asserts &#39;target&#39; completes successfully.</span>
+
+<span class="sd">    This method should be used to create all threads in test cases, as</span>
+<span class="sd">    otherwise there is a risk that a thread will silently fail, and/or</span>
+<span class="sd">    assertions made in the thread will not be respected.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      target: A callable object to be executed in the thread.</span>
+<span class="sd">      args: The argument tuple for the target invocation. Defaults to ().</span>
+<span class="sd">      kwargs: A dictionary of keyword arguments for the target invocation.</span>
+<span class="sd">        Defaults to {}.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      A wrapper for threading.Thread that supports start() and join() methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">TensorFlowTestCase</span><span class="o">.</span><span class="n">_CheckedThread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+<span class="c1"># pylint: enable=invalid-name</span>
+
+  <span class="k">def</span> <span class="nf">assertNear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that two floats are near each other.</span>
+
+<span class="sd">    Checks that |f1 - f2| &lt; err and asserts a test failure</span>
+<span class="sd">    if not.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      f1: A float value.</span>
+<span class="sd">      f2: A float value.</span>
+<span class="sd">      err: A float value.</span>
+<span class="sd">      msg: An optional string message to append to the failure message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># f1 == f2 is needed here as we might have: f1, f2 = inf, inf</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">f1</span> <span class="o">==</span> <span class="n">f2</span> <span class="ow">or</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">f1</span> <span class="o">-</span> <span class="n">f2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">err</span><span class="p">,</span>
+                    <span class="s2">&quot;</span><span class="si">%f</span><span class="s2"> != </span><span class="si">%f</span><span class="s2"> +/- </span><span class="si">%f%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="s2">&quot; (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">msg</span>
+                                           <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">assertArrayNear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">farray1</span><span class="p">,</span> <span class="n">farray2</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that two float arrays are near each other.</span>
+
+<span class="sd">    Checks that for all elements of farray1 and farray2</span>
+<span class="sd">    |f1 - f2| &lt; err.  Asserts a test failure if not.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      farray1: a list of float values.</span>
+<span class="sd">      farray2: a list of float values.</span>
+<span class="sd">      err: a float value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">farray1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">farray2</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">farray1</span><span class="p">,</span> <span class="n">farray2</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">f1</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">f2</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_NDArrayNear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndarray1</span><span class="p">,</span> <span class="n">ndarray2</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ndarray1</span> <span class="o">-</span> <span class="n">ndarray2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">err</span>
+
+  <span class="k">def</span> <span class="nf">assertNDArrayNear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndarray1</span><span class="p">,</span> <span class="n">ndarray2</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that two numpy arrays have near values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      ndarray1: a numpy ndarray.</span>
+<span class="sd">      ndarray2: a numpy ndarray.</span>
+<span class="sd">      err: a float. The maximum absolute difference allowed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NDArrayNear</span><span class="p">(</span><span class="n">ndarray1</span><span class="p">,</span> <span class="n">ndarray2</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">_GetNdArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+      <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span>
+
+  <span class="k">def</span> <span class="nf">_assertArrayLikeAllClose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GetNdArray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GetNdArray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;Shape mismatch: expected </span><span class="si">%s</span><span class="s2">, got </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">):</span>
+      <span class="c1"># Prints more details than np.testing.assert_allclose.</span>
+      <span class="c1">#</span>
+      <span class="c1"># NOTE: numpy.allclose (and numpy.testing.assert_allclose)</span>
+      <span class="c1"># checks whether two arrays are element-wise equal within a</span>
+      <span class="c1"># tolerance. The relative difference (rtol * abs(b)) and the</span>
+      <span class="c1"># absolute difference atol are added together to compare against</span>
+      <span class="c1"># the absolute difference between a and b.  Here, we want to</span>
+      <span class="c1"># print out which elements violate such conditions.</span>
+      <span class="n">cond</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">atol</span> <span class="o">+</span> <span class="n">rtol</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+      <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond</span><span class="p">)]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond</span><span class="p">)]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;not close where = &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond</span><span class="p">))</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># np.where is broken for scalars</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;not close lhs = &quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;not close rhs = &quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;not close dif = &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">))</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;not close tol = &quot;</span><span class="p">,</span> <span class="n">atol</span> <span class="o">+</span> <span class="n">rtol</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;dtype = </span><span class="si">%s</span><span class="s2">, shape = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">assertAllClose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that two numpy arrays, or dicts of same, have near values.</span>
+
+<span class="sd">    This does not support nested dicts.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      a: The expected numpy ndarray (or anything can be converted to one), or</span>
+<span class="sd">        dict of same. Must be a dict iff `b` is a dict.</span>
+<span class="sd">      b: The actual numpy ndarray (or anything can be converted to one), or</span>
+<span class="sd">        dict of same. Must be a dict iff `a` is a dict.</span>
+<span class="sd">      rtol: relative tolerance.</span>
+<span class="sd">      atol: absolute tolerance.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      ValueError: if only one of `a` and `b` is a dict.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_a_dict</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_a_dict</span> <span class="o">!=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t compare dict to non-dict, </span><span class="si">%s</span><span class="s2"> vs </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">is_a_dict</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">assertItemsEqual</span><span class="p">(</span>
+          <span class="n">a</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+          <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;mismatched keys, expected </span><span class="si">%s</span><span class="s2">, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+      <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assertArrayLikeAllClose</span><span class="p">(</span>
+            <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span>
+            <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: expected </span><span class="si">%s</span><span class="s2">, got </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_assertArrayLikeAllClose</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">assertAllCloseAccordingToType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                    <span class="n">a</span><span class="p">,</span>
+                                    <span class="n">b</span><span class="p">,</span>
+                                    <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+                                    <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+                                    <span class="n">float_rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+                                    <span class="n">float_atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+                                    <span class="n">half_rtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+                                    <span class="n">half_atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+                                    <span class="n">bfloat16_rtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+                                    <span class="n">bfloat16_atol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Like assertAllClose, but also suitable for comparing fp16 arrays.</span>
+
+<span class="sd">    In particular, the tolerance is reduced to 1e-3 if at least</span>
+<span class="sd">    one of the arguments is of type float16.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      a: the expected numpy ndarray or anything can be converted to one.</span>
+<span class="sd">      b: the actual numpy ndarray or anything can be converted to one.</span>
+<span class="sd">      rtol: relative tolerance.</span>
+<span class="sd">      atol: absolute tolerance.</span>
+<span class="sd">      float_rtol: relative tolerance for float32.</span>
+<span class="sd">      float_atol: absolute tolerance for float32.</span>
+<span class="sd">      half_rtol: relative tolerance for float16.</span>
+<span class="sd">      half_atol: absolute tolerance for float16.</span>
+<span class="sd">      bfloat16_rtol: relative tolerance for bfloat16.</span>
+<span class="sd">      bfloat16_atol: absolute tolerance for bfloat16.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GetNdArray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GetNdArray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="c1"># types with lower tol are put later to overwrite previous ones.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span> <span class="ow">or</span> <span class="n">b</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span> <span class="ow">or</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span> <span class="ow">or</span> <span class="n">b</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+      <span class="n">rtol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rtol</span><span class="p">,</span> <span class="n">float_rtol</span><span class="p">)</span>
+      <span class="n">atol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">atol</span><span class="p">,</span> <span class="n">float_atol</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float16</span> <span class="ow">or</span> <span class="n">b</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">:</span>
+      <span class="n">rtol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rtol</span><span class="p">,</span> <span class="n">half_rtol</span><span class="p">)</span>
+      <span class="n">atol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">atol</span><span class="p">,</span> <span class="n">half_atol</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">bfloat16</span><span class="o">.</span><span class="n">as_numpy_dtype</span> <span class="ow">or</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">bfloat16</span><span class="o">.</span><span class="n">as_numpy_dtype</span><span class="p">):</span>
+      <span class="n">rtol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rtol</span><span class="p">,</span> <span class="n">bfloat16_rtol</span><span class="p">)</span>
+      <span class="n">atol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">atol</span><span class="p">,</span> <span class="n">bfloat16_atol</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertAllClose</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">assertAllEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that two numpy arrays have the same values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      a: the expected numpy ndarray or anything can be converted to one.</span>
+<span class="sd">      b: the actual numpy ndarray or anything can be converted to one.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GetNdArray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GetNdArray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;Shape mismatch: expected </span><span class="si">%s</span><span class="s2">, got </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    <span class="n">same</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+      <span class="n">same</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">same</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">same</span><span class="p">):</span>
+      <span class="c1"># Prints more details than np.testing.assert_array_equal.</span>
+      <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">same</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span><span class="p">)]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span><span class="p">)]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;not equal where = &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># np.where is broken for scalars</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;not equal lhs = &quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;not equal rhs = &quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+  <span class="c1"># pylint: disable=g-doc-return-or-yield</span>
+  <span class="nd">@contextlib.contextmanager</span>
+  <span class="k">def</span> <span class="nf">assertRaisesWithPredicateMatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception_type</span><span class="p">,</span>
+                                     <span class="n">expected_err_re_or_predicate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a context manager to enclose code expected to raise an exception.</span>
+
+<span class="sd">    If the exception is an OpError, the op stack is also included in the message</span>
+<span class="sd">    predicate search.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      exception_type: The expected type of exception that should be raised.</span>
+<span class="sd">      expected_err_re_or_predicate: If this is callable, it should be a function</span>
+<span class="sd">        of one argument that inspects the passed-in exception and</span>
+<span class="sd">        returns True (success) or False (please fail the test). Otherwise, the</span>
+<span class="sd">        error message is expected to match this regular expression partially.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      A context manager to surround code that is expected to raise an</span>
+<span class="sd">      exception.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">expected_err_re_or_predicate</span><span class="p">):</span>
+      <span class="n">predicate</span> <span class="o">=</span> <span class="n">expected_err_re_or_predicate</span>
+    <span class="k">else</span><span class="p">:</span>
+
+      <span class="k">def</span> <span class="nf">predicate</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="n">err_str</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">errors</span><span class="o">.</span><span class="n">OpError</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">op</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">errors</span><span class="o">.</span><span class="n">OpError</span><span class="p">)</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="k">while</span> <span class="n">op</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+          <span class="n">err_str</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Caused by: &quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">name</span>
+          <span class="n">op</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">_original_op</span>  <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Searching within error strings: &#39;</span><span class="si">%s</span><span class="s2">&#39; within &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+                     <span class="n">expected_err_re_or_predicate</span><span class="p">,</span> <span class="n">err_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">expected_err_re_or_predicate</span><span class="p">,</span> <span class="n">err_str</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">yield</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">exception_type</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot; not raised&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">exception_type</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">predicate</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Exception of type </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span>
+                                                           <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+
+  <span class="c1"># pylint: enable=g-doc-return-or-yield</span>
+
+  <span class="k">def</span> <span class="nf">assertRaisesOpError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_err_re_or_predicate</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaisesWithPredicateMatch</span><span class="p">(</span><span class="n">errors</span><span class="o">.</span><span class="n">OpError</span><span class="p">,</span>
+                                               <span class="n">expected_err_re_or_predicate</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">assertShapeEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_array</span><span class="p">,</span> <span class="n">tf_tensor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that a Numpy ndarray and a TensorFlow tensor have the same shape.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      np_array: A Numpy ndarray or Numpy scalar.</span>
+<span class="sd">      tf_tensor: A Tensor.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      TypeError: If the arguments have the wrong type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">np_array</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">generic</span><span class="p">)):</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;np_array must be a Numpy ndarray or Numpy scalar&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tf_tensor</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;tf_tensor must be a Tensor&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertAllEqual</span><span class="p">(</span><span class="n">np_array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">tf_tensor</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
+
+  <span class="k">def</span> <span class="nf">assertDeviceEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device1</span><span class="p">,</span> <span class="n">device2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asserts that the two given devices are the same.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      device1: A string device name or TensorFlow `DeviceSpec` object.</span>
+<span class="sd">      device2: A string device name or TensorFlow `DeviceSpec` object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device1</span> <span class="o">=</span> <span class="n">pydev</span><span class="o">.</span><span class="n">canonical_name</span><span class="p">(</span><span class="n">device1</span><span class="p">)</span>
+    <span class="n">device2</span> <span class="o">=</span> <span class="n">pydev</span><span class="o">.</span><span class="n">canonical_name</span><span class="p">(</span><span class="n">device2</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">device1</span><span class="p">,</span> <span class="n">device2</span><span class="p">,</span>
+                     <span class="s2">&quot;Devices </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2"> are not equal&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">device1</span><span class="p">,</span> <span class="n">device2</span><span class="p">))</span>
+
+  <span class="c1"># Fix Python 3 compatibility issues</span>
+  <span class="k">if</span> <span class="n">six</span><span class="o">.</span><span class="n">PY3</span><span class="p">:</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+
+    <span class="c1"># Silence a deprecation warning</span>
+    <span class="n">assertRaisesRegexp</span> <span class="o">=</span> <span class="n">googletest</span><span class="o">.</span><span class="n">TestCase</span><span class="o">.</span><span class="n">assertRaisesRegex</span>
+
+    <span class="c1"># assertItemsEqual is assertCountEqual as of 3.2.</span>
+    <span class="n">assertItemsEqual</span> <span class="o">=</span> <span class="n">googletest</span><span class="o">.</span><span class="n">TestCase</span><span class="o">.</span><span class="n">assertCountEqual</span>
+
+    <span class="c1"># pylint: enable=invalid-name</span>
+
+
+<span class="k">def</span> <span class="nf">create_local_cluster</span><span class="p">(</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">num_ps</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="s2">&quot;grpc&quot;</span><span class="p">,</span>
+                         <span class="n">worker_config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ps_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Create and start local servers and return the associated `Server` objects.</span>
+
+<span class="sd">  Example:</span>
+<span class="sd">  ```python</span>
+<span class="sd">  workers, _ = tf.test.create_local_cluster(num_workers=2, num_ps=2)</span>
+
+<span class="sd">  worker_sessions = [tf.Session(w.target) for w in workers]</span>
+
+<span class="sd">  with tf.device(&quot;/job:ps/task:0&quot;):</span>
+<span class="sd">    ...</span>
+<span class="sd">  with tf.device(&quot;/job:ps/task:1&quot;):</span>
+<span class="sd">    ...</span>
+<span class="sd">  with tf.device(&quot;/job:worker/task:0&quot;):</span>
+<span class="sd">    ...</span>
+<span class="sd">  with tf.device(&quot;/job:worker/task:1&quot;):</span>
+<span class="sd">    ...</span>
+
+<span class="sd">  worker_sessions[0].run(...)</span>
+<span class="sd">  ```</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    num_workers: Number of worker servers to start.</span>
+<span class="sd">    num_ps: Number of PS servers to start.</span>
+<span class="sd">    protocol: Communication protocol.  Allowed values are documented in</span>
+<span class="sd">      the documentation of `tf.train.Server`.</span>
+<span class="sd">    worker_config: (optional) ConfigProto to initialize workers. Can be used</span>
+<span class="sd">      to instantiate multiple devices etc.</span>
+<span class="sd">    ps_config: (optional) ConfigProto to initialize PS servers.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A tuple `(worker_servers, ps_servers)`.  `worker_servers` is a list</span>
+<span class="sd">    of `num_workers` objects of type `tf.train.Server` (all running locally);</span>
+<span class="sd">    and `ps_servers` is a list of `num_ps` objects of similar type.</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    ImportError: if portpicker module was not found at load time</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">if</span> <span class="n">_portpicker_import_error</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">_portpicker_import_error</span>  <span class="c1"># pylint: disable=raising-bad-type</span>
+  <span class="n">worker_ports</span> <span class="o">=</span> <span class="p">[</span><span class="n">portpicker</span><span class="o">.</span><span class="n">pick_unused_port</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_workers</span><span class="p">)]</span>
+  <span class="n">ps_ports</span> <span class="o">=</span> <span class="p">[</span><span class="n">portpicker</span><span class="o">.</span><span class="n">pick_unused_port</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_ps</span><span class="p">)]</span>
+  <span class="n">cluster_dict</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s2">&quot;worker&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;localhost:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">port</span> <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">worker_ports</span><span class="p">],</span>
+      <span class="s2">&quot;ps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;localhost:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">port</span> <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">ps_ports</span><span class="p">]</span>
+  <span class="p">}</span>
+  <span class="n">cs</span> <span class="o">=</span> <span class="n">server_lib</span><span class="o">.</span><span class="n">ClusterSpec</span><span class="p">(</span><span class="n">cluster_dict</span><span class="p">)</span>
+
+  <span class="n">workers</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">server_lib</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span>
+          <span class="n">cs</span><span class="p">,</span> <span class="n">job_name</span><span class="o">=</span><span class="s2">&quot;worker&quot;</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">protocol</span><span class="p">,</span> <span class="n">task_index</span><span class="o">=</span><span class="n">ix</span><span class="p">,</span>
+          <span class="n">config</span><span class="o">=</span><span class="n">worker_config</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_workers</span><span class="p">)</span>
+  <span class="p">]</span>
+  <span class="n">ps_servers</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">server_lib</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span>
+          <span class="n">cs</span><span class="p">,</span> <span class="n">job_name</span><span class="o">=</span><span class="s2">&quot;ps&quot;</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">protocol</span><span class="p">,</span> <span class="n">task_index</span><span class="o">=</span><span class="n">ix</span><span class="p">,</span>
+          <span class="n">config</span><span class="o">=</span><span class="n">ps_config</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_ps</span><span class="p">)</span>
+  <span class="p">]</span>
+
+  <span class="k">return</span> <span class="n">workers</span><span class="p">,</span> <span class="n">ps_servers</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

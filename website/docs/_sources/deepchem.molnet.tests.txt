@@ -1,0 +1,30 @@
+deepchem.molnet.tests package
+=============================
+
+Submodules
+----------
+
+deepchem.molnet.tests.test_dnasim module
+----------------------------------------
+
+.. automodule:: deepchem.molnet.tests.test_dnasim
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.molnet.tests.test_molnet module
+----------------------------------------
+
+.. automodule:: deepchem.molnet.tests.test_molnet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.molnet.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

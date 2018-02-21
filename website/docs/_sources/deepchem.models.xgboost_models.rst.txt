@@ -1,0 +1,10 @@
+deepchem\.models\.xgboost\_models package
+=========================================
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.xgboost_models
+    :members:
+    :undoc-members:
+    :show-inheritance:

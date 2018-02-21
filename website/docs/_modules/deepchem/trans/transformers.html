@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.trans.transformers &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.trans.transformers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains an abstract base class that supports data transformations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">deepchem.data</span> <span class="kn">import</span> <span class="n">NumpyDataset</span>
+
+
+<div class="viewcode-block" id="undo_transforms"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.undo_transforms">[docs]</a><span class="k">def</span> <span class="nf">undo_transforms</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">transformers</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Undoes all transformations applied.&quot;&quot;&quot;</span>
+  <span class="c1"># Note that transformers have to be undone in reversed order</span>
+  <span class="k">for</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">transformers</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">y</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">untransform</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="undo_grad_transforms"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.undo_grad_transforms">[docs]</a><span class="k">def</span> <span class="nf">undo_grad_transforms</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">tasks</span><span class="p">,</span> <span class="n">transformers</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">transformers</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">grad</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">untransform_grad</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">grad</span></div>
+
+
+<div class="viewcode-block" id="get_grad_statistics"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.get_grad_statistics">[docs]</a><span class="k">def</span> <span class="nf">get_grad_statistics</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes and returns statistics of a dataset</span>
+
+<span class="sd">  This function assumes that the first task of a dataset holds the energy for</span>
+<span class="sd">  an input system, and that the remaining tasks holds the gradient for the</span>
+<span class="sd">  system.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">return</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span>
+  <span class="n">energy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+  <span class="n">grad</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">energy</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+    <span class="n">grad</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">energy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+  <span class="n">ydely_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">grad</span><span class="p">,</span> <span class="n">ydely_means</span></div>
+
+
+<span class="k">class</span> <span class="nc">Transformer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Abstract base class for different ML models.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1"># Hack to allow for easy unpickling:</span>
+  <span class="c1"># http://stefaanlippens.net/pickleproblem</span>
+  <span class="vm">__module__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_w</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">dataset</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initializes transformation based on dataset statistics.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span> <span class="o">=</span> <span class="n">transform_X</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span> <span class="o">=</span> <span class="n">transform_y</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_w</span> <span class="o">=</span> <span class="n">transform_w</span>
+    <span class="c1"># One, but not both, transform_X or tranform_y is true</span>
+    <span class="k">assert</span> <span class="n">transform_X</span> <span class="ow">or</span> <span class="n">transform_y</span> <span class="ow">or</span> <span class="n">transform_w</span>
+    <span class="c1"># Use fact that bools add as ints in python</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">transform_X</span> <span class="o">+</span> <span class="n">transform_y</span> <span class="o">+</span> <span class="n">transform_w</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform the data in a set of (X, y, w) arrays.&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Each Transformer is responsible for its own transform_array method.&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reverses stored transformation on provided data.&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Each Transformer is responsible for its own untransfomr method.&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms all internally stored data.</span>
+<span class="sd">    Adds X-transform, y-transform columns to metadata.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">y_shape</span><span class="p">,</span> <span class="n">w_shape</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">y_shape</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot transform y when y_values are not present&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">w_shape</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_w</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot transform w when w_values are not present&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">transform_on_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms numpy arrays X, y, and w</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span>
+
+
+<div class="viewcode-block" id="NormalizationTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.NormalizationTransformer">[docs]</a><span class="k">class</span> <span class="nc">NormalizationTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_w</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">dataset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">transform_gradients</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize normalization transformation.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">transform_X</span><span class="p">:</span>
+      <span class="n">X_means</span><span class="p">,</span> <span class="n">X_stds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">(</span><span class="n">X_stats</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">y_stats</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">X_means</span> <span class="o">=</span> <span class="n">X_means</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">X_stds</span> <span class="o">=</span> <span class="n">X_stds</span>
+    <span class="k">elif</span> <span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">y_means</span><span class="p">,</span> <span class="n">y_stds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">(</span><span class="n">X_stats</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">y_stats</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">y_means</span> <span class="o">=</span> <span class="n">y_means</span>
+      <span class="c1"># Control for pathological case with no variance.</span>
+      <span class="n">y_stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_stds</span><span class="p">)</span>
+      <span class="n">y_stds</span><span class="p">[</span><span class="n">y_stds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">y_stds</span> <span class="o">=</span> <span class="n">y_stds</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_gradients</span> <span class="o">=</span> <span class="n">transform_gradients</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_gradients</span><span class="p">:</span>
+      <span class="n">true_grad</span><span class="p">,</span> <span class="n">ydely_means</span> <span class="o">=</span> <span class="n">get_grad_statistics</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">true_grad</span><span class="p">,</span> <span class="p">(</span><span class="n">true_grad</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">ydely_means</span> <span class="o">=</span> <span class="n">ydely_means</span>
+
+    <span class="nb">super</span><span class="p">(</span><span class="n">NormalizationTransformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">transform_X</span><span class="o">=</span><span class="n">transform_X</span><span class="p">,</span>
+        <span class="n">transform_y</span><span class="o">=</span><span class="n">transform_y</span><span class="p">,</span>
+        <span class="n">transform_w</span><span class="o">=</span><span class="n">transform_w</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NormalizationTransformer.transform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.NormalizationTransformer.transform">[docs]</a>  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">NormalizationTransformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="n">parallel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NormalizationTransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.NormalizationTransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform the data in a set of (X, y, w) arrays.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">((</span><span class="n">X</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_means</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_stds</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_means</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_stds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NormalizationTransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.NormalizationTransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Undo transformation on provided data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">z</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_stds</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_means</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">y_stds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_stds</span>
+      <span class="n">y_means</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_means</span>
+      <span class="n">n_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_stds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">z_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+      <span class="c1"># Get the reversed shape of z: (..., n_tasks, batch_size)</span>
+      <span class="n">z_shape</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+      <span class="c1"># Find the task dimension of z</span>
+      <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">z_shape</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="o">!=</span> <span class="n">n_tasks</span> <span class="ow">and</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="c1"># Prevent broadcasting on wrong dimension</span>
+          <span class="n">y_stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y_stds</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+          <span class="n">y_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y_means</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">z</span> <span class="o">*</span> <span class="n">y_stds</span> <span class="o">+</span> <span class="n">y_means</span></div>
+
+<div class="viewcode-block" id="NormalizationTransformer.untransform_grad"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.NormalizationTransformer.untransform_grad">[docs]</a>  <span class="k">def</span> <span class="nf">untransform_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">tasks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Undo transformation on gradient.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+
+      <span class="n">grad_means</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_means</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+      <span class="n">energy_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_stds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">grad_var</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">energy_var</span> <span class="o">*</span> <span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">ydely_means</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_means</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_means</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+      <span class="n">energy</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+      <span class="n">transformed_grad</span> <span class="o">=</span> <span class="p">[]</span>
+
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">energy</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">Etf</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">grad_Etf</span> <span class="o">=</span> <span class="n">grad</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">grad_E</span> <span class="o">=</span> <span class="n">Etf</span> <span class="o">*</span> <span class="n">grad_var</span> <span class="o">+</span> <span class="n">energy_var</span> <span class="o">*</span> <span class="n">grad_Etf</span> <span class="o">+</span> <span class="n">grad_means</span>
+        <span class="n">grad_E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">grad_E</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">transformed_grad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grad_E</span><span class="p">)</span>
+
+      <span class="n">transformed_grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">transformed_grad</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">transformed_grad</span></div></div>
+
+
+<div class="viewcode-block" id="ClippingTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ClippingTransformer">[docs]</a><span class="k">class</span> <span class="nc">ClippingTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Clip large values in datasets.</span>
+
+<span class="sd">     Example:</span>
+
+<span class="sd">     &gt;&gt;&gt; n_samples = 10</span>
+<span class="sd">     &gt;&gt;&gt; n_features = 3</span>
+<span class="sd">     &gt;&gt;&gt; n_tasks = 1</span>
+<span class="sd">     &gt;&gt;&gt; ids = np.arange(n_samples)</span>
+<span class="sd">     &gt;&gt;&gt; X = np.random.rand(n_samples, n_features)</span>
+<span class="sd">     &gt;&gt;&gt; y = np.zeros((n_samples, n_tasks))</span>
+<span class="sd">     &gt;&gt;&gt; w = np.ones((n_samples, n_tasks))</span>
+<span class="sd">     &gt;&gt;&gt; dataset = dc.data.NumpyDataset(X, y, w, ids)</span>
+<span class="sd">     &gt;&gt;&gt; transformer = dc.trans.ClippingTransformer(transform_X=True)</span>
+<span class="sd">     &gt;&gt;&gt; dataset = transformer.transform(dataset)</span>
+
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_w</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">dataset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">x_max</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span>
+               <span class="n">y_max</span><span class="o">=</span><span class="mf">500.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize clipping transformation.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    transform_X: bool, optional (default False)</span>
+<span class="sd">      Whether to transform X</span>
+<span class="sd">    transform_y: bool, optional (default False)</span>
+<span class="sd">      Whether to transform y</span>
+<span class="sd">    transform_w: bool, optional (default False)</span>
+<span class="sd">      Whether to transform w</span>
+<span class="sd">    dataset: dc.data.Dataset object, optional</span>
+<span class="sd">      Dataset to be transformed</span>
+<span class="sd">    x_max: float, optional</span>
+<span class="sd">      Maximum absolute value for X</span>
+<span class="sd">    y_max: float, optional</span>
+<span class="sd">      Maximum absolute value for y</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">ClippingTransformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">transform_X</span><span class="o">=</span><span class="n">transform_X</span><span class="p">,</span>
+        <span class="n">transform_y</span><span class="o">=</span><span class="n">transform_y</span><span class="p">,</span>
+        <span class="n">transform_w</span><span class="o">=</span><span class="n">transform_w</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">transform_w</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">x_max</span> <span class="o">=</span> <span class="n">x_max</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span> <span class="o">=</span> <span class="n">y_max</span>
+
+<div class="viewcode-block" id="ClippingTransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ClippingTransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform the data in a set of (X, y, w) arrays.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Features</span>
+<span class="sd">    y: np.ndarray</span>
+<span class="sd">      Tasks</span>
+<span class="sd">    w: np.ndarray</span>
+<span class="sd">      Weights</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Transformed features</span>
+<span class="sd">    y: np.ndarray</span>
+<span class="sd">      Transformed tasks</span>
+<span class="sd">    w: np.ndarray</span>
+<span class="sd">      Transformed weights</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="n">X</span><span class="p">[</span><span class="n">X</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_max</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_max</span>
+      <span class="n">X</span><span class="p">[</span><span class="n">X</span> <span class="o">&lt;</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_max</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_max</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">y</span><span class="p">[</span><span class="n">y</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span>
+      <span class="n">y</span><span class="p">[</span><span class="n">y</span> <span class="o">&lt;</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ClippingTransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ClippingTransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Cannot untransform datasets with ClippingTransformer.&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LogTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.LogTransformer">[docs]</a><span class="k">class</span> <span class="nc">LogTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">features</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">tasks</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">dataset</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">features</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span>
+    <span class="sd">&quot;&quot;&quot;Initialize log  transformation.&quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">LogTransformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">transform_X</span><span class="o">=</span><span class="n">transform_X</span><span class="p">,</span> <span class="n">transform_y</span><span class="o">=</span><span class="n">transform_y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LogTransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.LogTransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform the data in a set of (X, y, w) arrays.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="n">num_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_features</span><span class="p">):</span>
+          <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+            <span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">num_tasks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_tasks</span><span class="p">):</span>
+          <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+            <span class="n">y</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="n">y</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogTransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.LogTransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Undo transformation on provided data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="n">num_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_features</span><span class="p">):</span>
+          <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+            <span class="n">z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="n">z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">z</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">num_tasks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_tasks</span><span class="p">):</span>
+          <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+            <span class="n">z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="n">z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">z</span></div></div>
+
+
+<div class="viewcode-block" id="BalancingTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.BalancingTransformer">[docs]</a><span class="k">class</span> <span class="nc">BalancingTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Balance positive and negative examples for weights.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_w</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">dataset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">BalancingTransformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">transform_X</span><span class="o">=</span><span class="n">transform_X</span><span class="p">,</span>
+        <span class="n">transform_y</span><span class="o">=</span><span class="n">transform_y</span><span class="p">,</span>
+        <span class="n">transform_w</span><span class="o">=</span><span class="n">transform_w</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="c1"># BalancingTransformer can only transform weights.</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">transform_X</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">transform_y</span>
+    <span class="k">assert</span> <span class="n">transform_w</span>
+
+    <span class="c1"># Compute weighting factors from dataset.</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">w</span>
+    <span class="c1"># Ensure dataset is binary</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]))</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">get_task_names</span><span class="p">()):</span>
+      <span class="n">task_w</span> <span class="o">=</span> <span class="n">w</span><span class="p">[:,</span> <span class="n">ind</span><span class="p">]</span>
+      <span class="n">task_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">ind</span><span class="p">]</span>
+      <span class="c1"># Remove labels with zero weights</span>
+      <span class="n">task_y</span> <span class="o">=</span> <span class="n">task_y</span><span class="p">[</span><span class="n">task_w</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+      <span class="n">num_positives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">task_y</span><span class="p">)</span>
+      <span class="n">num_negatives</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_y</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_positives</span>
+      <span class="k">if</span> <span class="n">num_positives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">pos_weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_negatives</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_positives</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">pos_weight</span> <span class="o">=</span> <span class="mi">1</span>
+      <span class="n">neg_weight</span> <span class="o">=</span> <span class="mi">1</span>
+      <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">neg_weight</span><span class="p">,</span> <span class="n">pos_weight</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+
+<div class="viewcode-block" id="BalancingTransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.BalancingTransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform the data in a set of (X, y, w) arrays.&quot;&quot;&quot;</span>
+    <span class="n">w_balanced</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">get_task_names</span><span class="p">()):</span>
+      <span class="n">task_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">ind</span><span class="p">]</span>
+      <span class="n">task_w</span> <span class="o">=</span> <span class="n">w</span><span class="p">[:,</span> <span class="n">ind</span><span class="p">]</span>
+      <span class="n">zero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">task_y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">task_w</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">one_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">task_y</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">task_w</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">w_balanced</span><span class="p">[</span><span class="n">zero_indices</span><span class="p">,</span> <span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">w_balanced</span><span class="p">[</span><span class="n">one_indices</span><span class="p">,</span> <span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w_balanced</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CDFTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CDFTransformer">[docs]</a><span class="k">class</span> <span class="nc">CDFTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Histograms the data and assigns values based on sorted list.&quot;&quot;&quot;</span>
+  <span class="sd">&quot;&quot;&quot;Acts like a Cumulative Distribution Function (CDF).&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transform_X</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">bins</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span> <span class="o">=</span> <span class="n">transform_X</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span> <span class="o">=</span> <span class="n">transform_y</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bins</span> <span class="o">=</span> <span class="n">bins</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span>
+    <span class="c1"># self.w = dataset.w</span>
+
+  <span class="c1"># TODO (flee2): for transform_y, figure out weights</span>
+
+<div class="viewcode-block" id="CDFTransformer.transform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CDFTransformer.transform">[docs]</a>  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">bins</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs CDF transform on data.&quot;&quot;&quot;</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">w_t</span> <span class="o">=</span> <span class="n">w</span>
+    <span class="n">ids_t</span> <span class="o">=</span> <span class="n">ids</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="n">X_t</span> <span class="o">=</span> <span class="n">get_cdf_values</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bins</span><span class="p">)</span>
+      <span class="n">y_t</span> <span class="o">=</span> <span class="n">y</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="n">X_t</span> <span class="o">=</span> <span class="n">X</span>
+      <span class="n">y_t</span> <span class="o">=</span> <span class="n">get_cdf_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bins</span><span class="p">)</span>
+      <span class="c1"># print(&quot;y will not be transformed by CDFTransformer, for now.&quot;)</span>
+    <span class="k">return</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X_t</span><span class="p">,</span> <span class="n">y_t</span><span class="p">,</span> <span class="n">w_t</span><span class="p">,</span> <span class="n">ids_t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CDFTransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CDFTransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="c1"># print(&quot;Cannot undo CDF Transformer, for now.&quot;)</span>
+    <span class="c1"># Need this for transform_y</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span></div></div>
+
+
+<div class="viewcode-block" id="get_cdf_values"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.get_cdf_values">[docs]</a><span class="k">def</span> <span class="nf">get_cdf_values</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">bins</span><span class="p">):</span>
+  <span class="c1"># array = np.transpose(array)</span>
+  <span class="n">n_rows</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">n_cols</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">array_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">))</span>
+  <span class="n">parts</span> <span class="o">=</span> <span class="n">n_rows</span> <span class="o">/</span> <span class="n">bins</span>
+  <span class="n">hist_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)</span>
+  <span class="n">sorted_hist_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">remainder</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="n">hist_values</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">parts</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">bins</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">hist_values</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">parts</span><span class="p">))</span> <span class="o">/</span> <span class="n">bins</span>
+  <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_cols</span><span class="p">):</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">array</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">sorted_hist_values</span> <span class="o">=</span> <span class="n">hist_values</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+    <span class="n">array_t</span><span class="p">[:,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">sorted_hist_values</span>
+
+  <span class="k">return</span> <span class="n">array_t</span></div>
+
+
+<div class="viewcode-block" id="PowerTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.PowerTransformer">[docs]</a><span class="k">class</span> <span class="nc">PowerTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Takes power n transforms of the data based on an input vector.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transform_X</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">powers</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span> <span class="o">=</span> <span class="n">transform_X</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span> <span class="o">=</span> <span class="n">transform_y</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">=</span> <span class="n">powers</span>
+
+<div class="viewcode-block" id="PowerTransformer.transform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.PowerTransformer.transform">[docs]</a>  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs power transform on data.&quot;&quot;&quot;</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">w_t</span> <span class="o">=</span> <span class="n">w</span>
+    <span class="n">ids_t</span> <span class="o">=</span> <span class="n">ids</span>
+    <span class="n">n_powers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="n">X_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_powers</span><span class="p">):</span>
+        <span class="n">X_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X_t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+      <span class="n">y_t</span> <span class="o">=</span> <span class="n">y</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span><span class="p">:</span>
+      <span class="c1"># print(&quot;y will not be transformed by PowerTransformer, for now.&quot;)</span>
+      <span class="n">y_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_powers</span><span class="p">):</span>
+        <span class="n">y_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">y_t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+      <span class="n">X_t</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    shutil.rmtree(dataset.data_dir)</span>
+<span class="sd">    os.makedirs(dataset.data_dir)</span>
+<span class="sd">    DiskDataset.from_numpy(dataset.data_dir, X_t, y_t, w_t, ids_t)</span>
+<span class="sd">    return dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X_t</span><span class="p">,</span> <span class="n">y_t</span><span class="p">,</span> <span class="n">w_t</span><span class="p">,</span> <span class="n">ids_t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PowerTransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.PowerTransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="c1"># print(&quot;Cannot undo Power Transformer, for now.&quot;)</span>
+    <span class="n">n_powers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">)</span>
+    <span class="n">orig_len</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">//</span> <span class="n">n_powers</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">[:,</span> <span class="p">:</span><span class="n">orig_len</span><span class="p">]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">z</span></div></div>
+
+
+<div class="viewcode-block" id="CoulombFitTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CoulombFitTransformer">[docs]</a><span class="k">class</span> <span class="nc">CoulombFitTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Performs randomization and binarization operations on batches of Coulomb Matrix features during fit.</span>
+
+<span class="sd">     Example:</span>
+
+<span class="sd">     &gt;&gt;&gt; n_samples = 10</span>
+<span class="sd">     &gt;&gt;&gt; n_features = 3</span>
+<span class="sd">     &gt;&gt;&gt; n_tasks = 1</span>
+<span class="sd">     &gt;&gt;&gt; ids = np.arange(n_samples)</span>
+<span class="sd">     &gt;&gt;&gt; X = np.random.rand(n_samples, n_features, n_features)</span>
+<span class="sd">     &gt;&gt;&gt; y = np.zeros((n_samples, n_tasks))</span>
+<span class="sd">     &gt;&gt;&gt; w = np.ones((n_samples, n_tasks))</span>
+<span class="sd">     &gt;&gt;&gt; dataset = dc.data.NumpyDataset(X, y, w, ids)</span>
+<span class="sd">     &gt;&gt;&gt; fit_transformers = [dc.trans.CoulombFitTransformer(dataset)]</span>
+<span class="sd">     &gt;&gt;&gt; model = dc.models.MultiTaskFitTransformRegressor(n_tasks,</span>
+<span class="sd">     ...    [n_features, n_features], batch_size=n_samples, fit_transformers=fit_transformers, n_evals=1)</span>
+<span class="sd">     n_features after fit_transform: 12</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initializes CoulombFitTransformer.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: dc.data.Dataset object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span>
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">triuind</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">&lt;=</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">realize</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">realize</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nbout</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">std</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CoulombFitTransformer.realize"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CoulombFitTransformer.realize">[docs]</a>  <span class="k">def</span> <span class="nf">realize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Randomize features.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Features</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Randomized features</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_realize_</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+      <span class="k">assert</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+      <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span>
+          <span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">**.</span><span class="mi">5</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:][:,</span> <span class="n">inds</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">triuind</span><span class="p">]</span>
+      <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">_realize_</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="CoulombFitTransformer.normalize"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CoulombFitTransformer.normalize">[docs]</a>  <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Normalize features.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Features</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Normalized features</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std</span></div>
+
+<div class="viewcode-block" id="CoulombFitTransformer.expand"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CoulombFitTransformer.expand">[docs]</a>  <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Binarize features.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Features</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Binarized features</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Xexp</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+      <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">):</span>
+        <span class="n">Xexp</span> <span class="o">+=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="n">X</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Xexp</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+
+<div class="viewcode-block" id="CoulombFitTransformer.X_transform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CoulombFitTransformer.X_transform">[docs]</a>  <span class="k">def</span> <span class="nf">X_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform Coulomb Fit transform on features.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Features</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Transformed features</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">realize</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">X</span></div>
+
+<div class="viewcode-block" id="CoulombFitTransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CoulombFitTransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CoulombFitTransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.CoulombFitTransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Cannot untransform datasets with FitTransformer.&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="IRVTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.IRVTransformer">[docs]</a><span class="k">class</span> <span class="nc">IRVTransformer</span><span class="p">():</span>
+  <span class="sd">&quot;&quot;&quot;Performs transform from ECFP to IRV features(K nearest neibours).&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">n_tasks</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">transform_x</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initializes IRVTransformer.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: dc.data.Dataset object</span>
+<span class="sd">      train_dataset</span>
+<span class="sd">    K: int</span>
+<span class="sd">      number of nearest neighbours being count</span>
+<span class="sd">    n_tasks: int</span>
+<span class="sd">      number of tasks</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span> <span class="o">=</span> <span class="n">n_tasks</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">K</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_x</span> <span class="o">=</span> <span class="n">transform_x</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span> <span class="o">=</span> <span class="n">transform_y</span>
+
+<div class="viewcode-block" id="IRVTransformer.realize"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.IRVTransformer.realize">[docs]</a>  <span class="k">def</span> <span class="nf">realize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">similarity</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;find samples with top ten similarity values in the reference dataset</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    similarity: np.ndarray</span>
+<span class="sd">      similarity value between target dataset and reference dataset</span>
+<span class="sd">      should have size of (n_samples_in_target, n_samples_in_reference)</span>
+<span class="sd">    y: np.array</span>
+<span class="sd">      labels for a single task</span>
+<span class="sd">    w: np.array</span>
+<span class="sd">      weights for a single task</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    features: list</span>
+<span class="sd">      n_samples * np.array of size (2*K,)</span>
+<span class="sd">      each array includes K similarity values and corresponding labels</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">similarity_xs</span> <span class="o">=</span> <span class="n">similarity</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">target_len</span><span class="p">,</span> <span class="n">reference_len</span><span class="p">]</span> <span class="o">=</span> <span class="n">similarity_xs</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">g_temp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">top_labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">g_temp</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;/cpu:0&#39;</span><span class="p">):</span>
+        <span class="n">labels_tf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">similarity_placeholder</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">reference_len</span><span class="p">))</span>
+        <span class="n">value</span><span class="p">,</span> <span class="n">indice</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span>
+            <span class="n">similarity_placeholder</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="c1"># the tf graph here pick up the (K+1) highest similarity values</span>
+        <span class="c1"># and their indices</span>
+        <span class="n">top_label</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">labels_tf</span><span class="p">,</span> <span class="n">indice</span><span class="p">)</span>
+      <span class="c1"># map the indices to labels</span>
+      <span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">target_len</span> <span class="o">//</span> <span class="mi">100</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="n">similarity_placeholder</span><span class="p">]</span> <span class="o">=</span> <span class="n">similarity_xs</span><span class="p">[</span><span class="n">count</span> <span class="o">*</span> <span class="mi">100</span><span class="p">:</span><span class="nb">min</span><span class="p">((</span>
+              <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">target_len</span><span class="p">),</span> <span class="p">:]</span>
+          <span class="c1"># generating batch of data by slicing similarity matrix</span>
+          <span class="c1"># into 100*reference_dataset_length</span>
+          <span class="n">fetched_values</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">value</span><span class="p">,</span> <span class="n">top_label</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+          <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fetched_values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+          <span class="n">top_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fetched_values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">top_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">top_labels</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># concatenate batches of data together</span>
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+      <span class="k">if</span> <span class="n">values</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="mi">1</span><span class="p">:(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">top_labels</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="mi">1</span><span class="p">:(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="p">]))</span>
+        <span class="c1"># highest similarity is 1: target is in the reference</span>
+        <span class="c1"># use the following K points</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">values</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">],</span> <span class="n">top_labels</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">]]))</span>
+        <span class="c1"># highest less than 1: target not in the reference, use top K points</span>
+    <span class="k">return</span> <span class="n">features</span></div>
+
+<div class="viewcode-block" id="IRVTransformer.X_transform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.IRVTransformer.X_transform">[docs]</a>  <span class="k">def</span> <span class="nf">X_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_target</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate similarity between target dataset(X_target) and</span>
+<span class="sd">    reference dataset(X): #(1 in intersection)/#(1 in union)</span>
+<span class="sd">         similarity = (X_target intersect X)/(X_target union X)</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    X_target: np.ndarray</span>
+<span class="sd">      fingerprints of target dataset</span>
+<span class="sd">      should have same length with X in the second axis</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X_target: np.ndarray</span>
+<span class="sd">      features of size(batch_size, 2*K*n_tasks)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X_target2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="n">X_target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;start similarity calculation&#39;</span><span class="p">)</span>
+    <span class="n">time1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">similarity</span> <span class="o">=</span> <span class="n">IRVTransformer</span><span class="o">.</span><span class="n">matrix_mul</span><span class="p">(</span><span class="n">X_target</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span>
+        <span class="n">n_features</span> <span class="o">-</span>
+        <span class="n">IRVTransformer</span><span class="o">.</span><span class="n">matrix_mul</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">X_target</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)))</span>
+    <span class="n">time2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;similarity calculation takes </span><span class="si">%i</span><span class="s1"> s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time2</span> <span class="o">-</span> <span class="n">time1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span><span class="p">):</span>
+      <span class="n">X_target2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">realize</span><span class="p">(</span><span class="n">similarity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">z</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_target2</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+  <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="IRVTransformer.matrix_mul"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.IRVTransformer.matrix_mul">[docs]</a>  <span class="k">def</span> <span class="nf">matrix_mul</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">shard_size</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate matrix multiplication for big matrix,</span>
+<span class="sd">    X1 and X2 are sliced into pieces with shard_size rows(columns)</span>
+<span class="sd">    then multiplied together and concatenated to the proper size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">(</span><span class="n">X1</span><span class="p">)</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">(</span><span class="n">X2</span><span class="p">)</span>
+    <span class="n">X1_shape</span> <span class="o">=</span> <span class="n">X1</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">X2_shape</span> <span class="o">=</span> <span class="n">X2</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">X1_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">X2_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">X1_iter</span> <span class="o">=</span> <span class="n">X1_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">shard_size</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">X2_iter</span> <span class="o">=</span> <span class="n">X2_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="n">shard_size</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">all_result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,))</span>
+    <span class="k">for</span> <span class="n">X1_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X1_iter</span><span class="p">):</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,))</span>
+      <span class="k">for</span> <span class="n">X2_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X2_iter</span><span class="p">):</span>
+        <span class="n">partial_result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">X1_id</span> <span class="o">*</span> <span class="n">shard_size</span><span class="p">:</span><span class="nb">min</span><span class="p">((</span>
+            <span class="n">X1_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">shard_size</span><span class="p">,</span> <span class="n">X1_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">:],</span>
+                                   <span class="n">X2</span><span class="p">[:,</span> <span class="n">X2_id</span> <span class="o">*</span> <span class="n">shard_size</span><span class="p">:</span><span class="nb">min</span><span class="p">((</span>
+                                       <span class="n">X2_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">shard_size</span><span class="p">,</span> <span class="n">X2_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+        <span class="c1"># calculate matrix multiplicatin on slices</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="n">result</span> <span class="o">=</span> <span class="n">partial_result</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">result</span><span class="p">,</span> <span class="n">partial_result</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># concatenate the slices together</span>
+        <span class="k">del</span> <span class="n">partial_result</span>
+      <span class="k">if</span> <span class="n">all_result</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">all_result</span> <span class="o">=</span> <span class="n">result</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">all_result</span><span class="p">,</span> <span class="n">result</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="k">del</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">all_result</span></div>
+
+<div class="viewcode-block" id="IRVTransformer.transform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.IRVTransformer.transform">[docs]</a>  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="n">X_length</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">X_trans</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X_length</span> <span class="o">//</span> <span class="mi">5000</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+      <span class="n">X_trans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">X_transform</span><span class="p">(</span>
+              <span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">count</span> <span class="o">*</span> <span class="mi">5000</span><span class="p">:</span><span class="nb">min</span><span class="p">((</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">X_length</span><span class="p">),</span> <span class="p">:]))</span>
+    <span class="n">X_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">X_trans</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X_trans</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IRVTransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.IRVTransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Cannot untransform datasets with IRVTransformer.&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DAGTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.DAGTransformer">[docs]</a><span class="k">class</span> <span class="nc">DAGTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Performs transform from ConvMol adjacency lists to</span>
+<span class="sd">  DAG calculation orders</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">max_atoms</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_w</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initializes DAGTransformer.</span>
+<span class="sd">    Only X can be transformed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span> <span class="o">=</span> <span class="n">transform_X</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span> <span class="o">=</span> <span class="n">transform_y</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_w</span> <span class="o">=</span> <span class="n">transform_w</span>
+    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_w</span>
+
+<div class="viewcode-block" id="DAGTransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.DAGTransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add calculation orders to ConvMol objects&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">idm</span><span class="p">,</span> <span class="n">mol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">[</span><span class="n">idm</span><span class="p">]</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UG_to_DAG</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DAGTransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.DAGTransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Cannot untransform datasets with DAGTransformer.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DAGTransformer.UG_to_DAG"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.DAGTransformer.UG_to_DAG">[docs]</a>  <span class="k">def</span> <span class="nf">UG_to_DAG</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function generates the DAGs for a molecule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># list of calculation orders for DAGs</span>
+    <span class="c1"># stemming from one specific atom in the molecule</span>
+    <span class="n">parents</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># starting from the adjacency list derived by graphconv featurizer</span>
+    <span class="n">UG</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">get_adjacency_list</span><span class="p">()</span>
+    <span class="c1"># number of atoms, also number of DAGs</span>
+    <span class="n">n_atoms</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">get_num_atoms</span><span class="p">()</span>
+    <span class="c1"># DAG on a molecule with k atoms includes k steps of calculation,</span>
+    <span class="c1"># each step calculating graph features for one atom.</span>
+    <span class="c1"># `max_atoms` is the maximum number of steps</span>
+    <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span>
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">):</span>
+      <span class="c1"># each iteration generates the DAG starting from atom with index `count`</span>
+      <span class="n">DAG</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="c1"># list of lists, elements represent the calculation orders</span>
+      <span class="c1"># for atoms in the current graph</span>
+      <span class="n">parent</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)]</span>
+      <span class="c1"># starting from the target atom with index `count`</span>
+      <span class="n">current_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">count</span><span class="p">]</span>
+      <span class="c1"># flags of whether the atom is already included in the DAG</span>
+      <span class="n">atoms_indicator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_atoms</span><span class="p">,))</span>
+      <span class="c1"># atom `count` is in the DAG</span>
+      <span class="n">radial</span> <span class="o">=</span> <span class="mi">1</span>
+      <span class="n">atoms_indicator</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">radial</span>
+      <span class="c1"># recording number of radial propagation steps</span>
+      <span class="k">while</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">atoms_indicator</span><span class="p">):</span>
+        <span class="c1"># in the fisrt loop, atoms directly connected to `count` will be added</span>
+        <span class="c1"># into the DAG(radial=0), then atoms two-bond away from `count`</span>
+        <span class="c1"># will be added in the second loop(radial=1).</span>
+        <span class="c1"># atoms i-bond away will be added in i-th loop</span>
+        <span class="k">if</span> <span class="n">radial</span> <span class="o">&gt;</span> <span class="n">n_atoms</span><span class="p">:</span>
+          <span class="c1"># when molecules have separate parts, starting from one part,</span>
+          <span class="c1"># it is not possible to include all atoms.</span>
+          <span class="c1"># this break quit the loop when going into such condition</span>
+          <span class="k">break</span>
+        <span class="c1"># reinitialize targets for next iteration</span>
+        <span class="n">next_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">radial</span> <span class="o">=</span> <span class="n">radial</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">current_atom</span> <span class="ow">in</span> <span class="n">current_atoms</span><span class="p">:</span>
+          <span class="k">for</span> <span class="n">atom_adj</span> <span class="ow">in</span> <span class="n">UG</span><span class="p">[</span><span class="n">current_atom</span><span class="p">]:</span>
+            <span class="c1"># atoms connected to current_atom</span>
+            <span class="k">if</span> <span class="n">atoms_indicator</span><span class="p">[</span><span class="n">atom_adj</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+              <span class="c1"># generate the dependency map of current DAG</span>
+              <span class="c1"># atoms connected to `current_atoms`(and not included in the DAG)</span>
+              <span class="c1"># are added, and will be the `current_atoms` for next iteration.</span>
+              <span class="n">DAG</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">current_atom</span><span class="p">,</span> <span class="n">atom_adj</span><span class="p">))</span>
+              <span class="n">atoms_indicator</span><span class="p">[</span><span class="n">atom_adj</span><span class="p">]</span> <span class="o">=</span> <span class="n">radial</span>
+              <span class="n">next_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom_adj</span><span class="p">)</span>
+        <span class="n">current_atoms</span> <span class="o">=</span> <span class="n">next_atoms</span>
+      <span class="c1"># DAG starts from the target atom, calculation should go in reverse</span>
+      <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">DAG</span><span class="p">):</span>
+        <span class="c1"># `edge[1]` is the parent of `edge[0]`</span>
+        <span class="n">parent</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="n">max_atoms</span><span class="p">)</span>
+        <span class="n">parent</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">parent</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+
+      <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parent</span><span class="p">):</span>
+        <span class="n">parent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">atoms_indicator</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+      <span class="c1"># after this loop, `parents[i]` includes all parents of atom i</span>
+      <span class="k">for</span> <span class="n">ids</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parent</span><span class="p">):</span>
+        <span class="c1"># manually adding the atom index into its parents list</span>
+        <span class="n">parent</span><span class="p">[</span><span class="n">ids</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ids</span> <span class="o">%</span> <span class="n">max_atoms</span><span class="p">)</span>
+      <span class="c1"># after this loop, `parents[i][0]` is i, `parents[i][1:]` are all parents of atom i</span>
+
+      <span class="c1"># atoms with less parents(farther from the target atom) come first.</span>
+      <span class="c1"># graph features of atoms without parents will be first calculated,</span>
+      <span class="c1"># then atoms with more parents can be calculated in order</span>
+      <span class="c1"># based on previously calculated graph features.</span>
+      <span class="c1"># target atom of this DAG will be calculated in the last step</span>
+      <span class="n">parent</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span>
+
+      <span class="k">for</span> <span class="n">ids</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parent</span><span class="p">):</span>
+        <span class="n">n_par</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="c1"># padding with `max_atoms`</span>
+        <span class="k">if</span> <span class="n">n_par</span> <span class="o">&lt;</span> <span class="n">max_atoms</span><span class="p">:</span>
+          <span class="n">parent</span><span class="p">[</span><span class="n">ids</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">max_atoms</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_atoms</span> <span class="o">-</span> <span class="n">n_par</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="n">n_par</span> <span class="o">&gt;</span> <span class="n">max_atoms</span><span class="p">:</span>
+          <span class="n">parent</span><span class="p">[</span><span class="n">ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent</span><span class="p">[</span><span class="n">ids</span><span class="p">][:</span><span class="n">max_atoms</span><span class="p">]</span>
+
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_atoms</span><span class="p">:</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">[</span><span class="o">-</span><span class="n">max_atoms</span><span class="p">:]</span>
+      <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">max_atoms</span><span class="p">:</span>
+        <span class="c1"># padding</span>
+        <span class="n">parent</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="n">max_atoms</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">)</span>
+      <span class="c1"># `parents[i]` is the calculation order for the DAG stemming from atom i,</span>
+      <span class="c1"># which is a max_atoms * max_atoms numpy array after padding</span>
+      <span class="n">parents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">parent</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">parents</span></div></div>
+
+
+<div class="viewcode-block" id="ImageTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ImageTransformer">[docs]</a><span class="k">class</span> <span class="nc">ImageTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Convert an image into width, height, channel</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">size</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_w</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initializes transformation based on dataset statistics.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_w</span> <span class="o">=</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="ImageTransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ImageTransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform the data in a set of (X, y, w) arrays.&quot;&quot;&quot;</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">]</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">scipy</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">imresize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">images</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span></div></div>
+
+
+<div class="viewcode-block" id="ANITransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer">[docs]</a><span class="k">class</span> <span class="nc">ANITransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Performs transform from 3D coordinates to ANI symmetry functions</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">max_atoms</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span>
+               <span class="n">radial_cutoff</span><span class="o">=</span><span class="mf">4.6</span><span class="p">,</span>
+               <span class="n">angular_cutoff</span><span class="o">=</span><span class="mf">3.1</span><span class="p">,</span>
+               <span class="n">radial_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+               <span class="n">angular_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+               <span class="n">atom_cases</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span>
+               <span class="n">atomic_number_differentiated</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+               <span class="n">coordinates_in_bohr</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_w</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Only X can be transformed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">radial_cutoff</span> <span class="o">=</span> <span class="n">radial_cutoff</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">angular_cutoff</span> <span class="o">=</span> <span class="n">angular_cutoff</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">radial_length</span> <span class="o">=</span> <span class="n">radial_length</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">angular_length</span> <span class="o">=</span> <span class="n">angular_length</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atom_cases</span> <span class="o">=</span> <span class="n">atom_cases</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atomic_number_differentiated</span> <span class="o">=</span> <span class="n">atomic_number_differentiated</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">coordinates_in_bohr</span> <span class="o">=</span> <span class="n">coordinates_in_bohr</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span> <span class="o">=</span> <span class="n">transform_X</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span> <span class="o">=</span> <span class="n">transform_y</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_w</span> <span class="o">=</span> <span class="n">transform_w</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">compute_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_graph</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">transform_batch_size</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_y</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_w</span>
+
+<div class="viewcode-block" id="ANITransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_X</span><span class="p">:</span>
+      <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+      <span class="n">X_out</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">num_transformed</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+
+      <span class="n">batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_batch_size</span>
+
+      <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">X_batch</span> <span class="o">=</span> <span class="n">X</span><span class="p">[(</span><span class="n">start</span> <span class="o">*</span> <span class="n">batch_size</span><span class="p">):</span><span class="n">end</span><span class="p">]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span> <span class="n">X_batch</span>
+            <span class="p">})[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">X_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">num_transformed</span> <span class="o">=</span> <span class="n">num_transformed</span> <span class="o">+</span> <span class="n">X_batch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%i</span><span class="s1"> samples transformed&#39;</span> <span class="o">%</span> <span class="n">num_transformed</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+          <span class="k">break</span>
+
+      <span class="n">X_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">X_out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">X_new</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ANITransformer.untransform"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer.untransform">[docs]</a>  <span class="k">def</span> <span class="nf">untransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Cannot untransform datasets with ANITransformer.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ANITransformer.build"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; tensorflow computation graph for transform &quot;&quot;&quot;</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+      <span class="n">atom_numbers</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+      <span class="n">flags</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">atom_numbers</span><span class="p">)</span>
+      <span class="n">flags</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+      <span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates_in_bohr</span><span class="p">:</span>
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="n">coordinates</span> <span class="o">*</span> <span class="mf">0.52917721092</span>
+      <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_matrix</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>
+      <span class="n">d_radial_cutoff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_cutoff</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radial_cutoff</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>
+      <span class="n">d_angular_cutoff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_cutoff</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">angular_cutoff</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>
+      <span class="n">radial_sym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">radial_symmetry</span><span class="p">(</span><span class="n">d_radial_cutoff</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">atom_numbers</span><span class="p">)</span>
+      <span class="n">angular_sym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angular_symmetry</span><span class="p">(</span><span class="n">d_angular_cutoff</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">atom_numbers</span><span class="p">,</span>
+                                          <span class="n">coordinates</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+          <span class="p">[</span>
+              <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">atom_numbers</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="n">radial_sym</span><span class="p">,</span>
+              <span class="n">angular_sym</span>
+          <span class="p">],</span>
+          <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">graph</span></div>
+
+<div class="viewcode-block" id="ANITransformer.distance_matrix"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer.distance_matrix">[docs]</a>  <span class="k">def</span> <span class="nf">distance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generate distance matrix &quot;&quot;&quot;</span>
+    <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span>
+    <span class="n">tensor1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">coordinates</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tensor2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">coordinates</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Calculate pairwise distance</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">tensor1</span> <span class="o">-</span> <span class="n">tensor2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+    <span class="c1"># Masking for valid atom index</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">d</span> <span class="o">*</span> <span class="n">flags</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="ANITransformer.distance_cutoff"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer.distance_cutoff">[docs]</a>  <span class="k">def</span> <span class="nf">distance_cutoff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generate distance matrix with trainable cutoff &quot;&quot;&quot;</span>
+    <span class="c1"># Cutoff with threshold Rc</span>
+    <span class="n">d_flag</span> <span class="o">=</span> <span class="n">flags</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">cutoff</span> <span class="o">-</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">d_flag</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">d_flag</span><span class="p">)</span>
+    <span class="n">d_flag</span> <span class="o">=</span> <span class="n">d_flag</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">d</span> <span class="o">/</span> <span class="n">cutoff</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span> <span class="o">*</span> <span class="n">d_flag</span></div>
+
+<div class="viewcode-block" id="ANITransformer.radial_symmetry"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer.radial_symmetry">[docs]</a>  <span class="k">def</span> <span class="nf">radial_symmetry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_cutoff</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">atom_numbers</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Radial Symmetry Function &quot;&quot;&quot;</span>
+    <span class="n">embedding</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_cases</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">atom_numbers_embedded</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">embedding_lookup</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">atom_numbers</span><span class="p">)</span>
+
+    <span class="n">Rs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radial_cutoff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radial_length</span><span class="p">)</span>
+    <span class="n">ita</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">Rs</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">/</span> <span class="p">(</span><span class="n">Rs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Rs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">Rs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Rs</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">ita</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ita</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">ita</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">d_cutoff</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d_cutoff</span><span class="p">]</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">]</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ita</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">Rs</span><span class="p">))</span> <span class="o">*</span> <span class="n">d_cutoff</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomic_number_differentiated</span><span class="p">:</span>
+      <span class="n">out_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">atom_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_cases</span><span class="p">:</span>
+        <span class="n">selected_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">atom_numbers_embedded</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">atom_type</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">out_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">out</span> <span class="o">*</span> <span class="n">selected_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+      <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">out_tensors</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ANITransformer.angular_symmetry"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer.angular_symmetry">[docs]</a>  <span class="k">def</span> <span class="nf">angular_symmetry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_cutoff</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">atom_numbers</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Angular Symmetry Function &quot;&quot;&quot;</span>
+
+    <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span>
+    <span class="n">embedding</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_cases</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">atom_numbers_embedded</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">embedding_lookup</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">atom_numbers</span><span class="p">)</span>
+
+    <span class="n">Rs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">angular_cutoff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">angular_length</span><span class="p">)</span>
+    <span class="n">ita</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">/</span> <span class="p">(</span><span class="n">Rs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Rs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">angular_length</span><span class="p">)</span>
+    <span class="n">zeta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angular_length</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">ita</span><span class="p">,</span> <span class="n">zeta</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ita</span><span class="p">,</span> <span class="n">zeta</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">thetas</span><span class="p">)</span>
+    <span class="n">zeta</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">ita</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ita</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">Rs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Rs</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">thetas</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">zeta</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">vector_distances</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">coordinates</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">coordinates</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">R_ij</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">R_ik</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">f_R_ij</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d_cutoff</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">f_R_ik</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d_cutoff</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Define angle theta = arccos(R_ij(Vector) dot R_ik(Vector)/R_ij(distance)/R_ik(distance))</span>
+    <span class="n">vector_mul</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">vector_distances</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> \
+                               <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">vector_distances</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">vector_mul</span> <span class="o">=</span> <span class="n">vector_mul</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">f_R_ij</span><span class="p">)</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">f_R_ik</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">vector_mul</span><span class="p">,</span> <span class="n">R_ij</span> <span class="o">*</span> <span class="n">R_ik</span> <span class="o">+</span> <span class="mf">1e-5</span><span class="p">))</span>
+
+    <span class="n">R_ij</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">R_ij</span><span class="p">]</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">R_ik</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">R_ik</span><span class="p">]</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">f_R_ij</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">f_R_ij</span><span class="p">]</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">f_R_ik</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">f_R_ik</span><span class="p">]</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">theta</span><span class="p">]</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">thetas</span><span class="p">))</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">zeta</span><span class="p">)</span> <span class="o">*</span> \
+                 <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ita</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">((</span><span class="n">R_ij</span> <span class="o">+</span> <span class="n">R_ik</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">-</span> <span class="n">Rs</span><span class="p">))</span> <span class="o">*</span> <span class="n">f_R_ij</span> <span class="o">*</span> <span class="n">f_R_ik</span> <span class="o">*</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomic_number_differentiated</span><span class="p">:</span>
+      <span class="n">out_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">id_j</span><span class="p">,</span> <span class="n">atom_type_j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_cases</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">atom_type_k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_cases</span><span class="p">[</span><span class="n">id_j</span><span class="p">:]:</span>
+          <span class="n">selected_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">atom_numbers_embedded</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">atom_type_j</span><span class="p">]]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> \
+                           <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">atom_numbers_embedded</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">atom_type_k</span><span class="p">]]</span> <span class="o">*</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+          <span class="n">selected_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span>
+              <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">selected_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+          <span class="n">out_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+              <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">out_tensor</span> <span class="o">*</span> <span class="n">selected_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+      <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">out_tensors</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">out_tensor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ANITransformer.get_num_feats"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.ANITransformer.get_num_feats">[docs]</a>  <span class="k">def</span> <span class="nf">get_num_feats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">n_feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">n_feat</span></div></div>
+
+
+<div class="viewcode-block" id="FeaturizationTransformer"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.FeaturizationTransformer">[docs]</a><span class="k">class</span> <span class="nc">FeaturizationTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  A transformer which runs a featurizer over the X values of a dataset.</span>
+<span class="sd">  Datasets used by this transformer must have rdkit.mol objects as the X</span>
+<span class="sd">  values</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">transform_X</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_y</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">transform_w</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+               <span class="n">dataset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">featurizer</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">featurizer</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">transform_X</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FeaturizingTransfomer can only be used on X&quot;</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">FeaturizationTransformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">transform_X</span><span class="o">=</span><span class="n">transform_X</span><span class="p">,</span>
+        <span class="n">transform_y</span><span class="o">=</span><span class="n">transform_y</span><span class="p">,</span>
+        <span class="n">transform_w</span><span class="o">=</span><span class="n">transform_w</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FeaturizationTransformer.transform_array"><a class="viewcode-back" href="../../../deepchem.trans.html#deepchem.trans.transformers.FeaturizationTransformer.transform_array">[docs]</a>  <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

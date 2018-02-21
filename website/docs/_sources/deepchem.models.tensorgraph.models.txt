@@ -1,0 +1,94 @@
+deepchem.models.tensorgraph.models package
+==========================================
+
+Submodules
+----------
+
+deepchem.models.tensorgraph.models.atomic_conv module
+-----------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.atomic_conv
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.gan module
+---------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.gan
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.graph_models module
+------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.graph_models
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.robust_multitask module
+----------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.robust_multitask
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.seqtoseq module
+--------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.seqtoseq
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.sequence_dnn module
+------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.sequence_dnn
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.symmetry_function_regression module
+----------------------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.symmetry_function_regression
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.test_graph_models module
+-----------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.test_graph_models
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.test_symmetry_functions module
+-----------------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.test_symmetry_functions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.models.text_cnn module
+--------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.models.text_cnn
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.tensorgraph.models
+    :members:
+    :undoc-members:
+    :show-inheritance:

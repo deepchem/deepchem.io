@@ -1,0 +1,77 @@
+deepchem\.models\.tensorflow\_models package
+============================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.models.tensorflow_models.tests
+
+Submodules
+----------
+
+deepchem\.models\.tensorflow\_models\.IRV module
+------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.IRV
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.models\.tensorflow\_models\.fcnet module
+--------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.fcnet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.models\.tensorflow\_models\.progressive\_joint module
+---------------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.progressive_joint
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.models\.tensorflow\_models\.progressive\_multitask module
+-------------------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.progressive_multitask
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.models\.tensorflow\_models\.robust\_multitask module
+--------------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.robust_multitask
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.models\.tensorflow\_models\.utils module
+--------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.models\.tensorflow\_models\.vina\_model module
+--------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.vina_model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.tensorflow_models
+    :members:
+    :undoc-members:
+    :show-inheritance:

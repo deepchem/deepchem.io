@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.utils.test package &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="index.html" />
+    <link rel="up" title="deepchem.utils package" href="deepchem.utils.html" />
+    <link rel="prev" title="deepchem.utils package" href="deepchem.utils.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">deepchem.utils.test package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.test.test_generator_evaluator">deepchem.utils.test.test_generator_evaluator module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.test.test_rdkit_util">deepchem.utils.test.test_rdkit_util module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.test.test_seq">deepchem.utils.test.test_seq module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.test">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-utils-test-package">
+<h1>deepchem.utils.test package<a class="headerlink" href="#deepchem-utils-test-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deepchem.utils.test.test_generator_evaluator">
+<span id="deepchem-utils-test-test-generator-evaluator-module"></span><h2>deepchem.utils.test.test_generator_evaluator module<a class="headerlink" href="#module-deepchem.utils.test.test_generator_evaluator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator">
+<em class="property">class </em><code class="descclassname">deepchem.utils.test.test_generator_evaluator.</code><code class="descname">TestGeneratorEvaluator</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_generator_evaluator.html#TestGeneratorEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.addCleanup">
+<code class="descname">addCleanup</code><span class="sig-paren">(</span><em>function</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.addCleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function, with arguments, to be called when the test is
+completed. Functions added are called on a LIFO basis and are
+called after tearDown on test failure or success.</p>
+<p>Cleanup items are called even if setUp fails (unlike tearDown).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.addTypeEqualityFunc">
+<code class="descname">addTypeEqualityFunc</code><span class="sig-paren">(</span><em>typeobj</em>, <em>function</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.addTypeEqualityFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a type specific assertEqual style function to compare a type.</p>
+<p>This method is for use by TestCase subclasses that need to register
+their own type equality functions to provide nicer error messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>typeobj</strong> &#8211; The data type to call this function on when both values
+are of the same type in assertEqual().</li>
+<li><strong>function</strong> &#8211; The callable taking two arguments and an optional
+msg= argument that raises self.failureException with a
+useful error message when the two arguments are not equal.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertAlmostEqual">
+<code class="descname">assertAlmostEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>places=None</em>, <em>msg=None</em>, <em>delta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+between the two objects is more than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>If the two objects compare equal then they will automatically
+compare almost equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertAlmostEquals">
+<code class="descname">assertAlmostEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertAlmostEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertCountEqual">
+<code class="descname">assertCountEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertCountEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An unordered sequence comparison asserting that the same elements,
+regardless of order.  If the same element occurs more than once,
+it verifies that the elements occur the same number of times.</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="docutils">
+<dt>self.assertEqual(Counter(list(first)),</dt>
+<dd>Counter(list(second)))</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Example:</dt>
+<dd><ul class="first last simple">
+<li>[0, 1, 1] and [1, 0, 1] compare equal.</li>
+<li>[0, 0, 1] and [0, 1] compare unequal.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertDictContainsSubset">
+<code class="descname">assertDictContainsSubset</code><span class="sig-paren">(</span><em>subset</em>, <em>dictionary</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertDictContainsSubset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether dictionary is a superset of subset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertDictEqual">
+<code class="descname">assertDictEqual</code><span class="sig-paren">(</span><em>d1</em>, <em>d2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertDictEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertEqual">
+<code class="descname">assertEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by the &#8216;==&#8217;
+operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertEquals">
+<code class="descname">assertEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertFalse">
+<code class="descname">assertFalse</code><span class="sig-paren">(</span><em>expr</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertFalse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertGreater">
+<code class="descname">assertGreater</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertGreater" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertGreaterEqual">
+<code class="descname">assertGreaterEqual</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertGreaterEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIn">
+<code class="descname">assertIn</code><span class="sig-paren">(</span><em>member</em>, <em>container</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIs">
+<code class="descname">assertIs</code><span class="sig-paren">(</span><em>expr1</em>, <em>expr2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIsInstance">
+<code class="descname">assertIsInstance</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(isinstance(obj, cls)), with a nicer
+default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIsNone">
+<code class="descname">assertIsNone</code><span class="sig-paren">(</span><em>obj</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIsNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(obj is None), with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIsNot">
+<code class="descname">assertIsNot</code><span class="sig-paren">(</span><em>expr1</em>, <em>expr2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIsNot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is not b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIsNotNone">
+<code class="descname">assertIsNotNone</code><span class="sig-paren">(</span><em>obj</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertIsNotNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsNone.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertLess">
+<code class="descname">assertLess</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertLess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertLessEqual">
+<code class="descname">assertLessEqual</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertLessEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertListEqual">
+<code class="descname">assertListEqual</code><span class="sig-paren">(</span><em>list1</em>, <em>list2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertListEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>list1</strong> &#8211; The first list to compare.</li>
+<li><strong>list2</strong> &#8211; The second list to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertLogs">
+<code class="descname">assertLogs</code><span class="sig-paren">(</span><em>logger=None</em>, <em>level=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertLogs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a log message of level <em>level</em> or higher is emitted
+on <em>logger_name</em> or its children.  If omitted, <em>level</em> defaults to
+INFO and <em>logger</em> defaults to the root logger.</p>
+<p>This method must be used as a context manager, and will yield
+a recording object with two attributes: <cite>output</cite> and <cite>records</cite>.
+At the end of the context manager, the <cite>output</cite> attribute will
+be a list of the matching formatted log messages and the
+<cite>records</cite> attribute will be a list of the corresponding LogRecord
+objects.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertLogs</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;first message&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo.bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;second message&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;INFO:foo:first message&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;ERROR:foo.bar:second message&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertMultiLineEqual">
+<code class="descname">assertMultiLineEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertMultiLineEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two multi-line strings are equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotAlmostEqual">
+<code class="descname">assertNotAlmostEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>places=None</em>, <em>msg=None</em>, <em>delta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+between the two objects is less than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>Objects that are equal automatically fail.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotAlmostEquals">
+<code class="descname">assertNotAlmostEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotAlmostEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotEqual">
+<code class="descname">assertNotEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by the &#8216;!=&#8217;
+operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotEquals">
+<code class="descname">assertNotEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotIn">
+<code class="descname">assertNotIn</code><span class="sig-paren">(</span><em>member</em>, <em>container</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a not in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotIsInstance">
+<code class="descname">assertNotIsInstance</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsInstance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotRegex">
+<code class="descname">assertNotRegex</code><span class="sig-paren">(</span><em>text</em>, <em>unexpected_regex</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test if the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotRegexpMatches">
+<code class="descname">assertNotRegexpMatches</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertNotRegexpMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRaises">
+<code class="descname">assertRaises</code><span class="sig-paren">(</span><em>expected_exception</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRaises" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless an exception of class expected_exception is raised
+by the callable when invoked with specified positional and
+keyword arguments. If a different type of exception is
+raised, it will not be caught, and the test case will be
+deemed to have suffered an error, exactly as for an
+unexpected exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument &#8216;msg&#8217; can be provided when assertRaises
+is used as a context object.</p>
+<p>The context manager keeps a reference to the exception as
+the &#8216;exception&#8217; attribute. This allows you to inspect the
+exception after the assertion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_exception</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">exception</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_exception</span><span class="o">.</span><span class="n">error_code</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRaisesRegex">
+<code class="descname">assertRaisesRegex</code><span class="sig-paren">(</span><em>expected_exception</em>, <em>expected_regex</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRaisesRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a raised exception matches a regex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected_exception</strong> &#8211; Exception class expected to be raised.</li>
+<li><strong>expected_regex</strong> &#8211; Regex (re pattern object or string) expected
+to be found in error message.</li>
+<li><strong>args</strong> &#8211; Function to be called and extra positional args.</li>
+<li><strong>kwargs</strong> &#8211; Extra kwargs.</li>
+<li><strong>msg</strong> &#8211; Optional message used in case of failure. Can only be used
+when assertRaisesRegex is used as a context manager.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRaisesRegexp">
+<code class="descname">assertRaisesRegexp</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRaisesRegexp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRegex">
+<code class="descname">assertRegex</code><span class="sig-paren">(</span><em>text</em>, <em>expected_regex</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test unless the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRegexpMatches">
+<code class="descname">assertRegexpMatches</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertRegexpMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertSequenceEqual">
+<code class="descname">assertSequenceEqual</code><span class="sig-paren">(</span><em>seq1</em>, <em>seq2</em>, <em>msg=None</em>, <em>seq_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertSequenceEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An equality assertion for ordered sequences (like lists and tuples).</p>
+<p>For the purposes of this function, a valid ordered sequence type is one
+which can be indexed, has a length, and has an equality operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>seq1</strong> &#8211; The first sequence to compare.</li>
+<li><strong>seq2</strong> &#8211; The second sequence to compare.</li>
+<li><strong>seq_type</strong> &#8211; The expected datatype of the sequences, or None if no
+datatype should be enforced.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertSetEqual">
+<code class="descname">assertSetEqual</code><span class="sig-paren">(</span><em>set1</em>, <em>set2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertSetEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A set-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>set1</strong> &#8211; The first set to compare.</li>
+<li><strong>set2</strong> &#8211; The second set to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>assertSetEqual uses ducktyping to support different types of sets, and
+is optimized for sets specifically (parameters must support a
+difference method).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertTrue">
+<code class="descname">assertTrue</code><span class="sig-paren">(</span><em>expr</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertTrue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is true.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertTupleEqual">
+<code class="descname">assertTupleEqual</code><span class="sig-paren">(</span><em>tuple1</em>, <em>tuple2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertTupleEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tuple1</strong> &#8211; The first tuple to compare.</li>
+<li><strong>tuple2</strong> &#8211; The second tuple to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertWarns">
+<code class="descname">assertWarns</code><span class="sig-paren">(</span><em>expected_warning</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertWarns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a warning of class warnClass is triggered
+by the callable when invoked with specified positional and
+keyword arguments.  If a different type of warning is
+triggered, it will not be handled: depending on the other
+warning filtering rules in effect, it might be silenced, printed
+out, or raised as an exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument &#8216;msg&#8217; can be provided when assertWarns
+is used as a context object.</p>
+<p>The context manager keeps a reference to the first matching
+warning as the &#8216;warning&#8217; attribute; similarly, the &#8216;filename&#8217;
+and &#8216;lineno&#8217; attributes give you information about the line
+of Python code from which the warning was triggered.
+This allows you to inspect the warning after the assertion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_warning</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">warning</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_warning</span><span class="o">.</span><span class="n">some_attribute</span><span class="p">,</span> <span class="mi">147</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertWarnsRegex">
+<code class="descname">assertWarnsRegex</code><span class="sig-paren">(</span><em>expected_warning</em>, <em>expected_regex</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assertWarnsRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a triggered warning matches a regexp.
+Basic functioning is similar to assertWarns() with the addition
+that only warnings whose messages also match the regular expression
+are considered successful matches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected_warning</strong> &#8211; Warning class expected to be triggered.</li>
+<li><strong>expected_regex</strong> &#8211; Regex (re pattern object or string) expected
+to be found in error message.</li>
+<li><strong>args</strong> &#8211; Function to be called and extra positional args.</li>
+<li><strong>kwargs</strong> &#8211; Extra kwargs.</li>
+<li><strong>msg</strong> &#8211; Optional message used in case of failure. Can only be used
+when assertWarnsRegex is used as a context manager.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assert_">
+<code class="descname">assert_</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.assert_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.countTestCases">
+<code class="descname">countTestCases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.countTestCases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the test without collecting errors in a TestResult</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.defaultTestResult">
+<code class="descname">defaultTestResult</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.defaultTestResult" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.doCleanups">
+<code class="descname">doCleanups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.doCleanups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute all cleanup functions. Normally called for you after
+tearDown.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.fail">
+<code class="descname">fail</code><span class="sig-paren">(</span><em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail immediately, with the given message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failIf">
+<code class="descname">failIf</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failIf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failIfAlmostEqual">
+<code class="descname">failIfAlmostEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failIfAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failIfEqual">
+<code class="descname">failIfEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failIfEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failUnless">
+<code class="descname">failUnless</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failUnless" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failUnlessAlmostEqual">
+<code class="descname">failUnlessAlmostEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failUnlessAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failUnlessEqual">
+<code class="descname">failUnlessEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failUnlessEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failUnlessRaises">
+<code class="descname">failUnlessRaises</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failUnlessRaises" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failureException">
+<code class="descname">failureException</code><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.failureException" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">AssertionError</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.id">
+<code class="descname">id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.longMessage">
+<code class="descname">longMessage</code><em class="property"> = True</em><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.longMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.maxDiff">
+<code class="descname">maxDiff</code><em class="property"> = 640</em><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.maxDiff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>result=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.setUpClass">
+<code class="descname">setUpClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.shortDescription">
+<code class="descname">shortDescription</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.shortDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a one-line description of the test, or None if no
+description has been provided.</p>
+<p>The default implementation of this method returns the first line of
+the specified test method&#8217;s docstring.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.skipTest">
+<code class="descname">skipTest</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.skipTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skip this test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.subTest">
+<code class="descname">subTest</code><span class="sig-paren">(</span><em>msg=&lt;object object&gt;</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.subTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a context manager that will return the enclosed block
+of code in a subtest identified by the optional message and
+keyword parameters.  A failure in the subtest marks the test
+case as failed but resumes execution at the end of the enclosed
+block, allowing further test code to be executed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.tearDown">
+<code class="descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.tearDownClass">
+<code class="descname">tearDownClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.tearDownClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.test_compute_model_performance_multitask_classifier">
+<code class="descname">test_compute_model_performance_multitask_classifier</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_generator_evaluator.html#TestGeneratorEvaluator.test_compute_model_performance_multitask_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.test_compute_model_performance_multitask_classifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.test_compute_model_performance_multitask_regressor">
+<code class="descname">test_compute_model_performance_multitask_regressor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_generator_evaluator.html#TestGeneratorEvaluator.test_compute_model_performance_multitask_regressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.test_compute_model_performance_multitask_regressor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.test_compute_model_performance_singletask_classifier">
+<code class="descname">test_compute_model_performance_singletask_classifier</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_generator_evaluator.html#TestGeneratorEvaluator.test_compute_model_performance_singletask_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.test_compute_model_performance_singletask_classifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.test_compute_model_performance_singletask_regressor">
+<code class="descname">test_compute_model_performance_singletask_regressor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_generator_evaluator.html#TestGeneratorEvaluator.test_compute_model_performance_singletask_regressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_generator_evaluator.TestGeneratorEvaluator.test_compute_model_performance_singletask_regressor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.utils.test.test_rdkit_util">
+<span id="deepchem-utils-test-test-rdkit-util-module"></span><h2>deepchem.utils.test.test_rdkit_util module<a class="headerlink" href="#module-deepchem.utils.test.test_rdkit_util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil">
+<em class="property">class </em><code class="descclassname">deepchem.utils.test.test_rdkit_util.</code><code class="descname">TestRdkitUtil</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_rdkit_util.html#TestRdkitUtil"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.addCleanup">
+<code class="descname">addCleanup</code><span class="sig-paren">(</span><em>function</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.addCleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function, with arguments, to be called when the test is
+completed. Functions added are called on a LIFO basis and are
+called after tearDown on test failure or success.</p>
+<p>Cleanup items are called even if setUp fails (unlike tearDown).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.addTypeEqualityFunc">
+<code class="descname">addTypeEqualityFunc</code><span class="sig-paren">(</span><em>typeobj</em>, <em>function</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.addTypeEqualityFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a type specific assertEqual style function to compare a type.</p>
+<p>This method is for use by TestCase subclasses that need to register
+their own type equality functions to provide nicer error messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>typeobj</strong> &#8211; The data type to call this function on when both values
+are of the same type in assertEqual().</li>
+<li><strong>function</strong> &#8211; The callable taking two arguments and an optional
+msg= argument that raises self.failureException with a
+useful error message when the two arguments are not equal.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertAlmostEqual">
+<code class="descname">assertAlmostEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>places=None</em>, <em>msg=None</em>, <em>delta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+between the two objects is more than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>If the two objects compare equal then they will automatically
+compare almost equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertAlmostEquals">
+<code class="descname">assertAlmostEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertAlmostEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertCountEqual">
+<code class="descname">assertCountEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertCountEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An unordered sequence comparison asserting that the same elements,
+regardless of order.  If the same element occurs more than once,
+it verifies that the elements occur the same number of times.</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="docutils">
+<dt>self.assertEqual(Counter(list(first)),</dt>
+<dd>Counter(list(second)))</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Example:</dt>
+<dd><ul class="first last simple">
+<li>[0, 1, 1] and [1, 0, 1] compare equal.</li>
+<li>[0, 0, 1] and [0, 1] compare unequal.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertDictContainsSubset">
+<code class="descname">assertDictContainsSubset</code><span class="sig-paren">(</span><em>subset</em>, <em>dictionary</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertDictContainsSubset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether dictionary is a superset of subset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertDictEqual">
+<code class="descname">assertDictEqual</code><span class="sig-paren">(</span><em>d1</em>, <em>d2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertDictEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertEqual">
+<code class="descname">assertEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by the &#8216;==&#8217;
+operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertEquals">
+<code class="descname">assertEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertFalse">
+<code class="descname">assertFalse</code><span class="sig-paren">(</span><em>expr</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertFalse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertGreater">
+<code class="descname">assertGreater</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertGreater" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertGreaterEqual">
+<code class="descname">assertGreaterEqual</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertGreaterEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIn">
+<code class="descname">assertIn</code><span class="sig-paren">(</span><em>member</em>, <em>container</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIs">
+<code class="descname">assertIs</code><span class="sig-paren">(</span><em>expr1</em>, <em>expr2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIsInstance">
+<code class="descname">assertIsInstance</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(isinstance(obj, cls)), with a nicer
+default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIsNone">
+<code class="descname">assertIsNone</code><span class="sig-paren">(</span><em>obj</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIsNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(obj is None), with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIsNot">
+<code class="descname">assertIsNot</code><span class="sig-paren">(</span><em>expr1</em>, <em>expr2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIsNot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is not b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIsNotNone">
+<code class="descname">assertIsNotNone</code><span class="sig-paren">(</span><em>obj</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertIsNotNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsNone.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertLess">
+<code class="descname">assertLess</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertLess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertLessEqual">
+<code class="descname">assertLessEqual</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertLessEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertListEqual">
+<code class="descname">assertListEqual</code><span class="sig-paren">(</span><em>list1</em>, <em>list2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertListEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>list1</strong> &#8211; The first list to compare.</li>
+<li><strong>list2</strong> &#8211; The second list to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertLogs">
+<code class="descname">assertLogs</code><span class="sig-paren">(</span><em>logger=None</em>, <em>level=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertLogs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a log message of level <em>level</em> or higher is emitted
+on <em>logger_name</em> or its children.  If omitted, <em>level</em> defaults to
+INFO and <em>logger</em> defaults to the root logger.</p>
+<p>This method must be used as a context manager, and will yield
+a recording object with two attributes: <cite>output</cite> and <cite>records</cite>.
+At the end of the context manager, the <cite>output</cite> attribute will
+be a list of the matching formatted log messages and the
+<cite>records</cite> attribute will be a list of the corresponding LogRecord
+objects.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertLogs</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;first message&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo.bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;second message&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;INFO:foo:first message&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;ERROR:foo.bar:second message&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertMultiLineEqual">
+<code class="descname">assertMultiLineEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertMultiLineEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two multi-line strings are equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotAlmostEqual">
+<code class="descname">assertNotAlmostEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>places=None</em>, <em>msg=None</em>, <em>delta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+between the two objects is less than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>Objects that are equal automatically fail.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotAlmostEquals">
+<code class="descname">assertNotAlmostEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotAlmostEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotEqual">
+<code class="descname">assertNotEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by the &#8216;!=&#8217;
+operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotEquals">
+<code class="descname">assertNotEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotIn">
+<code class="descname">assertNotIn</code><span class="sig-paren">(</span><em>member</em>, <em>container</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a not in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotIsInstance">
+<code class="descname">assertNotIsInstance</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsInstance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotRegex">
+<code class="descname">assertNotRegex</code><span class="sig-paren">(</span><em>text</em>, <em>unexpected_regex</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test if the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotRegexpMatches">
+<code class="descname">assertNotRegexpMatches</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertNotRegexpMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRaises">
+<code class="descname">assertRaises</code><span class="sig-paren">(</span><em>expected_exception</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRaises" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless an exception of class expected_exception is raised
+by the callable when invoked with specified positional and
+keyword arguments. If a different type of exception is
+raised, it will not be caught, and the test case will be
+deemed to have suffered an error, exactly as for an
+unexpected exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument &#8216;msg&#8217; can be provided when assertRaises
+is used as a context object.</p>
+<p>The context manager keeps a reference to the exception as
+the &#8216;exception&#8217; attribute. This allows you to inspect the
+exception after the assertion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_exception</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">exception</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_exception</span><span class="o">.</span><span class="n">error_code</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRaisesRegex">
+<code class="descname">assertRaisesRegex</code><span class="sig-paren">(</span><em>expected_exception</em>, <em>expected_regex</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRaisesRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a raised exception matches a regex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected_exception</strong> &#8211; Exception class expected to be raised.</li>
+<li><strong>expected_regex</strong> &#8211; Regex (re pattern object or string) expected
+to be found in error message.</li>
+<li><strong>args</strong> &#8211; Function to be called and extra positional args.</li>
+<li><strong>kwargs</strong> &#8211; Extra kwargs.</li>
+<li><strong>msg</strong> &#8211; Optional message used in case of failure. Can only be used
+when assertRaisesRegex is used as a context manager.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRaisesRegexp">
+<code class="descname">assertRaisesRegexp</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRaisesRegexp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRegex">
+<code class="descname">assertRegex</code><span class="sig-paren">(</span><em>text</em>, <em>expected_regex</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test unless the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRegexpMatches">
+<code class="descname">assertRegexpMatches</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertRegexpMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertSequenceEqual">
+<code class="descname">assertSequenceEqual</code><span class="sig-paren">(</span><em>seq1</em>, <em>seq2</em>, <em>msg=None</em>, <em>seq_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertSequenceEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An equality assertion for ordered sequences (like lists and tuples).</p>
+<p>For the purposes of this function, a valid ordered sequence type is one
+which can be indexed, has a length, and has an equality operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>seq1</strong> &#8211; The first sequence to compare.</li>
+<li><strong>seq2</strong> &#8211; The second sequence to compare.</li>
+<li><strong>seq_type</strong> &#8211; The expected datatype of the sequences, or None if no
+datatype should be enforced.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertSetEqual">
+<code class="descname">assertSetEqual</code><span class="sig-paren">(</span><em>set1</em>, <em>set2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertSetEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A set-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>set1</strong> &#8211; The first set to compare.</li>
+<li><strong>set2</strong> &#8211; The second set to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>assertSetEqual uses ducktyping to support different types of sets, and
+is optimized for sets specifically (parameters must support a
+difference method).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertTrue">
+<code class="descname">assertTrue</code><span class="sig-paren">(</span><em>expr</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertTrue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is true.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertTupleEqual">
+<code class="descname">assertTupleEqual</code><span class="sig-paren">(</span><em>tuple1</em>, <em>tuple2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertTupleEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tuple1</strong> &#8211; The first tuple to compare.</li>
+<li><strong>tuple2</strong> &#8211; The second tuple to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertWarns">
+<code class="descname">assertWarns</code><span class="sig-paren">(</span><em>expected_warning</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertWarns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a warning of class warnClass is triggered
+by the callable when invoked with specified positional and
+keyword arguments.  If a different type of warning is
+triggered, it will not be handled: depending on the other
+warning filtering rules in effect, it might be silenced, printed
+out, or raised as an exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument &#8216;msg&#8217; can be provided when assertWarns
+is used as a context object.</p>
+<p>The context manager keeps a reference to the first matching
+warning as the &#8216;warning&#8217; attribute; similarly, the &#8216;filename&#8217;
+and &#8216;lineno&#8217; attributes give you information about the line
+of Python code from which the warning was triggered.
+This allows you to inspect the warning after the assertion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_warning</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">warning</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_warning</span><span class="o">.</span><span class="n">some_attribute</span><span class="p">,</span> <span class="mi">147</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertWarnsRegex">
+<code class="descname">assertWarnsRegex</code><span class="sig-paren">(</span><em>expected_warning</em>, <em>expected_regex</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assertWarnsRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a triggered warning matches a regexp.
+Basic functioning is similar to assertWarns() with the addition
+that only warnings whose messages also match the regular expression
+are considered successful matches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected_warning</strong> &#8211; Warning class expected to be triggered.</li>
+<li><strong>expected_regex</strong> &#8211; Regex (re pattern object or string) expected
+to be found in error message.</li>
+<li><strong>args</strong> &#8211; Function to be called and extra positional args.</li>
+<li><strong>kwargs</strong> &#8211; Extra kwargs.</li>
+<li><strong>msg</strong> &#8211; Optional message used in case of failure. Can only be used
+when assertWarnsRegex is used as a context manager.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assert_">
+<code class="descname">assert_</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.assert_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.countTestCases">
+<code class="descname">countTestCases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.countTestCases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the test without collecting errors in a TestResult</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.defaultTestResult">
+<code class="descname">defaultTestResult</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.defaultTestResult" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.doCleanups">
+<code class="descname">doCleanups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.doCleanups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute all cleanup functions. Normally called for you after
+tearDown.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.fail">
+<code class="descname">fail</code><span class="sig-paren">(</span><em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail immediately, with the given message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failIf">
+<code class="descname">failIf</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failIf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failIfAlmostEqual">
+<code class="descname">failIfAlmostEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failIfAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failIfEqual">
+<code class="descname">failIfEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failIfEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failUnless">
+<code class="descname">failUnless</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failUnless" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failUnlessAlmostEqual">
+<code class="descname">failUnlessAlmostEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failUnlessAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failUnlessEqual">
+<code class="descname">failUnlessEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failUnlessEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failUnlessRaises">
+<code class="descname">failUnlessRaises</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failUnlessRaises" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failureException">
+<code class="descname">failureException</code><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.failureException" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">AssertionError</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.id">
+<code class="descname">id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.longMessage">
+<code class="descname">longMessage</code><em class="property"> = True</em><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.longMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.maxDiff">
+<code class="descname">maxDiff</code><em class="property"> = 640</em><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.maxDiff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>result=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.setUpClass">
+<code class="descname">setUpClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.shortDescription">
+<code class="descname">shortDescription</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.shortDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a one-line description of the test, or None if no
+description has been provided.</p>
+<p>The default implementation of this method returns the first line of
+the specified test method&#8217;s docstring.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.skipTest">
+<code class="descname">skipTest</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.skipTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skip this test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.subTest">
+<code class="descname">subTest</code><span class="sig-paren">(</span><em>msg=&lt;object object&gt;</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.subTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a context manager that will return the enclosed block
+of code in a subtest identified by the optional message and
+keyword parameters.  A failure in the subtest marks the test
+case as failed but resumes execution at the end of the enclosed
+block, allowing further test code to be executed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.tearDown">
+<code class="descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.tearDownClass">
+<code class="descname">tearDownClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.tearDownClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_add_hydrogens_to_mol">
+<code class="descname">test_add_hydrogens_to_mol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_rdkit_util.html#TestRdkitUtil.test_add_hydrogens_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_add_hydrogens_to_mol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_compute_charges">
+<code class="descname">test_compute_charges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_rdkit_util.html#TestRdkitUtil.test_compute_charges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_compute_charges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_get_xyz_from_mol">
+<code class="descname">test_get_xyz_from_mol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_rdkit_util.html#TestRdkitUtil.test_get_xyz_from_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_get_xyz_from_mol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_load_molecule">
+<code class="descname">test_load_molecule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_rdkit_util.html#TestRdkitUtil.test_load_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_load_molecule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_merge_molecules_xyz">
+<code class="descname">test_merge_molecules_xyz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_rdkit_util.html#TestRdkitUtil.test_merge_molecules_xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_merge_molecules_xyz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_pdbqt_to_pdb">
+<code class="descname">test_pdbqt_to_pdb</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_rdkit_util.html#TestRdkitUtil.test_pdbqt_to_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_pdbqt_to_pdb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_write_molecule">
+<code class="descname">test_write_molecule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_rdkit_util.html#TestRdkitUtil.test_write_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_rdkit_util.TestRdkitUtil.test_write_molecule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.utils.test.test_seq">
+<span id="deepchem-utils-test-test-seq-module"></span><h2>deepchem.utils.test.test_seq module<a class="headerlink" href="#module-deepchem.utils.test.test_seq" title="Permalink to this headline">¶</a></h2>
+<p>Tests that sequence handling utilities work.</p>
+<dl class="class">
+<dt id="deepchem.utils.test.test_seq.TestSeq">
+<em class="property">class </em><code class="descclassname">deepchem.utils.test.test_seq.</code><code class="descname">TestSeq</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_seq.html#TestSeq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Tests sequence handling utilities.</p>
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.addCleanup">
+<code class="descname">addCleanup</code><span class="sig-paren">(</span><em>function</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.addCleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function, with arguments, to be called when the test is
+completed. Functions added are called on a LIFO basis and are
+called after tearDown on test failure or success.</p>
+<p>Cleanup items are called even if setUp fails (unlike tearDown).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.addTypeEqualityFunc">
+<code class="descname">addTypeEqualityFunc</code><span class="sig-paren">(</span><em>typeobj</em>, <em>function</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.addTypeEqualityFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a type specific assertEqual style function to compare a type.</p>
+<p>This method is for use by TestCase subclasses that need to register
+their own type equality functions to provide nicer error messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>typeobj</strong> &#8211; The data type to call this function on when both values
+are of the same type in assertEqual().</li>
+<li><strong>function</strong> &#8211; The callable taking two arguments and an optional
+msg= argument that raises self.failureException with a
+useful error message when the two arguments are not equal.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertAlmostEqual">
+<code class="descname">assertAlmostEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>places=None</em>, <em>msg=None</em>, <em>delta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+between the two objects is more than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>If the two objects compare equal then they will automatically
+compare almost equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertAlmostEquals">
+<code class="descname">assertAlmostEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertAlmostEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertCountEqual">
+<code class="descname">assertCountEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertCountEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An unordered sequence comparison asserting that the same elements,
+regardless of order.  If the same element occurs more than once,
+it verifies that the elements occur the same number of times.</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="docutils">
+<dt>self.assertEqual(Counter(list(first)),</dt>
+<dd>Counter(list(second)))</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Example:</dt>
+<dd><ul class="first last simple">
+<li>[0, 1, 1] and [1, 0, 1] compare equal.</li>
+<li>[0, 0, 1] and [0, 1] compare unequal.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertDictContainsSubset">
+<code class="descname">assertDictContainsSubset</code><span class="sig-paren">(</span><em>subset</em>, <em>dictionary</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertDictContainsSubset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether dictionary is a superset of subset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertDictEqual">
+<code class="descname">assertDictEqual</code><span class="sig-paren">(</span><em>d1</em>, <em>d2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertDictEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertEqual">
+<code class="descname">assertEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by the &#8216;==&#8217;
+operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertEquals">
+<code class="descname">assertEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertFalse">
+<code class="descname">assertFalse</code><span class="sig-paren">(</span><em>expr</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertFalse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertGreater">
+<code class="descname">assertGreater</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertGreater" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertGreaterEqual">
+<code class="descname">assertGreaterEqual</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertGreaterEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertIn">
+<code class="descname">assertIn</code><span class="sig-paren">(</span><em>member</em>, <em>container</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertIs">
+<code class="descname">assertIs</code><span class="sig-paren">(</span><em>expr1</em>, <em>expr2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertIs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertIsInstance">
+<code class="descname">assertIsInstance</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(isinstance(obj, cls)), with a nicer
+default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertIsNone">
+<code class="descname">assertIsNone</code><span class="sig-paren">(</span><em>obj</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertIsNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(obj is None), with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertIsNot">
+<code class="descname">assertIsNot</code><span class="sig-paren">(</span><em>expr1</em>, <em>expr2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertIsNot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is not b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertIsNotNone">
+<code class="descname">assertIsNotNone</code><span class="sig-paren">(</span><em>obj</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertIsNotNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsNone.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertLess">
+<code class="descname">assertLess</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertLess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertLessEqual">
+<code class="descname">assertLessEqual</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertLessEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertListEqual">
+<code class="descname">assertListEqual</code><span class="sig-paren">(</span><em>list1</em>, <em>list2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertListEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>list1</strong> &#8211; The first list to compare.</li>
+<li><strong>list2</strong> &#8211; The second list to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertLogs">
+<code class="descname">assertLogs</code><span class="sig-paren">(</span><em>logger=None</em>, <em>level=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertLogs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a log message of level <em>level</em> or higher is emitted
+on <em>logger_name</em> or its children.  If omitted, <em>level</em> defaults to
+INFO and <em>logger</em> defaults to the root logger.</p>
+<p>This method must be used as a context manager, and will yield
+a recording object with two attributes: <cite>output</cite> and <cite>records</cite>.
+At the end of the context manager, the <cite>output</cite> attribute will
+be a list of the matching formatted log messages and the
+<cite>records</cite> attribute will be a list of the corresponding LogRecord
+objects.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertLogs</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;first message&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo.bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;second message&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;INFO:foo:first message&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;ERROR:foo.bar:second message&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertMultiLineEqual">
+<code class="descname">assertMultiLineEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertMultiLineEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two multi-line strings are equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertNotAlmostEqual">
+<code class="descname">assertNotAlmostEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>places=None</em>, <em>msg=None</em>, <em>delta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertNotAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+between the two objects is less than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>Objects that are equal automatically fail.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertNotAlmostEquals">
+<code class="descname">assertNotAlmostEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertNotAlmostEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertNotEqual">
+<code class="descname">assertNotEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertNotEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by the &#8216;!=&#8217;
+operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertNotEquals">
+<code class="descname">assertNotEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertNotEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertNotIn">
+<code class="descname">assertNotIn</code><span class="sig-paren">(</span><em>member</em>, <em>container</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertNotIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a not in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertNotIsInstance">
+<code class="descname">assertNotIsInstance</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertNotIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsInstance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertNotRegex">
+<code class="descname">assertNotRegex</code><span class="sig-paren">(</span><em>text</em>, <em>unexpected_regex</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertNotRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test if the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertNotRegexpMatches">
+<code class="descname">assertNotRegexpMatches</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertNotRegexpMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertRaises">
+<code class="descname">assertRaises</code><span class="sig-paren">(</span><em>expected_exception</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertRaises" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless an exception of class expected_exception is raised
+by the callable when invoked with specified positional and
+keyword arguments. If a different type of exception is
+raised, it will not be caught, and the test case will be
+deemed to have suffered an error, exactly as for an
+unexpected exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument &#8216;msg&#8217; can be provided when assertRaises
+is used as a context object.</p>
+<p>The context manager keeps a reference to the exception as
+the &#8216;exception&#8217; attribute. This allows you to inspect the
+exception after the assertion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_exception</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">exception</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_exception</span><span class="o">.</span><span class="n">error_code</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertRaisesRegex">
+<code class="descname">assertRaisesRegex</code><span class="sig-paren">(</span><em>expected_exception</em>, <em>expected_regex</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertRaisesRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a raised exception matches a regex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected_exception</strong> &#8211; Exception class expected to be raised.</li>
+<li><strong>expected_regex</strong> &#8211; Regex (re pattern object or string) expected
+to be found in error message.</li>
+<li><strong>args</strong> &#8211; Function to be called and extra positional args.</li>
+<li><strong>kwargs</strong> &#8211; Extra kwargs.</li>
+<li><strong>msg</strong> &#8211; Optional message used in case of failure. Can only be used
+when assertRaisesRegex is used as a context manager.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertRaisesRegexp">
+<code class="descname">assertRaisesRegexp</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertRaisesRegexp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertRegex">
+<code class="descname">assertRegex</code><span class="sig-paren">(</span><em>text</em>, <em>expected_regex</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test unless the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertRegexpMatches">
+<code class="descname">assertRegexpMatches</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertRegexpMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertSequenceEqual">
+<code class="descname">assertSequenceEqual</code><span class="sig-paren">(</span><em>seq1</em>, <em>seq2</em>, <em>msg=None</em>, <em>seq_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertSequenceEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An equality assertion for ordered sequences (like lists and tuples).</p>
+<p>For the purposes of this function, a valid ordered sequence type is one
+which can be indexed, has a length, and has an equality operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>seq1</strong> &#8211; The first sequence to compare.</li>
+<li><strong>seq2</strong> &#8211; The second sequence to compare.</li>
+<li><strong>seq_type</strong> &#8211; The expected datatype of the sequences, or None if no
+datatype should be enforced.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertSetEqual">
+<code class="descname">assertSetEqual</code><span class="sig-paren">(</span><em>set1</em>, <em>set2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertSetEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A set-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>set1</strong> &#8211; The first set to compare.</li>
+<li><strong>set2</strong> &#8211; The second set to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>assertSetEqual uses ducktyping to support different types of sets, and
+is optimized for sets specifically (parameters must support a
+difference method).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertTrue">
+<code class="descname">assertTrue</code><span class="sig-paren">(</span><em>expr</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertTrue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is true.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertTupleEqual">
+<code class="descname">assertTupleEqual</code><span class="sig-paren">(</span><em>tuple1</em>, <em>tuple2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertTupleEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tuple1</strong> &#8211; The first tuple to compare.</li>
+<li><strong>tuple2</strong> &#8211; The second tuple to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertWarns">
+<code class="descname">assertWarns</code><span class="sig-paren">(</span><em>expected_warning</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertWarns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a warning of class warnClass is triggered
+by the callable when invoked with specified positional and
+keyword arguments.  If a different type of warning is
+triggered, it will not be handled: depending on the other
+warning filtering rules in effect, it might be silenced, printed
+out, or raised as an exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument &#8216;msg&#8217; can be provided when assertWarns
+is used as a context object.</p>
+<p>The context manager keeps a reference to the first matching
+warning as the &#8216;warning&#8217; attribute; similarly, the &#8216;filename&#8217;
+and &#8216;lineno&#8217; attributes give you information about the line
+of Python code from which the warning was triggered.
+This allows you to inspect the warning after the assertion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_warning</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">warning</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_warning</span><span class="o">.</span><span class="n">some_attribute</span><span class="p">,</span> <span class="mi">147</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assertWarnsRegex">
+<code class="descname">assertWarnsRegex</code><span class="sig-paren">(</span><em>expected_warning</em>, <em>expected_regex</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assertWarnsRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a triggered warning matches a regexp.
+Basic functioning is similar to assertWarns() with the addition
+that only warnings whose messages also match the regular expression
+are considered successful matches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected_warning</strong> &#8211; Warning class expected to be triggered.</li>
+<li><strong>expected_regex</strong> &#8211; Regex (re pattern object or string) expected
+to be found in error message.</li>
+<li><strong>args</strong> &#8211; Function to be called and extra positional args.</li>
+<li><strong>kwargs</strong> &#8211; Extra kwargs.</li>
+<li><strong>msg</strong> &#8211; Optional message used in case of failure. Can only be used
+when assertWarnsRegex is used as a context manager.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.assert_">
+<code class="descname">assert_</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.assert_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.countTestCases">
+<code class="descname">countTestCases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.countTestCases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the test without collecting errors in a TestResult</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.defaultTestResult">
+<code class="descname">defaultTestResult</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.defaultTestResult" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.doCleanups">
+<code class="descname">doCleanups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.doCleanups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute all cleanup functions. Normally called for you after
+tearDown.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.fail">
+<code class="descname">fail</code><span class="sig-paren">(</span><em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail immediately, with the given message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.failIf">
+<code class="descname">failIf</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.failIf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.failIfAlmostEqual">
+<code class="descname">failIfAlmostEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.failIfAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.failIfEqual">
+<code class="descname">failIfEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.failIfEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.failUnless">
+<code class="descname">failUnless</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.failUnless" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.failUnlessAlmostEqual">
+<code class="descname">failUnlessAlmostEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.failUnlessAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.failUnlessEqual">
+<code class="descname">failUnlessEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.failUnlessEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.failUnlessRaises">
+<code class="descname">failUnlessRaises</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.failUnlessRaises" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_seq.TestSeq.failureException">
+<code class="descname">failureException</code><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.failureException" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">AssertionError</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.id">
+<code class="descname">id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_seq.TestSeq.longMessage">
+<code class="descname">longMessage</code><em class="property"> = True</em><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.longMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.utils.test.test_seq.TestSeq.maxDiff">
+<code class="descname">maxDiff</code><em class="property"> = 640</em><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.maxDiff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>result=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.setUpClass">
+<code class="descname">setUpClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.shortDescription">
+<code class="descname">shortDescription</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.shortDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a one-line description of the test, or None if no
+description has been provided.</p>
+<p>The default implementation of this method returns the first line of
+the specified test method&#8217;s docstring.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.skipTest">
+<code class="descname">skipTest</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.skipTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skip this test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.subTest">
+<code class="descname">subTest</code><span class="sig-paren">(</span><em>msg=&lt;object object&gt;</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.subTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a context manager that will return the enclosed block
+of code in a subtest identified by the optional message and
+keyword parameters.  A failure in the subtest marks the test
+case as failed but resumes execution at the end of the enclosed
+block, allowing further test code to be executed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.tearDown">
+<code class="descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.tearDownClass">
+<code class="descname">tearDownClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.tearDownClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.test_one_hot_mismatch">
+<code class="descname">test_one_hot_mismatch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_seq.html#TestSeq.test_one_hot_mismatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.test_one_hot_mismatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.test.test_seq.TestSeq.test_one_hot_simple">
+<code class="descname">test_one_hot_simple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/test/test_seq.html#TestSeq.test_one_hot_simple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.test.test_seq.TestSeq.test_one_hot_simple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.utils.test">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.utils.test" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.utils.test.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

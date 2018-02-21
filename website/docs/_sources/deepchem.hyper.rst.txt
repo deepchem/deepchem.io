@@ -1,0 +1,37 @@
+deepchem\.hyper package
+=======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.hyper.tests
+
+Submodules
+----------
+
+deepchem\.hyper\.gaussian\_process module
+-----------------------------------------
+
+.. automodule:: deepchem.hyper.gaussian_process
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.hyper\.grid\_search module
+------------------------------------
+
+.. automodule:: deepchem.hyper.grid_search
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.hyper
+    :members:
+    :undoc-members:
+    :show-inheritance:

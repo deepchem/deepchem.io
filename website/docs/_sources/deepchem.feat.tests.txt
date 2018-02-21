@@ -1,0 +1,94 @@
+deepchem.feat.tests package
+===========================
+
+Submodules
+----------
+
+deepchem.feat.tests.test_atomic_coordinates module
+--------------------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_atomic_coordinates
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_basic module
+-------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_basic
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_binding_pocket_features module
+-------------------------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_binding_pocket_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_coulomb_matrices module
+------------------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_coulomb_matrices
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_features module
+----------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_fingerprints module
+--------------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_fingerprints
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_graph_features module
+----------------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_graph_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_mol_graphs module
+------------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_mol_graphs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_rdkit_grid_features module
+---------------------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_rdkit_grid_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.feat.tests.test_sdf_reader module
+------------------------------------------
+
+.. automodule:: deepchem.feat.tests.test_sdf_reader
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.feat.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

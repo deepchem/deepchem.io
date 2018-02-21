@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.feat.basic &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.feat.basic</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Basic molecular features.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Steven Kearnes&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2014, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;LGPL v2.1+&quot;</span>
+
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">Descriptors</span>
+<span class="kn">from</span> <span class="nn">deepchem.feat</span> <span class="kn">import</span> <span class="n">Featurizer</span>
+
+
+<div class="viewcode-block" id="MolecularWeight"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.basic.MolecularWeight">[docs]</a><span class="k">class</span> <span class="nc">MolecularWeight</span><span class="p">(</span><span class="n">Featurizer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Molecular weight.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mw&#39;</span><span class="p">,</span> <span class="s1">&#39;molecular_weight&#39;</span><span class="p">]</span>
+
+  <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate molecular weight.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : RDKit Mol</span>
+<span class="sd">        Molecule.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wt</span> <span class="o">=</span> <span class="n">Descriptors</span><span class="o">.</span><span class="n">ExactMolWt</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">wt</span> <span class="o">=</span> <span class="p">[</span><span class="n">wt</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">wt</span></div>
+
+
+<div class="viewcode-block" id="RDKitDescriptors"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.basic.RDKitDescriptors">[docs]</a><span class="k">class</span> <span class="nc">RDKitDescriptors</span><span class="p">(</span><span class="n">Featurizer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  RDKit descriptors.</span>
+
+<span class="sd">  See http://rdkit.org/docs/GettingStartedInPython.html</span>
+<span class="sd">  #list-of-available-descriptors.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;descriptors&#39;</span>
+
+  <span class="c1"># (ytz): This is done to avoid future compatibility issues like inclusion of</span>
+  <span class="c1"># the 3D descriptors or changing the feature size.</span>
+  <span class="n">allowedDescriptors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
+      <span class="s1">&#39;MaxAbsPartialCharge&#39;</span><span class="p">,</span> <span class="s1">&#39;MinPartialCharge&#39;</span><span class="p">,</span> <span class="s1">&#39;MinAbsPartialCharge&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;HeavyAtomMolWt&#39;</span><span class="p">,</span> <span class="s1">&#39;MaxAbsEStateIndex&#39;</span><span class="p">,</span> <span class="s1">&#39;NumRadicalElectrons&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;NumValenceElectrons&#39;</span><span class="p">,</span> <span class="s1">&#39;MinAbsEStateIndex&#39;</span><span class="p">,</span> <span class="s1">&#39;MaxEStateIndex&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;MaxPartialCharge&#39;</span><span class="p">,</span> <span class="s1">&#39;MinEStateIndex&#39;</span><span class="p">,</span> <span class="s1">&#39;ExactMolWt&#39;</span><span class="p">,</span> <span class="s1">&#39;MolWt&#39;</span><span class="p">,</span> <span class="s1">&#39;BalabanJ&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;BertzCT&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi0&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi0n&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi0v&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi1&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi1n&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi1v&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi2n&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;Chi2v&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi3n&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi3v&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi4n&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi4v&#39;</span><span class="p">,</span> <span class="s1">&#39;HallKierAlpha&#39;</span><span class="p">,</span> <span class="s1">&#39;Ipc&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;Kappa1&#39;</span><span class="p">,</span> <span class="s1">&#39;Kappa2&#39;</span><span class="p">,</span> <span class="s1">&#39;Kappa3&#39;</span><span class="p">,</span> <span class="s1">&#39;LabuteASA&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA1&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA10&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;PEOE_VSA11&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA12&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA13&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA14&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA2&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;PEOE_VSA3&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA4&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA5&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA6&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA7&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;PEOE_VSA8&#39;</span><span class="p">,</span> <span class="s1">&#39;PEOE_VSA9&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA1&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA10&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA2&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA3&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;SMR_VSA4&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA5&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA6&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA7&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA8&#39;</span><span class="p">,</span> <span class="s1">&#39;SMR_VSA9&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;SlogP_VSA1&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA10&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA11&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA12&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA2&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;SlogP_VSA3&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA4&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA5&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA6&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA7&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;SlogP_VSA8&#39;</span><span class="p">,</span> <span class="s1">&#39;SlogP_VSA9&#39;</span><span class="p">,</span> <span class="s1">&#39;TPSA&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA1&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA10&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;EState_VSA11&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA2&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA3&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA4&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;EState_VSA5&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA6&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA7&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA8&#39;</span><span class="p">,</span> <span class="s1">&#39;EState_VSA9&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;VSA_EState1&#39;</span><span class="p">,</span> <span class="s1">&#39;VSA_EState10&#39;</span><span class="p">,</span> <span class="s1">&#39;VSA_EState2&#39;</span><span class="p">,</span> <span class="s1">&#39;VSA_EState3&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;VSA_EState4&#39;</span><span class="p">,</span> <span class="s1">&#39;VSA_EState5&#39;</span><span class="p">,</span> <span class="s1">&#39;VSA_EState6&#39;</span><span class="p">,</span> <span class="s1">&#39;VSA_EState7&#39;</span><span class="p">,</span> <span class="s1">&#39;VSA_EState8&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;VSA_EState9&#39;</span><span class="p">,</span> <span class="s1">&#39;FractionCSP3&#39;</span><span class="p">,</span> <span class="s1">&#39;HeavyAtomCount&#39;</span><span class="p">,</span> <span class="s1">&#39;NHOHCount&#39;</span><span class="p">,</span> <span class="s1">&#39;NOCount&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;NumAliphaticCarbocycles&#39;</span><span class="p">,</span> <span class="s1">&#39;NumAliphaticHeterocycles&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;NumAliphaticRings&#39;</span><span class="p">,</span> <span class="s1">&#39;NumAromaticCarbocycles&#39;</span><span class="p">,</span> <span class="s1">&#39;NumAromaticHeterocycles&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;NumAromaticRings&#39;</span><span class="p">,</span> <span class="s1">&#39;NumHAcceptors&#39;</span><span class="p">,</span> <span class="s1">&#39;NumHDonors&#39;</span><span class="p">,</span> <span class="s1">&#39;NumHeteroatoms&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;NumRotatableBonds&#39;</span><span class="p">,</span> <span class="s1">&#39;NumSaturatedCarbocycles&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;NumSaturatedHeterocycles&#39;</span><span class="p">,</span> <span class="s1">&#39;NumSaturatedRings&#39;</span><span class="p">,</span> <span class="s1">&#39;RingCount&#39;</span><span class="p">,</span> <span class="s1">&#39;MolLogP&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;MolMR&#39;</span>
+  <span class="p">])</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">descriptors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">descList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">function</span> <span class="ow">in</span> <span class="n">Descriptors</span><span class="o">.</span><span class="n">descList</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowedDescriptors</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descList</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">function</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate RDKit descriptors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : RDKit Mol</span>
+<span class="sd">        Molecule.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rval</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">desc_name</span><span class="p">,</span> <span class="n">function</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">descList</span><span class="p">:</span>
+      <span class="n">rval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="n">mol</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">rval</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

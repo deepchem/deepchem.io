@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tensorgraph.models.text_cnn &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html"><span><img src="../../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tensorgraph.models.text_cnn</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Sep 28 15:17:50 2017</span>
+
+<span class="sd">@author: zqwu</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.metrics</span> <span class="kn">import</span> <span class="n">to_one_hot</span><span class="p">,</span> <span class="n">from_one_hot</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">Concat</span><span class="p">,</span> <span class="n">SoftMax</span><span class="p">,</span> \
+  <span class="n">SoftMaxCrossEntropy</span><span class="p">,</span> <span class="n">BatchNorm</span><span class="p">,</span> <span class="n">WeightedError</span><span class="p">,</span> <span class="n">Dropout</span><span class="p">,</span> <span class="n">BatchNormalization</span><span class="p">,</span> \
+  <span class="n">Conv1D</span><span class="p">,</span> <span class="n">ReduceMax</span><span class="p">,</span> <span class="n">Squeeze</span><span class="p">,</span> <span class="n">Stack</span><span class="p">,</span> <span class="n">Highway</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.graph_layers</span> <span class="kn">import</span> <span class="n">DTNNEmbedding</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">L2Loss</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Weights</span><span class="p">,</span> <span class="n">Feature</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.tensor_graph</span> <span class="kn">import</span> <span class="n">TensorGraph</span>
+<span class="kn">from</span> <span class="nn">deepchem.trans</span> <span class="kn">import</span> <span class="n">undo_transforms</span>
+
+<span class="c1"># Common symbols in SMILES, note that Cl and Br are regarded as single symbol</span>
+<span class="n">default_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;#&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;(&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;)&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;+&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s1">&#39;-&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s1">&#39;/&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="s1">&#39;3&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+    <span class="s1">&#39;4&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s1">&#39;5&#39;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+    <span class="s1">&#39;6&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="s1">&#39;7&#39;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+    <span class="s1">&#39;8&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="s1">&#39;=&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="s1">&#39;F&#39;</span><span class="p">:</span> <span class="mi">17</span><span class="p">,</span>
+    <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span>
+    <span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>
+    <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s1">&#39;O&#39;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+    <span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+    <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span>
+    <span class="s1">&#39;[&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
+    <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+    <span class="s1">&#39;]&#39;</span><span class="p">:</span> <span class="mi">26</span><span class="p">,</span>
+    <span class="s1">&#39;_&#39;</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span>
+    <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">28</span><span class="p">,</span>
+    <span class="s1">&#39;Cl&#39;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
+    <span class="s1">&#39;Br&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">31</span><span class="p">,</span>
+    <span class="s1">&#39;o&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+    <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mi">33</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="TextCNNTensorGraph"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.text_cnn.TextCNNTensorGraph">[docs]</a><span class="k">class</span> <span class="nc">TextCNNTensorGraph</span><span class="p">(</span><span class="n">TensorGraph</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot; A Convolutional neural network on smiles strings</span>
+<span class="sd">  Reimplementation of the discriminator module in ORGAN: https://arxiv.org/abs/1705.10843</span>
+<span class="sd">  Originated from: http://emnlp2014.org/papers/pdf/EMNLP2014181.pdf</span>
+
+<span class="sd">  This model applies multiple 1D convolutional filters to the padded strings,</span>
+<span class="sd">  then max-over-time pooling is applied on all filters, extracting one feature per filter.</span>
+<span class="sd">  All features are concatenated and transformed through several hidden layers to form predictions.</span>
+
+<span class="sd">  This model is initially developed for sentence-level classification tasks, with</span>
+<span class="sd">  words represented as vectors. In this implementation, SMILES strings are dissected</span>
+<span class="sd">  into characters and transformed to one-hot vectors in a similar way. The model can</span>
+<span class="sd">  be used for general molecular-level classification or regression tasks. It is also</span>
+<span class="sd">  used in the ORGAN model as discriminator.</span>
+<span class="sd">  </span>
+<span class="sd">  Training of the model only requires SMILES strings input, all featurized datasets</span>
+<span class="sd">  that include SMILES in the `ids` attribute are accepted. PDBbind, QM7 and QM7b </span>
+<span class="sd">  are not supported. To use the model, `build_char_dict` should be called first</span>
+<span class="sd">  before defining the model to build character dict of input dataset, example can</span>
+<span class="sd">  be found in examples/delaney/delaney_textcnn.py</span>
+<span class="sd">  </span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+      <span class="bp">self</span><span class="p">,</span>
+      <span class="n">n_tasks</span><span class="p">,</span>
+      <span class="n">char_dict</span><span class="p">,</span>
+      <span class="n">seq_length</span><span class="p">,</span>
+      <span class="n">n_embedding</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span>
+      <span class="n">kernel_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
+      <span class="n">num_filters</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">160</span><span class="p">,</span> <span class="mi">160</span><span class="p">],</span>
+      <span class="n">dropout</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+      <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;classification&quot;</span><span class="p">,</span>
+      <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_tasks: int</span>
+<span class="sd">      Number of tasks</span>
+<span class="sd">    char_dict: dict</span>
+<span class="sd">      Mapping from characters in smiles to integers</span>
+<span class="sd">    seq_length: int</span>
+<span class="sd">      Length of sequences(after padding)</span>
+<span class="sd">    n_embedding: int, optional</span>
+<span class="sd">      Length of embedding vector</span>
+<span class="sd">    filter_sizes: list of int, optional</span>
+<span class="sd">      Properties of filters used in the conv net</span>
+<span class="sd">    num_filters: list of int, optional</span>
+<span class="sd">      Properties of filters used in the conv net</span>
+<span class="sd">    dropout: float, optional</span>
+<span class="sd">      Dropout rate</span>
+<span class="sd">    mode: str</span>
+<span class="sd">      Either &quot;classification&quot; or &quot;regression&quot; for type of model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span> <span class="o">=</span> <span class="n">n_tasks</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">char_dict</span> <span class="o">=</span> <span class="n">char_dict</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">seq_length</span> <span class="o">=</span> <span class="n">seq_length</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span> <span class="o">=</span> <span class="n">n_embedding</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">kernel_sizes</span> <span class="o">=</span> <span class="n">kernel_sizes</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_filters</span> <span class="o">=</span> <span class="n">num_filters</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">dropout</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">TextCNNTensorGraph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build_graph</span><span class="p">()</span>
+
+  <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="TextCNNTensorGraph.build_char_dict"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.text_cnn.TextCNNTensorGraph.build_char_dict">[docs]</a>  <span class="k">def</span> <span class="nf">build_char_dict</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">default_dict</span><span class="o">=</span><span class="n">default_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Collect all unique characters(in smiles) from the dataset.</span>
+<span class="sd">    This method should be called before defining the model to build appropriate char_dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># SMILES strings</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span>
+    <span class="c1"># Maximum length is expanded to allow length variation during train and inference</span>
+    <span class="n">seq_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">smile</span><span class="p">)</span> <span class="k">for</span> <span class="n">smile</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">)</span>
+    <span class="c1"># &#39;_&#39; served as delimiter and padding</span>
+    <span class="n">all_smiles</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">tot_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_smiles</span><span class="p">)</span>
+    <span class="c1"># Initialize common characters as keys</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">default_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">out_dict</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">default_dict</span><span class="p">)</span>
+    <span class="n">current_key_val</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="c1"># Include space to avoid extra keys</span>
+    <span class="n">keys</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39; &#39;</span><span class="p">])</span>
+    <span class="n">extra_keys</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">tot_len</span><span class="p">:</span>
+      <span class="c1"># For &#39;Cl&#39;, &#39;Br&#39;, etc.</span>
+      <span class="k">if</span> <span class="n">all_smiles</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+      <span class="k">elif</span> <span class="n">all_smiles</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Character not recognized, add to extra_keys</span>
+        <span class="n">extra_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_smiles</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_smiles</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="c1"># Add all extra_keys to char_dict</span>
+    <span class="k">for</span> <span class="n">extra_key</span> <span class="ow">in</span> <span class="n">extra_keys</span><span class="p">:</span>
+      <span class="n">out_dict</span><span class="p">[</span><span class="n">extra_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_key_val</span>
+      <span class="n">current_key_val</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">out_dict</span><span class="p">,</span> <span class="n">seq_length</span></div>
+
+<div class="viewcode-block" id="TextCNNTensorGraph.build_graph"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.text_cnn.TextCNNTensorGraph.build_graph">[docs]</a>  <span class="k">def</span> <span class="nf">build_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">smiles_seqs</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="c1"># Character embedding</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">Embedding</span> <span class="o">=</span> <span class="n">DTNNEmbedding</span><span class="p">(</span>
+        <span class="n">n_embedding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span><span class="p">,</span>
+        <span class="n">periodic_table_length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">smiles_seqs</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pooled_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">conv_layers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">num_filter</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_sizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_filters</span><span class="p">):</span>
+      <span class="c1"># Multiple convolutional layers with different filter widths</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">conv_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+          <span class="n">Conv1D</span><span class="p">(</span>
+              <span class="n">kernel_size</span><span class="o">=</span><span class="n">filter_size</span><span class="p">,</span>
+              <span class="n">filters</span><span class="o">=</span><span class="n">num_filter</span><span class="p">,</span>
+              <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;valid&#39;</span><span class="p">,</span>
+              <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Embedding</span><span class="p">]))</span>
+      <span class="c1"># Max-over-time pooling</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">pooled_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+          <span class="n">ReduceMax</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]))</span>
+    <span class="c1"># Concat features from all filters(one feature per filter)</span>
+    <span class="n">concat_outputs</span> <span class="o">=</span> <span class="n">Concat</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pooled_outputs</span><span class="p">)</span>
+    <span class="n">dropout</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_prob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">concat_outputs</span><span class="p">])</span>
+    <span class="n">dense</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span>
+        <span class="n">out_channels</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">activation_fn</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">dropout</span><span class="p">])</span>
+    <span class="c1"># Highway layer from https://arxiv.org/pdf/1505.00387.pdf</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">gather</span> <span class="o">=</span> <span class="n">Highway</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">dense</span><span class="p">])</span>
+
+    <span class="n">costs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span><span class="p">):</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+        <span class="n">classification</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span>
+            <span class="n">out_channels</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation_fn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gather</span><span class="p">])</span>
+        <span class="n">softmax</span> <span class="o">=</span> <span class="n">SoftMax</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">classification</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">softmax</span><span class="p">)</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="n">SoftMaxCrossEntropy</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">label</span><span class="p">,</span> <span class="n">classification</span><span class="p">])</span>
+        <span class="n">costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+        <span class="n">regression</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span>
+            <span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation_fn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gather</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">regression</span><span class="p">)</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="n">L2Loss</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">label</span><span class="p">,</span> <span class="n">regression</span><span class="p">])</span>
+        <span class="n">costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+      <span class="n">all_cost</span> <span class="o">=</span> <span class="n">Stack</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="n">costs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+      <span class="n">all_cost</span> <span class="o">=</span> <span class="n">Stack</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="n">costs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">Weights</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span><span class="p">))</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">WeightedError</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">all_cost</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TextCNNTensorGraph.default_generator"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.text_cnn.TextCNNTensorGraph.default_generator">[docs]</a>  <span class="k">def</span> <span class="nf">default_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">dataset</span><span class="p">,</span>
+                        <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">predict</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                        <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">pad_batches</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transfer smiles strings to fixed length integer vectors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Starting epoch </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">)</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span> <span class="n">ids_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+          <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+          <span class="n">deterministic</span><span class="o">=</span><span class="n">deterministic</span><span class="p">,</span>
+          <span class="n">pad_batches</span><span class="o">=</span><span class="n">pad_batches</span><span class="p">):</span>
+
+        <span class="n">feed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">y_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+          <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+              <span class="n">feed_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_one_hot</span><span class="p">(</span><span class="n">y_b</span><span class="p">[:,</span> <span class="n">index</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+              <span class="n">feed_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_b</span><span class="p">[:,</span> <span class="n">index</span><span class="p">:</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">w_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">]</span> <span class="o">=</span> <span class="n">w_b</span>
+        <span class="c1"># Transform SMILES string to integer vectors</span>
+        <span class="n">smiles_seqs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">smiles_to_seq</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="k">for</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="n">ids_b</span><span class="p">]</span>
+        <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">smiles_seqs</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">smiles_seqs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">feed_dict</span></div>
+
+<div class="viewcode-block" id="TextCNNTensorGraph.smiles_to_seq"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.text_cnn.TextCNNTensorGraph.smiles_to_seq">[docs]</a>  <span class="k">def</span> <span class="nf">smiles_to_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Tokenize characters in smiles to integers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">smiles_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">smiles_len</span><span class="p">:</span>
+      <span class="c1"># Skip all spaces</span>
+      <span class="k">if</span> <span class="n">smiles</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39; &#39;</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="c1"># For &#39;Cl&#39;, &#39;Br&#39;, etc.</span>
+      <span class="k">elif</span> <span class="n">smiles</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_dict</span><span class="p">[</span><span class="n">smiles</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+      <span class="k">elif</span> <span class="n">smiles</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_dict</span><span class="p">[</span><span class="n">smiles</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;character not found in dict&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)):</span>
+      <span class="c1"># Padding with &#39;_&#39;</span>
+      <span class="n">seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_dict</span><span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TextCNNTensorGraph.predict_on_generator"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.text_cnn.TextCNNTensorGraph.predict_on_generator">[docs]</a>  <span class="k">def</span> <span class="nf">predict_on_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TextCNNTensorGraph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">predict_on_generator</span><span class="p">(</span>
+        <span class="n">generator</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outputs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">undo_transforms</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

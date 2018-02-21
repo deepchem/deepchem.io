@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tensorgraph.tests.test_nbr_list &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html"><span><img src="../../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tensorgraph.tests.test_nbr_list</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">nose.tools</span> <span class="kn">import</span> <span class="n">assert_true</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">test_util</span>
+
+<span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">from</span> <span class="nn">deepchem.data</span> <span class="kn">import</span> <span class="n">NumpyDataset</span>
+<span class="kn">from</span> <span class="nn">deepchem.data.datasets</span> <span class="kn">import</span> <span class="n">Databag</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReduceSum</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Flatten</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Feature</span><span class="p">,</span> <span class="n">Label</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ToFloat</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Concat</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">NeighborList</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReduceSquareDifference</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">WeightedLinearCombo</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.tensor_graph</span> <span class="kn">import</span> <span class="n">TensorGraph</span>
+
+
+<div class="viewcode-block" id="TestNbrList"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList">[docs]</a><span class="k">class</span> <span class="nc">TestNbrList</span><span class="p">(</span><span class="n">test_util</span><span class="o">.</span><span class="n">TensorFlowTestCase</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Test that tensorgraph neighbor-list works. </span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestNbrList.test_neighbor_list_simple"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_neighbor_list_simple">[docs]</a>  <span class="k">def</span> <span class="nf">test_neighbor_list_simple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that neighbor lists can be constructed.&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="n">features</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,))</span>
+    <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span>
+        <span class="n">N_atoms</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">features</span><span class="p">])</span>
+    <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">ToFloat</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">nbr_list</span><span class="p">])</span>
+    <span class="c1"># This isn&#39;t a meaningful loss, but just for test</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">ReduceSum</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">nbr_list</span><span class="p">])</span>
+    <span class="n">tg</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">TensorGraph</span><span class="p">(</span><span class="n">use_queue</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">tg</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">nbr_list</span><span class="p">)</span>
+    <span class="n">tg</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+    <span class="n">tg</span><span class="o">.</span><span class="n">build</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_weighted_combo"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_weighted_combo">[docs]</a>  <span class="k">def</span> <span class="nf">test_weighted_combo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests that weighted linear combinations can be built&quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="n">X1</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">n_features</span><span class="p">))</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">n_features</span><span class="p">))</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+
+    <span class="n">features_1</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_features</span><span class="p">))</span>
+    <span class="n">features_2</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_features</span><span class="p">))</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,))</span>
+
+    <span class="n">combo</span> <span class="o">=</span> <span class="n">WeightedLinearCombo</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">features_1</span><span class="p">,</span> <span class="n">features_2</span><span class="p">])</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">ReduceSum</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">combo</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">ReduceSquareDifference</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">out</span><span class="p">,</span> <span class="n">labels</span><span class="p">])</span>
+
+    <span class="n">databag</span> <span class="o">=</span> <span class="n">Databag</span><span class="p">({</span><span class="n">features_1</span><span class="p">:</span> <span class="n">X1</span><span class="p">,</span> <span class="n">features_2</span><span class="p">:</span> <span class="n">X2</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+
+    <span class="n">tg</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">TensorGraph</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">use_queue</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">tg</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+    <span class="n">tg</span><span class="o">.</span><span class="n">fit_generator</span><span class="p">(</span><span class="n">databag</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">get_layer_variables</span><span class="p">(</span><span class="n">combo</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">get_layer_variables</span><span class="p">(</span><span class="n">out</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_neighbor_list_shape"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_neighbor_list_shape">[docs]</a>  <span class="k">def</span> <span class="nf">test_neighbor_list_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that NeighborList works.&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">coords</span><span class="p">))</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                              <span class="n">stop</span><span class="p">)(</span><span class="n">coords</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">nbr_list</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="k">assert</span> <span class="n">nbr_list</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_get_cells_1D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_get_cells_1D">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_cells_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test neighbor-list method get_cells() in 1D&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">cells</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_cells</span><span class="p">()</span>
+      <span class="n">cells_eval</span> <span class="o">=</span> <span class="n">cells</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="n">true_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">cells_eval</span><span class="p">,</span> <span class="n">true_cells</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_get_closest_atoms_1D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_get_closest_atoms_1D">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_closest_atoms_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test get_closest_atoms works correctly in 1D&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_cells</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">cells</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_cells</span><span class="p">()</span>
+      <span class="n">closest_atoms</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_closest_atoms</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
+      <span class="n">atoms_in_cells_eval</span> <span class="o">=</span> <span class="n">closest_atoms</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="n">true_atoms_in_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="p">(</span><span class="n">n_cells</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">))</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">atoms_in_cells_eval</span><span class="p">,</span>
+                                           <span class="n">true_atoms_in_cells</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_get_neighbor_cells_1D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_get_neighbor_cells_1D">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_neighbor_cells_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that get_neighbor_cells works in 1D&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">cells</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_cells</span><span class="p">()</span>
+      <span class="n">nbr_cells</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_neighbor_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+      <span class="n">nbr_cells_eval</span> <span class="o">=</span> <span class="n">nbr_cells</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="n">true_nbr_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+                                 <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span>
+                                 <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">]])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">nbr_cells_eval</span><span class="p">,</span> <span class="n">true_nbr_cells</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_get_cells_for_atoms_1D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_get_cells_for_atoms_1D">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_cells_for_atoms_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that get_cells_for_atoms works in 1D&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">cells</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_cells</span><span class="p">()</span>
+      <span class="n">cells_for_atoms</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_cells_for_atoms</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
+      <span class="n">cells_for_atoms_eval</span> <span class="o">=</span> <span class="n">cells_for_atoms</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+      <span class="n">true_cells_for_atoms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">]])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">cells_for_atoms_eval</span><span class="p">,</span>
+                                           <span class="n">true_cells_for_atoms</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_get_atoms_in_nbrs_1D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_get_atoms_in_nbrs_1D">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_atoms_in_nbrs_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test get_atoms_in_brs in 1D&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">cells</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_cells</span><span class="p">()</span>
+      <span class="n">uniques</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">get_atoms_in_nbrs</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
+
+      <span class="n">uniques_eval</span> <span class="o">=</span> <span class="p">[</span><span class="n">unique</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="k">for</span> <span class="n">unique</span> <span class="ow">in</span> <span class="n">uniques</span><span class="p">]</span>
+      <span class="n">uniques_eval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">uniques_eval</span><span class="p">)</span>
+
+      <span class="n">true_uniques</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">uniques_eval</span><span class="p">,</span> <span class="n">true_uniques</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_neighbor_list_1D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_neighbor_list_1D">[docs]</a>  <span class="k">def</span> <span class="nf">test_neighbor_list_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test neighbor list on 1D example.&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">compute_nbr_list</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">nbr_list</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">nbr_list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_neighbor_list_2D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_neighbor_list_2D">[docs]</a>  <span class="k">def</span> <span class="nf">test_neighbor_list_2D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test neighbor list on 2D example.&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">]])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">compute_nbr_list</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">nbr_list</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">nbr_list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_neighbor_list_3D"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_neighbor_list_3D">[docs]</a>  <span class="k">def</span> <span class="nf">test_neighbor_list_3D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test neighbor list on 3D example.&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span>
+                       <span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">]])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">compute_nbr_list</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">nbr_list</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">nbr_list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_neighbor_list_3D_empty_cells"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_neighbor_list_3D_empty_cells">[docs]</a>  <span class="k">def</span> <span class="nf">test_neighbor_list_3D_empty_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test neighbor list on 3D example where cells are empty.</span>
+
+<span class="sd">    Stresses the failure mode where the neighboring cells are empty</span>
+<span class="sd">    so top_k will throw a failure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 1 and 2 are nbrs. 8 and 9 are nbrs</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span>
+                       <span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">]])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+      <span class="n">nbr_list_layer</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span>
+                                    <span class="n">stop</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">nbr_list_layer</span><span class="o">.</span><span class="n">compute_nbr_list</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">nbr_list</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">nbr_list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="TestNbrList.test_neighbor_list_vina"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.tests.html#deepchem.models.tensorgraph.tests.test_nbr_list.TestNbrList.test_neighbor_list_vina">[docs]</a>  <span class="k">def</span> <span class="nf">test_neighbor_list_vina</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test under conditions closer to Vina usage.&quot;&quot;&quot;</span>
+    <span class="n">N_atoms</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">M_nbrs</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">nbr_cutoff</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_atoms</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+
+    <span class="c1"># Now an (N, M) shape</span>
+    <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">NeighborList</span><span class="p">(</span>
+        <span class="n">N_atoms</span><span class="p">,</span> <span class="n">M_nbrs</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">coords</span><span class="p">])</span>
+
+    <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">ToFloat</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">nbr_list</span><span class="p">])</span>
+    <span class="n">flattened</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">nbr_list</span><span class="p">])</span>
+    <span class="n">dense</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">flattened</span><span class="p">])</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">ReduceSum</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">dense</span><span class="p">])</span>
+
+    <span class="n">tg</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">TensorGraph</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">use_queue</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">tg</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="n">databag</span> <span class="o">=</span> <span class="n">Databag</span><span class="p">({</span><span class="n">coords</span><span class="p">:</span> <span class="n">X</span><span class="p">})</span>
+    <span class="n">tg</span><span class="o">.</span><span class="n">fit_generator</span><span class="p">(</span><span class="n">databag</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span></div></div>
+
+  <span class="c1"># TODO(rbharath): Move this into a model directly</span>
+  <span class="c1">#def test_vina(self):</span>
+  <span class="c1">#  &quot;&quot;&quot;Test that vina graph can be constructed in TensorGraph.&quot;&quot;&quot;</span>
+  <span class="c1">#  N_protein = 4</span>
+  <span class="c1">#  N_ligand = 1</span>
+  <span class="c1">#  N_atoms = 5</span>
+  <span class="c1">#  M_nbrs = 2</span>
+  <span class="c1">#  ndim = 3</span>
+  <span class="c1">#  start = 0</span>
+  <span class="c1">#  stop = 4</span>
+  <span class="c1">#  nbr_cutoff = 1</span>
+
+  <span class="c1">#  X_prot = NumpyDataset(start + np.random.rand(N_protein, ndim) * (stop -</span>
+  <span class="c1">#                                                                   start))</span>
+  <span class="c1">#  X_ligand = NumpyDataset(start + np.random.rand(N_ligand, ndim) * (stop -</span>
+  <span class="c1">#                                                                    start))</span>
+  <span class="c1">#  y = NumpyDataset(np.random.rand(</span>
+  <span class="c1">#      1,))</span>
+
+  <span class="c1">#  # TODO(rbharath): Mysteriously, the actual atom types aren&#39;t</span>
+  <span class="c1">#  # used in the current implementation. This is obviously wrong, but need</span>
+  <span class="c1">#  # to dig out why this is happening.</span>
+  <span class="c1">#  prot_coords = Feature(shape=(N_protein, ndim))</span>
+  <span class="c1">#  ligand_coords = Feature(shape=(N_ligand, ndim))</span>
+  <span class="c1">#  labels = Label(shape=(1,))</span>
+
+  <span class="c1">#  coords = Concat(in_layers=[prot_coords, ligand_coords], axis=0)</span>
+
+  <span class="c1">#  #prot_Z = Feature(shape=(N_protein,), dtype=tf.int32)</span>
+  <span class="c1">#  #ligand_Z = Feature(shape=(N_ligand,), dtype=tf.int32)</span>
+  <span class="c1">#  #Z = Concat(in_layers=[prot_Z, ligand_Z], axis=0)</span>
+
+  <span class="c1">#  # Now an (N, M) shape</span>
+  <span class="c1">#  nbr_list = NeighborList(</span>
+  <span class="c1">#      N_protein + N_ligand,</span>
+  <span class="c1">#      M_nbrs,</span>
+  <span class="c1">#      ndim,</span>
+  <span class="c1">#      nbr_cutoff,</span>
+  <span class="c1">#      start,</span>
+  <span class="c1">#      stop,</span>
+  <span class="c1">#      in_layers=[coords])</span>
+
+  <span class="c1">#  # Shape (N, M)</span>
+  <span class="c1">#  dists = InteratomicL2Distances(</span>
+  <span class="c1">#      N_protein + N_ligand, M_nbrs, ndim, in_layers=[coords, nbr_list])</span>
+
+  <span class="c1">#  repulsion = VinaRepulsion(in_layers=[dists])</span>
+  <span class="c1">#  hydrophobic = VinaHydrophobic(in_layers=[dists])</span>
+  <span class="c1">#  hbond = VinaHydrogenBond(in_layers=[dists])</span>
+  <span class="c1">#  gauss_1 = VinaGaussianFirst(in_layers=[dists])</span>
+  <span class="c1">#  gauss_2 = VinaGaussianSecond(in_layers=[dists])</span>
+
+  <span class="c1">#  # Shape (N, M)</span>
+  <span class="c1">#  interactions = WeightedLinearCombo(</span>
+  <span class="c1">#      in_layers=[repulsion, hydrophobic, hbond, gauss_1, gauss_2])</span>
+
+  <span class="c1">#  # Shape (N, M)</span>
+  <span class="c1">#  thresholded = Cutoff(in_layers=[dists, interactions])</span>
+
+  <span class="c1">#  # Shape (N, M)</span>
+  <span class="c1">#  free_energies = VinaNonlinearity(in_layers=[thresholded])</span>
+  <span class="c1">#  free_energy = ReduceSum(in_layers=[free_energies])</span>
+
+  <span class="c1">#  loss = L2Loss(in_layers=[free_energy, labels])</span>
+
+  <span class="c1">#  databag = Databag({prot_coords: X_prot, ligand_coords: X_ligand, labels: y})</span>
+
+  <span class="c1">#  tg = dc.models.TensorGraph(learning_rate=0.1, use_queue=False)</span>
+  <span class="c1">#  tg.set_loss(loss)</span>
+  <span class="c1">#  tg.fit_generator(databag.iterbatches(epochs=1))</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

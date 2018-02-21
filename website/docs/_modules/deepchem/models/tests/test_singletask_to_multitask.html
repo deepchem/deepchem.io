@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tests.test_singletask_to_multitask &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tests.test_singletask_to_multitask</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Testing singletask-to-multitask.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Bharath Ramsundar&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+
+<div class="viewcode-block" id="TestSingletasktoMultitask"><a class="viewcode-back" href="../../../../deepchem.models.tests.html#deepchem.models.tests.test_singletask_to_multitask.TestSingletasktoMultitask">[docs]</a><span class="k">class</span> <span class="nc">TestSingletasktoMultitask</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Test top-level API for singletask_to_multitask ML models.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="c1">#def test_singletask_to_multitask_classification(self):</span>
+  <span class="c1">#  n_features = 10</span>
+  <span class="c1">#  n_tasks = 17</span>
+  <span class="c1">#  tasks = range(n_tasks)</span>
+  <span class="c1">#  # Define train dataset</span>
+  <span class="c1">#  n_train = 100</span>
+  <span class="c1">#  X_train = np.random.rand(n_train, n_features)</span>
+  <span class="c1">#  y_train = np.random.randint(2, size=(n_train, n_tasks))</span>
+  <span class="c1">#  w_train = np.ones_like(y_train)</span>
+  <span class="c1">#  ids_train = [&quot;C&quot;] * n_train</span>
+  <span class="c1">#  train_dataset = dc.data.DiskDataset.from_numpy(</span>
+  <span class="c1">#      X_train, y_train, w_train, ids_train)</span>
+
+  <span class="c1">#  # Define test dataset</span>
+  <span class="c1">#  n_test = 10</span>
+  <span class="c1">#  X_test = np.random.rand(n_test, n_features)</span>
+  <span class="c1">#  y_test = np.random.randint(2, size=(n_test, n_tasks))</span>
+  <span class="c1">#  w_test = np.ones_like(y_test)</span>
+  <span class="c1">#  ids_test = [&quot;C&quot;] * n_test</span>
+  <span class="c1">#  test_dataset = dc.data.DiskDataset.from_numpy(</span>
+  <span class="c1">#      X_test, y_test, w_test, ids_test)</span>
+
+  <span class="c1">#  classification_metrics = [dc.metrics.Metric(dc.metrics.roc_auc_score)]</span>
+  <span class="c1">#  def model_builder(model_dir):</span>
+  <span class="c1">#    sklearn_model = LogisticRegression()</span>
+  <span class="c1">#    return dc.models.SklearnModel(sklearn_model, model_dir)</span>
+  <span class="c1">#  multitask_model = dc.models.SingletaskToMultitask(</span>
+  <span class="c1">#      tasks, model_builder)</span>
+
+  <span class="c1">#  # Fit trained model</span>
+  <span class="c1">#  multitask_model.fit(train_dataset)</span>
+  <span class="c1">#  multitask_model.save()</span>
+
+  <span class="c1">#  # Eval multitask_model on train/test</span>
+  <span class="c1">#  _ = multitask_model.evaluate(train_dataset, classification_metrics)</span>
+  <span class="c1">#  _ = multitask_model.evaluate(test_dataset, classification_metrics)</span>
+
+<div class="viewcode-block" id="TestSingletasktoMultitask.test_to_singletask"><a class="viewcode-back" href="../../../../deepchem.models.tests.html#deepchem.models.tests.test_singletask_to_multitask.TestSingletasktoMultitask.test_to_singletask">[docs]</a>  <span class="k">def</span> <span class="nf">test_to_singletask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that to_singletask works.&quot;&quot;&quot;</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_tasks</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="c1"># Generate data</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
+
+    <span class="n">task_dirs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_tasks</span><span class="p">):</span>
+        <span class="n">task_dirs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span>
+      <span class="n">singletask_datasets</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">SingletaskToMultitask</span><span class="o">.</span><span class="n">_to_singletask</span><span class="p">(</span>
+          <span class="n">dataset</span><span class="p">,</span> <span class="n">task_dirs</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_tasks</span><span class="p">):</span>
+        <span class="n">singletask_dataset</span> <span class="o">=</span> <span class="n">singletask_datasets</span><span class="p">[</span><span class="n">task</span><span class="p">]</span>
+        <span class="n">X_task</span><span class="p">,</span> <span class="n">y_task</span><span class="p">,</span> <span class="n">w_task</span><span class="p">,</span> <span class="n">ids_task</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">singletask_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">singletask_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">singletask_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span>
+            <span class="n">singletask_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+        <span class="n">w_nonzero</span> <span class="o">=</span> <span class="n">w</span><span class="p">[:,</span> <span class="n">task</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X_task</span><span class="p">,</span> <span class="n">X</span><span class="p">[</span><span class="n">w_nonzero</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">y_task</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                                      <span class="n">y</span><span class="p">[:,</span> <span class="n">task</span><span class="p">][</span><span class="n">w_nonzero</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">w_task</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                                      <span class="n">w</span><span class="p">[:,</span> <span class="n">task</span><span class="p">][</span><span class="n">w_nonzero</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ids_task</span><span class="p">,</span> <span class="n">ids</span><span class="p">[</span><span class="n">w_nonzero</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="k">finally</span><span class="p">:</span>
+      <span class="c1"># Cleanup</span>
+      <span class="k">for</span> <span class="n">task_dir</span> <span class="ow">in</span> <span class="n">task_dirs</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">task_dir</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

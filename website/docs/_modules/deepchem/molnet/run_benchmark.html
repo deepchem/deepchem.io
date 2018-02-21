@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.molnet.run_benchmark &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.molnet.run_benchmark</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon Mar 06 14:25:40 2017</span>
+
+<span class="sd">@author: Zhenqin Wu</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">deepchem</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">deepchem.molnet.run_benchmark_models</span> <span class="kn">import</span> <span class="n">benchmark_classification</span><span class="p">,</span> <span class="n">benchmark_regression</span>
+<span class="kn">from</span> <span class="nn">deepchem.molnet.check_availability</span> <span class="kn">import</span> <span class="n">CheckFeaturizer</span><span class="p">,</span> <span class="n">CheckSplit</span>
+<span class="kn">from</span> <span class="nn">deepchem.molnet.preset_hyper_parameters</span> <span class="kn">import</span> <span class="n">hps</span>
+
+
+<div class="viewcode-block" id="run_benchmark"><a class="viewcode-back" href="../../../deepchem.molnet.html#deepchem.molnet.run_benchmark.run_benchmark">[docs]</a><span class="k">def</span> <span class="nf">run_benchmark</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span>
+                  <span class="n">model</span><span class="p">,</span>
+                  <span class="n">split</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                  <span class="n">metric</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                  <span class="n">direction</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                  <span class="n">featurizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                  <span class="n">n_features</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                  <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                  <span class="n">hyper_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                  <span class="n">hyper_param_search</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                  <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                  <span class="n">search_range</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                  <span class="n">test</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                  <span class="nb">reload</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                  <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Run benchmark test on designated datasets with deepchem(or user-defined) model</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  datasets: list of string</span>
+<span class="sd">      choice of which datasets to use, should be: bace_c, bace_r, bbbp, chembl,</span>
+<span class="sd">      clearance, clintox, delaney, hiv, hopv, kaggle, lipo, muv, nci, pcba,</span>
+<span class="sd">      pdbbind, ppb, qm7, qm7b, qm8, qm9, sampl, sider, tox21, toxcast</span>
+<span class="sd">  model: string or user-defined model stucture</span>
+<span class="sd">      choice of which model to use, deepchem provides implementation of</span>
+<span class="sd">      logistic regression, random forest, multitask network,</span>
+<span class="sd">      bypass multitask network, irv, graph convolution;</span>
+<span class="sd">      for user define model, it should include function: fit, evaluate</span>
+<span class="sd">  split: string,  optional (default=None)</span>
+<span class="sd">      choice of splitter function, None = using the default splitter</span>
+<span class="sd">  metric: string, optional (default=None)</span>
+<span class="sd">      choice of evaluation metrics, None = using the default metrics(AUC &amp; R2)</span>
+<span class="sd">  direction: bool, optional(default=True)</span>
+<span class="sd">      Optimization direction when doing hyperparameter search</span>
+<span class="sd">      Maximization(True) or minimization(False)</span>
+<span class="sd">  featurizer: string or dc.feat.Featurizer,  optional (default=None)</span>
+<span class="sd">      choice of featurization, None = using the default corresponding to model</span>
+<span class="sd">      (string only applicable to deepchem models)</span>
+<span class="sd">  n_features: int, optional(default=0)</span>
+<span class="sd">      depending on featurizers, redefined when using deepchem featurizers,</span>
+<span class="sd">      need to be specified for user-defined featurizers(if using deepchem models)</span>
+<span class="sd">  out_path: string, optional(default=&#39;.&#39;)</span>
+<span class="sd">      path of result file</span>
+<span class="sd">  hyper_parameters: dict, optional (default=None)</span>
+<span class="sd">      hyper parameters for designated model, None = use preset values</span>
+<span class="sd">  hyper_param_search: bool, optional(default=False)</span>
+<span class="sd">      whether to perform hyper parameter search, using gaussian process by default</span>
+<span class="sd">  max_iter: int, optional(default=20)</span>
+<span class="sd">      number of optimization trials</span>
+<span class="sd">  search_range: int(float), optional(default=4)</span>
+<span class="sd">      optimization on [initial values / search_range,</span>
+<span class="sd">                       initial values * search_range]</span>
+<span class="sd">  test: boolean, optional(default=False)</span>
+<span class="sd">      whether to evaluate on test set</span>
+<span class="sd">  reload: boolean, optional(default=True)</span>
+<span class="sd">      whether to save and reload featurized datasets</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s1">&#39;bace_c&#39;</span><span class="p">,</span> <span class="s1">&#39;bbbp&#39;</span><span class="p">,</span> <span class="s1">&#39;clintox&#39;</span><span class="p">,</span> <span class="s1">&#39;hiv&#39;</span><span class="p">,</span> <span class="s1">&#39;muv&#39;</span><span class="p">,</span> <span class="s1">&#39;pcba&#39;</span><span class="p">,</span> <span class="s1">&#39;pcba_146&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pcba_2475&#39;</span><span class="p">,</span> <span class="s1">&#39;sider&#39;</span><span class="p">,</span> <span class="s1">&#39;tox21&#39;</span><span class="p">,</span> <span class="s1">&#39;toxcast&#39;</span>
+    <span class="p">]:</span>
+      <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;classification&#39;</span>
+      <span class="k">if</span> <span class="n">metric</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">metric</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">deepchem</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Metric</span><span class="p">(</span><span class="n">deepchem</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="k">elif</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s1">&#39;bace_r&#39;</span><span class="p">,</span> <span class="s1">&#39;chembl&#39;</span><span class="p">,</span> <span class="s1">&#39;clearance&#39;</span><span class="p">,</span> <span class="s1">&#39;delaney&#39;</span><span class="p">,</span> <span class="s1">&#39;hopv&#39;</span><span class="p">,</span> <span class="s1">&#39;kaggle&#39;</span><span class="p">,</span> <span class="s1">&#39;lipo&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;nci&#39;</span><span class="p">,</span> <span class="s1">&#39;pdbbind&#39;</span><span class="p">,</span> <span class="s1">&#39;ppb&#39;</span><span class="p">,</span> <span class="s1">&#39;qm7&#39;</span><span class="p">,</span> <span class="s1">&#39;qm7b&#39;</span><span class="p">,</span> <span class="s1">&#39;qm8&#39;</span><span class="p">,</span> <span class="s1">&#39;qm9&#39;</span><span class="p">,</span> <span class="s1">&#39;sampl&#39;</span>
+    <span class="p">]:</span>
+      <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;regression&#39;</span>
+      <span class="k">if</span> <span class="n">metric</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">metric</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">deepchem</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Metric</span><span class="p">(</span><span class="n">deepchem</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">pearson_r2_score</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dataset not supported&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">featurizer</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+      <span class="c1"># Assigning featurizer if not user defined</span>
+      <span class="n">pair</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">CheckFeaturizer</span><span class="p">:</span>
+        <span class="n">featurizer</span> <span class="o">=</span> <span class="n">CheckFeaturizer</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n_features</span> <span class="o">=</span> <span class="n">CheckFeaturizer</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">continue</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">CheckSplit</span><span class="p">[</span><span class="n">dataset</span><span class="p">]:</span>
+      <span class="k">continue</span>
+
+    <span class="n">loading_functions</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;bace_c&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_bace_classification</span><span class="p">,</span>
+        <span class="s1">&#39;bace_r&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_bace_regression</span><span class="p">,</span>
+        <span class="s1">&#39;bbbp&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_bbbp</span><span class="p">,</span>
+        <span class="s1">&#39;chembl&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_chembl</span><span class="p">,</span>
+        <span class="s1">&#39;clearance&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_clearance</span><span class="p">,</span>
+        <span class="s1">&#39;clintox&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_clintox</span><span class="p">,</span>
+        <span class="s1">&#39;delaney&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_delaney</span><span class="p">,</span>
+        <span class="s1">&#39;hiv&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_hiv</span><span class="p">,</span>
+        <span class="s1">&#39;hopv&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_hopv</span><span class="p">,</span>
+        <span class="s1">&#39;kaggle&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_kaggle</span><span class="p">,</span>
+        <span class="s1">&#39;lipo&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_lipo</span><span class="p">,</span>
+        <span class="s1">&#39;muv&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_muv</span><span class="p">,</span>
+        <span class="s1">&#39;nci&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_nci</span><span class="p">,</span>
+        <span class="s1">&#39;pcba&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pcba</span><span class="p">,</span>
+        <span class="s1">&#39;pcba_146&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pcba_146</span><span class="p">,</span>
+        <span class="s1">&#39;pcba_2475&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pcba_2475</span><span class="p">,</span>
+        <span class="s1">&#39;pdbbind&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pdbbind_grid</span><span class="p">,</span>
+        <span class="s1">&#39;ppb&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_ppb</span><span class="p">,</span>
+        <span class="s1">&#39;qm7&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_qm7_from_mat</span><span class="p">,</span>
+        <span class="s1">&#39;qm7b&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_qm7b_from_mat</span><span class="p">,</span>
+        <span class="s1">&#39;qm8&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_qm8</span><span class="p">,</span>
+        <span class="s1">&#39;qm9&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_qm9</span><span class="p">,</span>
+        <span class="s1">&#39;sampl&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_sampl</span><span class="p">,</span>
+        <span class="s1">&#39;sider&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_sider</span><span class="p">,</span>
+        <span class="s1">&#39;tox21&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_tox21</span><span class="p">,</span>
+        <span class="s1">&#39;toxcast&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_toxcast</span>
+    <span class="p">}</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Benchmark on dataset: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">dataset</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------&#39;</span><span class="p">)</span>
+    <span class="c1"># loading datasets</span>
+    <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Splitting function: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">split</span><span class="p">)</span>
+      <span class="n">tasks</span><span class="p">,</span> <span class="n">all_dataset</span><span class="p">,</span> <span class="n">transformers</span> <span class="o">=</span> <span class="n">loading_functions</span><span class="p">[</span><span class="n">dataset</span><span class="p">](</span>
+          <span class="n">featurizer</span><span class="o">=</span><span class="n">featurizer</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">split</span><span class="p">,</span> <span class="nb">reload</span><span class="o">=</span><span class="nb">reload</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">tasks</span><span class="p">,</span> <span class="n">all_dataset</span><span class="p">,</span> <span class="n">transformers</span> <span class="o">=</span> <span class="n">loading_functions</span><span class="p">[</span><span class="n">dataset</span><span class="p">](</span>
+          <span class="n">featurizer</span><span class="o">=</span><span class="n">featurizer</span><span class="p">,</span> <span class="nb">reload</span><span class="o">=</span><span class="nb">reload</span><span class="p">)</span>
+
+    <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">all_dataset</span>
+
+    <span class="n">time_start_fitting</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">train_score</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">valid_score</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">test_score</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="n">hyper_param_search</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">hyper_parameters</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">hyper_parameters</span> <span class="o">=</span> <span class="n">hps</span><span class="p">[</span><span class="n">model</span><span class="p">]</span>
+      <span class="n">search_mode</span> <span class="o">=</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">hyper</span><span class="o">.</span><span class="n">GaussianProcessHyperparamOpt</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+      <span class="n">hyper_param_opt</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">search_mode</span><span class="o">.</span><span class="n">hyperparam_search</span><span class="p">(</span>
+          <span class="n">hyper_parameters</span><span class="p">,</span>
+          <span class="n">train_dataset</span><span class="p">,</span>
+          <span class="n">valid_dataset</span><span class="p">,</span>
+          <span class="n">transformers</span><span class="p">,</span>
+          <span class="n">metric</span><span class="p">,</span>
+          <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">,</span>
+          <span class="n">n_features</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span>
+          <span class="n">n_tasks</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">),</span>
+          <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+          <span class="n">search_range</span><span class="o">=</span><span class="n">search_range</span><span class="p">)</span>
+      <span class="n">hyper_parameters</span> <span class="o">=</span> <span class="n">hyper_param_opt</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
+        <span class="n">train_score</span><span class="p">,</span> <span class="n">valid_score</span><span class="p">,</span> <span class="n">test_score</span> <span class="o">=</span> <span class="n">benchmark_classification</span><span class="p">(</span>
+            <span class="n">train_dataset</span><span class="p">,</span>
+            <span class="n">valid_dataset</span><span class="p">,</span>
+            <span class="n">test_dataset</span><span class="p">,</span>
+            <span class="n">tasks</span><span class="p">,</span>
+            <span class="n">transformers</span><span class="p">,</span>
+            <span class="n">n_features</span><span class="p">,</span>
+            <span class="n">metric</span><span class="p">,</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="n">test</span><span class="o">=</span><span class="n">test</span><span class="p">,</span>
+            <span class="n">hyper_parameters</span><span class="o">=</span><span class="n">hyper_parameters</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;regression&#39;</span><span class="p">:</span>
+        <span class="n">train_score</span><span class="p">,</span> <span class="n">valid_score</span><span class="p">,</span> <span class="n">test_score</span> <span class="o">=</span> <span class="n">benchmark_regression</span><span class="p">(</span>
+            <span class="n">train_dataset</span><span class="p">,</span>
+            <span class="n">valid_dataset</span><span class="p">,</span>
+            <span class="n">test_dataset</span><span class="p">,</span>
+            <span class="n">tasks</span><span class="p">,</span>
+            <span class="n">transformers</span><span class="p">,</span>
+            <span class="n">n_features</span><span class="p">,</span>
+            <span class="n">metric</span><span class="p">,</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="n">test</span><span class="o">=</span><span class="n">test</span><span class="p">,</span>
+            <span class="n">hyper_parameters</span><span class="o">=</span><span class="n">hyper_parameters</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+      <span class="n">train_score</span><span class="p">[</span><span class="s1">&#39;user_defined&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span>
+                                                   <span class="n">transformers</span><span class="p">)</span>
+      <span class="n">valid_score</span><span class="p">[</span><span class="s1">&#39;user_defined&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">valid_dataset</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span>
+                                                   <span class="n">transformers</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">test</span><span class="p">:</span>
+        <span class="n">test_score</span><span class="p">[</span><span class="s1">&#39;user_defined&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span>
+                                                    <span class="n">transformers</span><span class="p">)</span>
+
+    <span class="n">time_finish_fitting</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="s1">&#39;results.csv&#39;</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+      <span class="n">model_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">train_score</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">train_score</span><span class="p">[</span><span class="n">model_name</span><span class="p">]:</span>
+        <span class="n">output_line</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">split</span><span class="p">),</span> <span class="n">mode</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">,</span>
+            <span class="n">train_score</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="s1">&#39;valid&#39;</span><span class="p">,</span> <span class="n">valid_score</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">test</span><span class="p">:</span>
+          <span class="n">output_line</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">test_score</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">i</span><span class="p">]])</span>
+        <span class="n">output_line</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">[</span><span class="s1">&#39;time_for_running&#39;</span><span class="p">,</span> <span class="n">time_finish_fitting</span> <span class="o">-</span> <span class="n">time_start_fitting</span><span class="p">])</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">output_line</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hyper_param_search</span><span class="p">:</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">dataset</span> <span class="o">+</span> <span class="n">model</span> <span class="o">+</span> <span class="s1">&#39;.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">hyper_parameters</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+
+<span class="c1">#</span>
+<span class="c1"># Note by @XericZephyr. Reason why I spun off this function:</span>
+<span class="c1">#   1. Some model needs dataset information.</span>
+<span class="c1">#   2. It offers us possibility to **cache** the dataset</span>
+<span class="c1">#      if the featurizer runs very slow, e.g., GraphConv.</span>
+<span class="c1">#   2+. The cache can even happen at Travis CI to accelerate</span>
+<span class="c1">#       CI testing.</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="load_dataset"><a class="viewcode-back" href="../../../deepchem.molnet.html#deepchem.molnet.run_benchmark.load_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">featurizer</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Load specific dataset for benchmark.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  dataset: string</span>
+<span class="sd">      choice of which datasets to use, should be: tox21, muv, sider,</span>
+<span class="sd">      toxcast, pcba, delaney, kaggle, nci, clintox, hiv, pcba_128, pcba_146, pdbbind, chembl,</span>
+<span class="sd">      qm7, qm7b, qm9, sampl</span>
+<span class="sd">  featurizer: string or dc.feat.Featurizer.</span>
+<span class="sd">      choice of featurization.</span>
+<span class="sd">  split: string,  optional (default=None)</span>
+<span class="sd">      choice of splitter function, None = using the default splitter</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">dataset_loading_functions</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s1">&#39;bace_c&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_bace_classification</span><span class="p">,</span>
+      <span class="s1">&#39;bace_r&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_bace_regression</span><span class="p">,</span>
+      <span class="s1">&#39;bbbp&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_bbbp</span><span class="p">,</span>
+      <span class="s1">&#39;chembl&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_chembl</span><span class="p">,</span>
+      <span class="s1">&#39;clearance&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_clearance</span><span class="p">,</span>
+      <span class="s1">&#39;clintox&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_clintox</span><span class="p">,</span>
+      <span class="s1">&#39;delaney&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_delaney</span><span class="p">,</span>
+      <span class="s1">&#39;hiv&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_hiv</span><span class="p">,</span>
+      <span class="s1">&#39;hopv&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_hopv</span><span class="p">,</span>
+      <span class="s1">&#39;kaggle&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_kaggle</span><span class="p">,</span>
+      <span class="s1">&#39;lipo&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_lipo</span><span class="p">,</span>
+      <span class="s1">&#39;muv&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_muv</span><span class="p">,</span>
+      <span class="s1">&#39;nci&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_nci</span><span class="p">,</span>
+      <span class="s1">&#39;pcba&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pcba</span><span class="p">,</span>
+      <span class="s1">&#39;pcba_128&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pcba_128</span><span class="p">,</span>
+      <span class="s1">&#39;pcba_146&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pcba_146</span><span class="p">,</span>
+      <span class="s1">&#39;pcba_2475&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pcba_2475</span><span class="p">,</span>
+      <span class="s1">&#39;pdbbind&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_pdbbind_grid</span><span class="p">,</span>
+      <span class="s1">&#39;ppb&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_ppb</span><span class="p">,</span>
+      <span class="s1">&#39;qm7&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_qm7_from_mat</span><span class="p">,</span>
+      <span class="s1">&#39;qm7b&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_qm7b_from_mat</span><span class="p">,</span>
+      <span class="s1">&#39;qm8&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_qm8</span><span class="p">,</span>
+      <span class="s1">&#39;qm9&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_qm9</span><span class="p">,</span>
+      <span class="s1">&#39;sampl&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_sampl</span><span class="p">,</span>
+      <span class="s1">&#39;sider&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_sider</span><span class="p">,</span>
+      <span class="s1">&#39;tox21&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_tox21</span><span class="p">,</span>
+      <span class="s1">&#39;toxcast&#39;</span><span class="p">:</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_toxcast</span>
+  <span class="p">}</span>
+  <span class="k">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------&#39;</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Loading dataset: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">dataset</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------&#39;</span><span class="p">)</span>
+  <span class="c1"># loading datasets</span>
+  <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Splitting function: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">split</span><span class="p">)</span>
+  <span class="n">tasks</span><span class="p">,</span> <span class="n">all_dataset</span><span class="p">,</span> <span class="n">transformers</span> <span class="o">=</span> <span class="n">dataset_loading_functions</span><span class="p">[</span><span class="n">dataset</span><span class="p">](</span>
+      <span class="n">featurizer</span><span class="o">=</span><span class="n">featurizer</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">split</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">tasks</span><span class="p">,</span> <span class="n">all_dataset</span><span class="p">,</span> <span class="n">transformers</span></div>
+
+
+<div class="viewcode-block" id="benchmark_model"><a class="viewcode-back" href="../../../deepchem.molnet.html#deepchem.molnet.run_benchmark.benchmark_model">[docs]</a><span class="k">def</span> <span class="nf">benchmark_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">all_dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Benchmark custom model.</span>
+
+<span class="sd">  model: user-defined model stucture</span>
+<span class="sd">    For user define model, it should include function: fit, evaluate.</span>
+
+<span class="sd">  all_dataset: (train, test, val) data tuple.</span>
+<span class="sd">    Returned by `load_dataset` function.</span>
+
+<span class="sd">  transformers</span>
+
+<span class="sd">  metric: string</span>
+<span class="sd">    choice of evaluation metrics.</span>
+
+
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">time_start_fitting</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="n">train_score</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>
+  <span class="n">valid_score</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>
+  <span class="n">test_score</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>
+
+  <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">all_dataset</span>
+
+  <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+  <span class="n">train_score</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+  <span class="n">valid_score</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">valid_dataset</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">test</span><span class="p">:</span>
+    <span class="n">test_score</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+
+  <span class="n">time_finish_fitting</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="n">time_for_running</span> <span class="o">=</span> <span class="n">time_finish_fitting</span> <span class="o">-</span> <span class="n">time_start_fitting</span>
+
+  <span class="k">return</span> <span class="n">train_score</span><span class="p">,</span> <span class="n">valid_score</span><span class="p">,</span> <span class="n">test_score</span><span class="p">,</span> <span class="n">time_for_running</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

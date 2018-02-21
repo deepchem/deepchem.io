@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>TensorGraph Mechanics &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">TensorGraph Mechanics</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="tensorgraph-mechanics">
+<h1>TensorGraph Mechanics<a class="headerlink" href="#tensorgraph-mechanics" title="Permalink to this headline">¶</a></h1>
+<p>In this IPython notebook, we will cover more advanced aspects of the
+<code class="docutils literal"><span class="pre">TensorGraph</span></code> framework. In particular, we will demonstrate how to
+share weights between layers and show how to use <code class="docutils literal"><span class="pre">DataBag</span></code> to reduce
+the amount of overhead needed to train complex <code class="docutils literal"><span class="pre">TensorGraph</span></code> models.</p>
+<p>Let’s start by defining a <code class="docutils literal"><span class="pre">TensorGraph</span></code> object.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.tensor_graph</span> <span class="kn">import</span> <span class="n">TensorGraph</span>
+
+<span class="n">tg</span> <span class="o">=</span> <span class="n">TensorGraph</span><span class="p">(</span><span class="n">use_queue</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Warning: No xgboost installed on your system
+Attempting to run xgboost will throw runtime errors
+Warning: No pyGPGO.covfunc installed on your system
+Attempting to run pyGPGO.covfunc will throw runtime errors
+Warning: No pyGPGO.acquisition installed on your system
+Attempting to run pyGPGO.acquisition will throw runtime errors
+Warning: No pyGPGO.surrogates.GaussianProcess installed on your system
+Attempting to run pyGPGO.surrogates.GaussianProcess will throw runtime errors
+Warning: No pyGPGO.GPGO installed on your system
+Attempting to run pyGPGO.GPGO will throw runtime errors
+</pre></div>
+</div>
+<p>We’re going to construct an architecture that has two identical feature
+inputs. Let’s call these feature inputs <code class="docutils literal"><span class="pre">left_features</span></code> and
+<code class="docutils literal"><span class="pre">right_features</span></code>.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Feature</span>
+
+<span class="n">left_features</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">75</span><span class="p">))</span>
+<span class="n">right_features</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">75</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Let’s now apply a nonlinear transformation to both <code class="docutils literal"><span class="pre">left_features</span></code> and
+<code class="docutils literal"><span class="pre">right_features</span></code>. We can use the <code class="docutils literal"><span class="pre">Dense</span></code> layer to do so. In
+addition, let’s make sure that we apply the same nonlinear
+transformation to both <code class="docutils literal"><span class="pre">left_features</span></code> and <code class="docutils literal"><span class="pre">right_features</span></code>. To
+this, we can use the <code class="docutils literal"><span class="pre">Layer.shared()</span></code>. We use this method by
+initializing a first <code class="docutils literal"><span class="pre">Dense</span></code> layer, and then calling the
+<code class="docutils literal"><span class="pre">Layer.shared()</span></code> method to make a copy of that layer.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+
+
+<span class="n">dense_left</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">left_features</span><span class="p">])</span>
+<span class="n">dense_right</span> <span class="o">=</span> <span class="n">dense_left</span><span class="o">.</span><span class="n">shared</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">right_features</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Let’s now combine these two transformed feature layers by addition. We
+will assume this network is being used to solve a regression problem, so
+we will introduce a <code class="docutils literal"><span class="pre">Label</span></code> that stores the true regression values. We
+can then define the objective function of the network via the <code class="docutils literal"><span class="pre">L2Loss</span></code>
+between the added output and the true label.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Add</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Label</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">L2Loss</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReduceMean</span>
+
+<span class="n">output</span> <span class="o">=</span> <span class="n">Add</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">dense_left</span><span class="p">,</span> <span class="n">dense_right</span><span class="p">])</span>
+<span class="n">tg</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">batch_loss</span> <span class="o">=</span> <span class="n">L2Loss</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">labels</span><span class="p">,</span> <span class="n">output</span><span class="p">])</span>
+<span class="c1"># Need to reduce over the loss</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">ReduceMean</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="n">batch_loss</span><span class="p">)</span>
+<span class="n">tg</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s now randomly sample an artificial dataset we can use to train this
+architecture. We will need to sample the <code class="docutils literal"><span class="pre">left_features</span></code>,
+<code class="docutils literal"><span class="pre">right_features</span></code>, and <code class="docutils literal"><span class="pre">labels</span></code> in order to be able to train the
+network.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.random</span>
+
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">sampled_left_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span>
+<span class="n">sampled_right_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span>
+<span class="n">sampled_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">75</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>How can we train <code class="docutils literal"><span class="pre">TensorGraph</span></code> networks with multiple <code class="docutils literal"><span class="pre">Feature</span></code>
+inputs? One option is to manually construct a python generator that
+provides inputs. The tutorial notebook on graph convolutions does this
+explicitly. For simpler cases, we can use the convenience object
+<code class="docutils literal"><span class="pre">DataBag</span></code> which makes it easier to construct generators. A <code class="docutils literal"><span class="pre">DataBag</span></code>
+holds multiple datasets (added via <code class="docutils literal"><span class="pre">DataBag.add_dataset</span></code>). The method
+<code class="docutils literal"><span class="pre">DataBag.iterbatches()</span></code> will construct a generator that peels off
+batches of the desired size from each dataset and return a dictionary
+mapping inputs (<code class="docutils literal"><span class="pre">Feature</span></code>, <code class="docutils literal"><span class="pre">Label</span></code>, and <code class="docutils literal"><span class="pre">Weight</span></code> objects) to data
+for that minibatch. Let’s see <code class="docutils literal"><span class="pre">DataBag</span></code> in action.</p>
+<p>Note that we will need to wrap our sampled Numpy arrays with
+<code class="docutils literal"><span class="pre">NumpyDataset</span></code> objects for our call to work.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deepchem.data.datasets</span> <span class="kn">import</span> <span class="n">Databag</span>
+<span class="kn">from</span> <span class="nn">deepchem.data.datasets</span> <span class="kn">import</span> <span class="n">NumpyDataset</span>
+
+<span class="n">databag</span> <span class="o">=</span> <span class="n">Databag</span><span class="p">()</span>
+<span class="n">databag</span><span class="o">.</span><span class="n">add_dataset</span><span class="p">(</span><span class="n">left_features</span><span class="p">,</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">sampled_left_features</span><span class="p">))</span>
+<span class="n">databag</span><span class="o">.</span><span class="n">add_dataset</span><span class="p">(</span><span class="n">right_features</span><span class="p">,</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">sampled_right_features</span><span class="p">))</span>
+<span class="n">databag</span><span class="o">.</span><span class="n">add_dataset</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">sampled_labels</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Let’s now train this architecture! We need to use the method
+<code class="docutils literal"><span class="pre">TensorGraph.fit_generator()</span></code> passing in a generator created by
+<code class="docutils literal"><span class="pre">databag.iterbatches()</span></code>.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">tg</span><span class="o">.</span><span class="n">fit_generator</span><span class="p">(</span>
+    <span class="n">databag</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Ending global_step 200: Average loss 0.472205
+TIMING: model fitting took 0.273 s
+</pre></div>
+</div>
+<p>You should now be able to construct more sophisticated <code class="docutils literal"><span class="pre">TensorGraph</span></code>
+architectures with relative ease!</p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/notebooks/TensorGraph_Mechanics.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

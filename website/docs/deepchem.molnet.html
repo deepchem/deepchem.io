@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.molnet package &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="index.html" />
+    <link rel="up" title="deepchem package" href="deepchem.html" />
+    <link rel="next" title="deepchem.molnet.load_function package" href="deepchem.molnet.load_function.html" />
+    <link rel="prev" title="deepchem.models.xgboost_models package" href="deepchem.models.xgboost_models.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">deepchem.molnet package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-deepchem.molnet.check_availability">deepchem.molnet.check_availability module</a></li>
+<li><a class="reference internal" href="#module-deepchem.molnet.dnasim">deepchem.molnet.dnasim module</a></li>
+<li><a class="reference internal" href="#module-deepchem.molnet.preset_hyper_parameters">deepchem.molnet.preset_hyper_parameters module</a></li>
+<li><a class="reference internal" href="#module-deepchem.molnet.run_benchmark">deepchem.molnet.run_benchmark module</a></li>
+<li><a class="reference internal" href="#module-deepchem.molnet.run_benchmark_low_data">deepchem.molnet.run_benchmark_low_data module</a></li>
+<li><a class="reference internal" href="#module-deepchem.molnet.run_benchmark_models">deepchem.molnet.run_benchmark_models module</a></li>
+<li><a class="reference internal" href="#module-deepchem.molnet">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-molnet-package">
+<h1>deepchem.molnet package<a class="headerlink" href="#deepchem-molnet-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deepchem.molnet.load_function.html">deepchem.molnet.load_function package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.bace_datasets">deepchem.molnet.load_function.bace_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.bace_features">deepchem.molnet.load_function.bace_features module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.bbbp_datasets">deepchem.molnet.load_function.bbbp_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.chembl_datasets">deepchem.molnet.load_function.chembl_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.chembl_tasks">deepchem.molnet.load_function.chembl_tasks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.clearance_datasets">deepchem.molnet.load_function.clearance_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.clintox_datasets">deepchem.molnet.load_function.clintox_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.delaney_datasets">deepchem.molnet.load_function.delaney_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.hiv_datasets">deepchem.molnet.load_function.hiv_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.hopv_datasets">deepchem.molnet.load_function.hopv_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.kaggle_datasets">deepchem.molnet.load_function.kaggle_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.kaggle_features">deepchem.molnet.load_function.kaggle_features module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.lipo_datasets">deepchem.molnet.load_function.lipo_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.muv_datasets">deepchem.molnet.load_function.muv_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.nci_datasets">deepchem.molnet.load_function.nci_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.pcba_datasets">deepchem.molnet.load_function.pcba_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.pdbbind_datasets">deepchem.molnet.load_function.pdbbind_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.ppb_datasets">deepchem.molnet.load_function.ppb_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.qm7_datasets">deepchem.molnet.load_function.qm7_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.qm8_datasets">deepchem.molnet.load_function.qm8_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.qm9_datasets">deepchem.molnet.load_function.qm9_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.sampl_datasets">deepchem.molnet.load_function.sampl_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.sider_datasets">deepchem.molnet.load_function.sider_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.tox21_datasets">deepchem.molnet.load_function.tox21_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function.toxcast_datasets">deepchem.molnet.load_function.toxcast_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-deepchem.molnet.load_function">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deepchem.molnet.tests.html">deepchem.molnet.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.tests.html#module-deepchem.molnet.tests.test_dnasim">deepchem.molnet.tests.test_dnasim module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.tests.html#module-deepchem.molnet.tests.test_molnet">deepchem.molnet.tests.test_molnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.tests.html#module-deepchem.molnet.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deepchem.molnet.check_availability">
+<span id="deepchem-molnet-check-availability-module"></span><h2>deepchem.molnet.check_availability module<a class="headerlink" href="#module-deepchem.molnet.check_availability" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deepchem.molnet.dnasim">
+<span id="deepchem-molnet-dnasim-module"></span><h2>deepchem.molnet.dnasim module<a class="headerlink" href="#module-deepchem.molnet.dnasim" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.get_distribution">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">get_distribution</code><span class="sig-paren">(</span><em>GC_fraction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#get_distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.get_distribution" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.motif_density">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">motif_density</code><span class="sig-paren">(</span><em>motif_name</em>, <em>seq_length</em>, <em>num_seqs</em>, <em>min_counts</em>, <em>max_counts</em>, <em>GC_fraction</em>, <em>central_bp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#motif_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.motif_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns sequences with motif density, along with embeddings array.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.simple_motif_embedding">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">simple_motif_embedding</code><span class="sig-paren">(</span><em>motif_name</em>, <em>seq_length</em>, <em>num_seqs</em>, <em>GC_fraction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#simple_motif_embedding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.simple_motif_embedding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulates sequences with a motif embedded anywhere in the sequence.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>motif_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; encode motif name</li>
+<li><strong>seq_length</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; length of sequence</li>
+<li><strong>num_seqs</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of sequences</li>
+<li><strong>GC_fraction</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; GC basepair fraction in background sequence</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>sequence_arr</strong> (<em>1darray</em>) &#8211;
+Array with sequence strings.</li>
+<li><strong>embedding_arr</strong> (<em>1darray</em>) &#8211;
+Array of embedding objects.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.simulate_differential_accessibility">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">simulate_differential_accessibility</code><span class="sig-paren">(</span><em>pos_motif_names</em>, <em>neg_motif_names</em>, <em>seq_length</em>, <em>min_num_motifs</em>, <em>max_num_motifs</em>, <em>num_pos</em>, <em>num_neg</em>, <em>GC_fraction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#simulate_differential_accessibility"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.simulate_differential_accessibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates data for differential accessibility task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pos_motif_names</strong> (<em>list</em>) &#8211; List of strings.</li>
+<li><strong>neg_motif_names</strong> (<em>list</em>) &#8211; List of strings.</li>
+<li><strong>seq_length</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>min_num_motifs</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>max_num_motifs</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>num_pos</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>num_neg</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>GC_fraction</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>sequence_arr</strong> (<em>1darray</em>) &#8211;
+Contains sequence strings.</li>
+<li><strong>y</strong> (<em>1darray</em>) &#8211;
+Contains labels.</li>
+<li><strong>embedding_arr</strong> (<em>1darray</em>) &#8211;
+Array of embedding objects.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.simulate_heterodimer_grammar">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">simulate_heterodimer_grammar</code><span class="sig-paren">(</span><em>motif1</em>, <em>motif2</em>, <em>seq_length</em>, <em>min_spacing</em>, <em>max_spacing</em>, <em>num_pos</em>, <em>num_neg</em>, <em>GC_fraction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#simulate_heterodimer_grammar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.simulate_heterodimer_grammar" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Simulates two classes of sequences with motif1 and motif2:</dt>
+<dd><ul class="first simple">
+<li>Positive class sequences with motif1 and motif2 positioned
+min_spacing and max_spacing</li>
+<li>Negative class sequences with independent motif1 and motif2 positioned</li>
+</ul>
+<p class="last">anywhere in the sequence, not as a heterodimer grammar</p>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>seq_length</strong> (<em>int, length of sequence</em>) &#8211; </li>
+<li><strong>GC_fraction</strong> (<em>float, GC fraction in background sequence</em>) &#8211; </li>
+<li><strong>num_pos</strong> (<em>int, number of positive class sequences</em>) &#8211; </li>
+<li><strong>num_neg</strong> (<em>int, number of negatice class sequences</em>) &#8211; </li>
+<li><strong>motif1</strong> (<em>str, encode motif name</em>) &#8211; </li>
+<li><strong>motif2</strong> (<em>str, encode motif name</em>) &#8211; </li>
+<li><strong>min_spacing</strong> (<em>int, minimum inter motif spacing</em>) &#8211; </li>
+<li><strong>max_spacing</strong> (<em>int, maximum inter motif spacing</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>sequence_arr</strong> (<em>1darray</em>) &#8211;
+Array with sequence strings.</li>
+<li><strong>y</strong> (<em>1darray</em>) &#8211;
+Array with positive/negative class labels.</li>
+<li><strong>embedding_arr</strong> (<em>list</em>) &#8211;
+List of embedding objects.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.simulate_motif_counting">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">simulate_motif_counting</code><span class="sig-paren">(</span><em>motif_name</em>, <em>seq_length</em>, <em>pos_counts</em>, <em>neg_counts</em>, <em>num_pos</em>, <em>num_neg</em>, <em>GC_fraction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#simulate_motif_counting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.simulate_motif_counting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates data for motif counting task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>motif_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; </li>
+<li><strong>seq_length</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>pos_counts</strong> (<em>list</em>) &#8211; (min_counts, max_counts) for positive set.</li>
+<li><strong>neg_counts</strong> (<em>list</em>) &#8211; (min_counts, max_counts) for negative set.</li>
+<li><strong>num_pos</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>num_neg</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>GC_fraction</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>sequence_arr</strong> (<em>1darray</em>) &#8211;
+Contains sequence strings.</li>
+<li><strong>y</strong> (<em>1darray</em>) &#8211;
+Contains labels.</li>
+<li><strong>embedding_arr</strong> (<em>1darray</em>) &#8211;
+Array of embedding objects.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.simulate_motif_density_localization">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">simulate_motif_density_localization</code><span class="sig-paren">(</span><em>motif_name</em>, <em>seq_length</em>, <em>center_size</em>, <em>min_motif_counts</em>, <em>max_motif_counts</em>, <em>num_pos</em>, <em>num_neg</em>, <em>GC_fraction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#simulate_motif_density_localization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.simulate_motif_density_localization" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Simulates two classes of seqeuences:</dt>
+<dd><ul class="first last simple">
+<li>Positive class sequences with multiple motif instances
+in center of the sequence.</li>
+<li>Negative class sequences with multiple motif instances
+anywhere in the sequence.</li>
+</ul>
+</dd>
+</dl>
+<p>The number of motif instances is uniformly sampled
+between minimum and maximum motif counts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>motif_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; encode motif name</li>
+<li><strong>seq_length</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; length of sequence</li>
+<li><strong>center_size</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; length of central part of the sequence where motifs can be positioned</li>
+<li><strong>min_motif_counts</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; minimum number of motif instances</li>
+<li><strong>max_motif_counts</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; maximum number of motif instances</li>
+<li><strong>num_pos</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of positive class sequences</li>
+<li><strong>num_neg</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of negative class sequences</li>
+<li><strong>GC_fraction</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; GC fraction in background sequence</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>sequence_arr</strong> (<em>1darray</em>) &#8211;
+Contains sequence strings.</li>
+<li><strong>y</strong> (<em>1darray</em>) &#8211;
+Contains labels.</li>
+<li><strong>embedding_arr</strong> (<em>1darray</em>) &#8211;
+Array of embedding objects.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.simulate_multi_motif_embedding">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">simulate_multi_motif_embedding</code><span class="sig-paren">(</span><em>motif_names</em>, <em>seq_length</em>, <em>min_num_motifs</em>, <em>max_num_motifs</em>, <em>num_seqs</em>, <em>GC_fraction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#simulate_multi_motif_embedding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.simulate_multi_motif_embedding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates data for multi motif recognition task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>motif_names</strong> (<em>list</em>) &#8211; List of strings.</li>
+<li><strong>seq_length</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>min_num_motifs</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>max_num_motifs</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>num_seqs</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>GC_fraction</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>sequence_arr</strong> (<em>1darray</em>) &#8211;
+Contains sequence strings.</li>
+<li><strong>y</strong> (<em>ndarray</em>) &#8211;
+Contains labels for each motif.</li>
+<li><strong>embedding_arr</strong> (<em>1darray</em>) &#8211;
+Array of embedding objects.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.dnasim.simulate_single_motif_detection">
+<code class="descclassname">deepchem.molnet.dnasim.</code><code class="descname">simulate_single_motif_detection</code><span class="sig-paren">(</span><em>motif_name</em>, <em>seq_length</em>, <em>num_pos</em>, <em>num_neg</em>, <em>GC_fraction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/dnasim.html#simulate_single_motif_detection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.dnasim.simulate_single_motif_detection" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Simulates two classes of seqeuences:</dt>
+<dd><ul class="first last simple">
+<li>Positive class sequence with a motif
+embedded anywhere in the sequence</li>
+<li>Negative class sequence without the motif</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>motif_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; encode motif name</li>
+<li><strong>seq_length</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; length of sequence</li>
+<li><strong>num_pos</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of positive class sequences</li>
+<li><strong>num_neg</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of negative class sequences</li>
+<li><strong>GC_fraction</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; GC fraction in background sequence</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>sequence_arr</strong> (<em>1darray</em>) &#8211;
+Array with sequence strings.</li>
+<li><strong>y</strong> (<em>1darray</em>) &#8211;
+Array with positive/negative class labels.</li>
+<li><strong>embedding_arr</strong> (<em>1darray</em>) &#8211;
+Array of embedding objects.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.molnet.preset_hyper_parameters">
+<span id="deepchem-molnet-preset-hyper-parameters-module"></span><h2>deepchem.molnet.preset_hyper_parameters module<a class="headerlink" href="#module-deepchem.molnet.preset_hyper_parameters" title="Permalink to this headline">¶</a></h2>
+<p>Created on Tue Mar  7 00:07:10 2017</p>
+<p>&#64;author: zqwu</p>
+</div>
+<div class="section" id="module-deepchem.molnet.run_benchmark">
+<span id="deepchem-molnet-run-benchmark-module"></span><h2>deepchem.molnet.run_benchmark module<a class="headerlink" href="#module-deepchem.molnet.run_benchmark" title="Permalink to this headline">¶</a></h2>
+<p>Created on Mon Mar 06 14:25:40 2017</p>
+<p>&#64;author: Zhenqin Wu</p>
+<dl class="function">
+<dt id="deepchem.molnet.run_benchmark.benchmark_model">
+<code class="descclassname">deepchem.molnet.run_benchmark.</code><code class="descname">benchmark_model</code><span class="sig-paren">(</span><em>model</em>, <em>all_dataset</em>, <em>transformers</em>, <em>metric</em>, <em>test=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/run_benchmark.html#benchmark_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.run_benchmark.benchmark_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Benchmark custom model.</p>
+<dl class="docutils">
+<dt>model: user-defined model stucture</dt>
+<dd>For user define model, it should include function: fit, evaluate.</dd>
+<dt>all_dataset: (train, test, val) data tuple.</dt>
+<dd>Returned by <cite>load_dataset</cite> function.</dd>
+</dl>
+<p>transformers</p>
+<dl class="docutils">
+<dt>metric: string</dt>
+<dd>choice of evaluation metrics.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.run_benchmark.load_dataset">
+<code class="descclassname">deepchem.molnet.run_benchmark.</code><code class="descname">load_dataset</code><span class="sig-paren">(</span><em>dataset</em>, <em>featurizer</em>, <em>split='random'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/run_benchmark.html#load_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.run_benchmark.load_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load specific dataset for benchmark.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; choice of which datasets to use, should be: tox21, muv, sider,
+toxcast, pcba, delaney, kaggle, nci, clintox, hiv, pcba_128, pcba_146, pdbbind, chembl,
+qm7, qm7b, qm9, sampl</li>
+<li><strong>featurizer</strong> (<em>string or dc.feat.Featurizer.</em>) &#8211; choice of featurization.</li>
+<li><strong>split</strong> (<em>string,  optional (default=None)</em>) &#8211; choice of splitter function, None = using the default splitter</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.run_benchmark.run_benchmark">
+<code class="descclassname">deepchem.molnet.run_benchmark.</code><code class="descname">run_benchmark</code><span class="sig-paren">(</span><em>datasets</em>, <em>model</em>, <em>split=None</em>, <em>metric=None</em>, <em>direction=True</em>, <em>featurizer=None</em>, <em>n_features=0</em>, <em>out_path='.'</em>, <em>hyper_parameters=None</em>, <em>hyper_param_search=False</em>, <em>max_iter=20</em>, <em>search_range=2</em>, <em>test=False</em>, <em>reload=True</em>, <em>seed=123</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/run_benchmark.html#run_benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.run_benchmark.run_benchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run benchmark test on designated datasets with deepchem(or user-defined) model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>datasets</strong> (<em>list of string</em>) &#8211; choice of which datasets to use, should be: bace_c, bace_r, bbbp, chembl,
+clearance, clintox, delaney, hiv, hopv, kaggle, lipo, muv, nci, pcba,
+pdbbind, ppb, qm7, qm7b, qm8, qm9, sampl, sider, tox21, toxcast</li>
+<li><strong>model</strong> (<em>string or user-defined model stucture</em>) &#8211; choice of which model to use, deepchem provides implementation of
+logistic regression, random forest, multitask network,
+bypass multitask network, irv, graph convolution;
+for user define model, it should include function: fit, evaluate</li>
+<li><strong>split</strong> (<em>string,  optional (default=None)</em>) &#8211; choice of splitter function, None = using the default splitter</li>
+<li><strong>metric</strong> (<em>string, optional (default=None)</em>) &#8211; choice of evaluation metrics, None = using the default metrics(AUC &amp; R2)</li>
+<li><strong>direction</strong> (<em>bool, optional(default=True)</em>) &#8211; Optimization direction when doing hyperparameter search
+Maximization(True) or minimization(False)</li>
+<li><strong>featurizer</strong> (<em>string or dc.feat.Featurizer,  optional (default=None)</em>) &#8211; choice of featurization, None = using the default corresponding to model
+(string only applicable to deepchem models)</li>
+<li><strong>n_features</strong> (<em>int, optional(default=0)</em>) &#8211; depending on featurizers, redefined when using deepchem featurizers,
+need to be specified for user-defined featurizers(if using deepchem models)</li>
+<li><strong>out_path</strong> (<em>string, optional(default='.')</em>) &#8211; path of result file</li>
+<li><strong>hyper_parameters</strong> (<em>dict, optional (default=None)</em>) &#8211; hyper parameters for designated model, None = use preset values</li>
+<li><strong>hyper_param_search</strong> (<em>bool, optional(default=False)</em>) &#8211; whether to perform hyper parameter search, using gaussian process by default</li>
+<li><strong>max_iter</strong> (<em>int, optional(default=20)</em>) &#8211; number of optimization trials</li>
+<li><strong>search_range</strong> (<em>int(float), optional(default=4)</em>) &#8211; optimization on [initial values / search_range,
+initial values * search_range]</li>
+<li><strong>test</strong> (<em>boolean, optional(default=False)</em>) &#8211; whether to evaluate on test set</li>
+<li><strong>reload</strong> (<em>boolean, optional(default=True)</em>) &#8211; whether to save and reload featurized datasets</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.molnet.run_benchmark_low_data">
+<span id="deepchem-molnet-run-benchmark-low-data-module"></span><h2>deepchem.molnet.run_benchmark_low_data module<a class="headerlink" href="#module-deepchem.molnet.run_benchmark_low_data" title="Permalink to this headline">¶</a></h2>
+<p>Created on Mon Mar 06 14:25:40 2017</p>
+<p>&#64;author: Zhenqin Wu</p>
+</div>
+<div class="section" id="module-deepchem.molnet.run_benchmark_models">
+<span id="deepchem-molnet-run-benchmark-models-module"></span><h2>deepchem.molnet.run_benchmark_models module<a class="headerlink" href="#module-deepchem.molnet.run_benchmark_models" title="Permalink to this headline">¶</a></h2>
+<p>Created on Mon Mar  6 23:41:26 2017</p>
+<p>&#64;author: zqwu</p>
+<dl class="function">
+<dt id="deepchem.molnet.run_benchmark_models.benchmark_classification">
+<code class="descclassname">deepchem.molnet.run_benchmark_models.</code><code class="descname">benchmark_classification</code><span class="sig-paren">(</span><em>train_dataset</em>, <em>valid_dataset</em>, <em>test_dataset</em>, <em>tasks</em>, <em>transformers</em>, <em>n_features</em>, <em>metric</em>, <em>model</em>, <em>test=False</em>, <em>hyper_parameters=None</em>, <em>seed=123</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/run_benchmark_models.html#benchmark_classification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.run_benchmark_models.benchmark_classification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate performance of different models on the specific dataset &amp; tasks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>train_dataset</strong> (<em>dataset struct</em>) &#8211; dataset used for model training and evaluation</li>
+<li><strong>valid_dataset</strong> (<em>dataset struct</em>) &#8211; dataset only used for model evaluation (and hyperparameter tuning)</li>
+<li><strong>test_dataset</strong> (<em>dataset struct</em>) &#8211; dataset only used for model evaluation</li>
+<li><strong>tasks</strong> (<em>list of string</em>) &#8211; list of targets(tasks, datasets)</li>
+<li><strong>transformers</strong> (<em>dc.trans.Transformer struct</em>) &#8211; transformer used for model evaluation</li>
+<li><strong>n_features</strong> (<em>integer</em>) &#8211; number of features, or length of binary fingerprints</li>
+<li><strong>metric</strong> (<em>list of dc.metrics.Metric objects</em>) &#8211; metrics used for evaluation</li>
+<li><strong>model</strong> (<em>string,  optional</em>) &#8211; choice of model
+&#8216;rf&#8217;, &#8216;tf&#8217;, &#8216;tf_robust&#8217;, &#8216;logreg&#8217;, &#8216;irv&#8217;, &#8216;graphconv&#8217;, &#8216;dag&#8217;, &#8216;xgb&#8217;,
+&#8216;weave&#8217;, &#8216;kernelsvm&#8217;, &#8216;textcnn&#8217;, &#8216;mpnn&#8217;</li>
+<li><strong>test</strong> (<em>boolean, optional</em>) &#8211; whether to calculate test_set performance</li>
+<li><strong>hyper_parameters</strong> (<em>dict, optional (default=None)</em>) &#8211; hyper parameters for designated model, None = use preset values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>train_scores</strong> (<em>dict</em>) &#8211;
+predicting results(AUC) on training set</li>
+<li><strong>valid_scores</strong> (<em>dict</em>) &#8211;
+predicting results(AUC) on valid set</li>
+<li><strong>test_scores</strong> (<em>dict</em>) &#8211;
+predicting results(AUC) on test set</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.molnet.run_benchmark_models.benchmark_regression">
+<code class="descclassname">deepchem.molnet.run_benchmark_models.</code><code class="descname">benchmark_regression</code><span class="sig-paren">(</span><em>train_dataset</em>, <em>valid_dataset</em>, <em>test_dataset</em>, <em>tasks</em>, <em>transformers</em>, <em>n_features</em>, <em>metric</em>, <em>model</em>, <em>test=False</em>, <em>hyper_parameters=None</em>, <em>seed=123</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/molnet/run_benchmark_models.html#benchmark_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.molnet.run_benchmark_models.benchmark_regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate performance of different models on the specific dataset &amp; tasks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>train_dataset</strong> (<em>dataset struct</em>) &#8211; dataset used for model training and evaluation</li>
+<li><strong>valid_dataset</strong> (<em>dataset struct</em>) &#8211; dataset only used for model evaluation (and hyperparameter tuning)</li>
+<li><strong>test_dataset</strong> (<em>dataset struct</em>) &#8211; dataset only used for model evaluation</li>
+<li><strong>tasks</strong> (<em>list of string</em>) &#8211; list of targets(tasks, datasets)</li>
+<li><strong>transformers</strong> (<em>dc.trans.Transformer struct</em>) &#8211; transformer used for model evaluation</li>
+<li><strong>n_features</strong> (<em>integer</em>) &#8211; number of features, or length of binary fingerprints</li>
+<li><strong>metric</strong> (<em>list of dc.metrics.Metric objects</em>) &#8211; metrics used for evaluation</li>
+<li><strong>model</strong> (<em>string, optional</em>) &#8211; choice of model
+&#8216;tf_regression&#8217;, &#8216;tf_regression_ft&#8217;, &#8216;rf_regression&#8217;, &#8216;graphconvreg&#8217;,
+&#8216;dtnn&#8217;, &#8216;dag_regression&#8217;, &#8216;xgb_regression&#8217;, &#8216;weave_regression&#8217;,
+&#8216;textcnn_regression&#8217;, &#8216;krr&#8217;, &#8216;ani&#8217;, &#8216;krr_ft&#8217;, &#8216;mpnn&#8217;</li>
+<li><strong>test</strong> (<em>boolean, optional</em>) &#8211; whether to calculate test_set performance</li>
+<li><strong>hyper_parameters</strong> (<em>dict, optional (default=None)</em>) &#8211; hyper parameters for designated model, None = use preset values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>train_scores</strong> (<em>dict</em>) &#8211;
+predicting results(R2) on training set</li>
+<li><strong>valid_scores</strong> (<em>dict</em>) &#8211;
+predicting results(R2) on valid set</li>
+<li><strong>test_scores</strong> (<em>dict</em>) &#8211;
+predicting results(R2) on test set</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.molnet">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.molnet" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.molnet.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

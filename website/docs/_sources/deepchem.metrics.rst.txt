@@ -1,0 +1,17 @@
+deepchem\.metrics package
+=========================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.metrics.tests
+
+Module contents
+---------------
+
+.. automodule:: deepchem.metrics
+    :members:
+    :undoc-members:
+    :show-inheritance:

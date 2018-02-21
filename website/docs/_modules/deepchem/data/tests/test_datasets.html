@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.data.tests.test_datasets &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="deepchem.data.tests" href="../tests.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.data.tests.test_datasets</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tests for dataset creation</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Bharath Ramsundar&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.framework</span> <span class="kn">import</span> <span class="n">test_util</span>
+
+
+<div class="viewcode-block" id="TestDatasets"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets">[docs]</a><span class="k">class</span> <span class="nc">TestDatasets</span><span class="p">(</span><span class="n">test_util</span><span class="o">.</span><span class="n">TensorFlowTestCase</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Test basic top-level API for dataset objects.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestDatasets.test_sparsify_and_densify"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_sparsify_and_densify">[docs]</a>  <span class="k">def</span> <span class="nf">test_sparsify_and_densify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that sparsify and densify work as inverses.&quot;&quot;&quot;</span>
+    <span class="c1"># Test on identity matrix</span>
+    <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="n">num_samples</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span>
+    <span class="n">X_sparse</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sparsify_features</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">X_reconstructed</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">densify_features</span><span class="p">(</span><span class="n">X_sparse</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X_reconstructed</span><span class="p">)</span>
+
+    <span class="c1"># Generate random sparse features dataset</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="o">.</span><span class="mo">05</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+    <span class="n">X_sparse</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sparsify_features</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">X_reconstructed</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">densify_features</span><span class="p">(</span><span class="n">X_sparse</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X_reconstructed</span><span class="p">)</span>
+
+    <span class="c1"># Test edge case with array of all zeros</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+    <span class="n">X_sparse</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sparsify_features</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">X_reconstructed</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">densify_features</span><span class="p">(</span><span class="n">X_sparse</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X_reconstructed</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_pad_features"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_pad_features">[docs]</a>  <span class="k">def</span> <span class="nf">test_pad_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that pad_features pads features correctly.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_tasks</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c1"># Test cases where n_samples &lt; 2*n_samples &lt; batch_size</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">29</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+
+    <span class="n">X_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_features</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test cases where n_samples &lt; batch_size</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">79</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+    <span class="n">X_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_features</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test case where n_samples == batch_size</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+    <span class="n">X_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_features</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test case for object featurization.</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}])</span>
+    <span class="n">X_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_features</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test case for more complicated object featurization</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})])</span>
+    <span class="n">X_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_features</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test case with multidimensional data</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+    <span class="n">X_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_features</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_pad_batches"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_pad_batches">[docs]</a>  <span class="k">def</span> <span class="nf">test_pad_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that pad_batch pads batches correctly.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_tasks</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c1"># Test cases where n_samples &lt; 2*n_samples &lt; batch_size</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">29</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+    <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,))</span>
+
+    <span class="n">X_out</span><span class="p">,</span> <span class="n">y_out</span><span class="p">,</span> <span class="n">w_out</span><span class="p">,</span> <span class="n">ids_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span>
+                                                     <span class="n">ids_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">w_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test cases where n_samples &lt; batch_size</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">79</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+    <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,))</span>
+
+    <span class="n">X_out</span><span class="p">,</span> <span class="n">y_out</span><span class="p">,</span> <span class="n">w_out</span><span class="p">,</span> <span class="n">ids_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span>
+                                                     <span class="n">ids_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">w_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test case where n_samples == batch_size</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+    <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,))</span>
+
+    <span class="n">X_out</span><span class="p">,</span> <span class="n">y_out</span><span class="p">,</span> <span class="n">w_out</span><span class="p">,</span> <span class="n">ids_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span>
+                                                     <span class="n">ids_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">w_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test case for object featurization.</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}])</span>
+    <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,))</span>
+    <span class="n">X_out</span><span class="p">,</span> <span class="n">y_out</span><span class="p">,</span> <span class="n">w_out</span><span class="p">,</span> <span class="n">ids_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span>
+                                                     <span class="n">ids_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">w_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test case for more complicated object featurization</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})])</span>
+    <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,))</span>
+    <span class="n">X_out</span><span class="p">,</span> <span class="n">y_out</span><span class="p">,</span> <span class="n">w_out</span><span class="p">,</span> <span class="n">ids_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span>
+                                                     <span class="n">ids_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">w_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span>
+
+    <span class="c1"># Test case with multidimensional data</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+    <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,))</span>
+
+    <span class="n">X_out</span><span class="p">,</span> <span class="n">y_out</span><span class="p">,</span> <span class="n">w_out</span><span class="p">,</span> <span class="n">ids_out</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pad_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span>
+                                                     <span class="n">ids_b</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">w_out</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_out</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_get_task_names"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_get_task_names">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_task_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that get_task_names returns correct task_names&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_task_names</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;log-solubility&quot;</span><span class="p">]</span>
+
+    <span class="n">multitask_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_multitask_data</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">multitask_dataset</span><span class="o">.</span><span class="n">get_task_names</span><span class="p">())</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">([</span>
+        <span class="s2">&quot;task0&quot;</span><span class="p">,</span> <span class="s2">&quot;task1&quot;</span><span class="p">,</span> <span class="s2">&quot;task2&quot;</span><span class="p">,</span> <span class="s2">&quot;task3&quot;</span><span class="p">,</span> <span class="s2">&quot;task4&quot;</span><span class="p">,</span> <span class="s2">&quot;task5&quot;</span><span class="p">,</span> <span class="s2">&quot;task6&quot;</span><span class="p">,</span> <span class="s2">&quot;task7&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;task8&quot;</span><span class="p">,</span> <span class="s2">&quot;task9&quot;</span><span class="p">,</span> <span class="s2">&quot;task10&quot;</span><span class="p">,</span> <span class="s2">&quot;task11&quot;</span><span class="p">,</span> <span class="s2">&quot;task12&quot;</span><span class="p">,</span> <span class="s2">&quot;task13&quot;</span><span class="p">,</span> <span class="s2">&quot;task14&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;task15&quot;</span><span class="p">,</span> <span class="s2">&quot;task16&quot;</span>
+    <span class="p">])</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_get_data_shape"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_get_data_shape">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_data_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that get_data_shape returns currect data shape&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_data_shape</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,)</span>
+
+    <span class="n">multitask_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_multitask_data</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">multitask_dataset</span><span class="o">.</span><span class="n">get_data_shape</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_len"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_len">[docs]</a>  <span class="k">def</span> <span class="nf">test_len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that len(dataset) works.&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">solubility_dataset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_reshard"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_reshard">[docs]</a>  <span class="k">def</span> <span class="nf">test_reshard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that resharding the dataset works.&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">solubility_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                    <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_number_shards</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">reshard</span><span class="p">(</span><span class="n">shard_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_shard_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">X_r</span><span class="p">,</span> <span class="n">y_r</span><span class="p">,</span> <span class="n">w_r</span><span class="p">,</span> <span class="n">ids_r</span> <span class="o">=</span> <span class="p">(</span><span class="n">solubility_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                            <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_number_shards</span><span class="p">()</span> <span class="o">==</span> <span class="mi">10</span>
+    <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">reshard</span><span class="p">(</span><span class="n">shard_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_shard_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">10</span>
+    <span class="n">X_rr</span><span class="p">,</span> <span class="n">y_rr</span><span class="p">,</span> <span class="n">w_rr</span><span class="p">,</span> <span class="n">ids_rr</span> <span class="o">=</span> <span class="p">(</span><span class="n">solubility_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                                <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+
+    <span class="c1"># Test first resharding worked</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X_r</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_r</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">w_r</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">ids_r</span><span class="p">)</span>
+
+    <span class="c1"># Test second resharding worked</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X_rr</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_rr</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">w_rr</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">ids_rr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_select"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_select">[docs]</a>  <span class="k">def</span> <span class="nf">test_select</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that dataset select works.&quot;&quot;&quot;</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_tasks</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+    <span class="n">select_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+    <span class="n">X_sel</span><span class="p">,</span> <span class="n">y_sel</span><span class="p">,</span> <span class="n">w_sel</span><span class="p">,</span> <span class="n">ids_sel</span> <span class="o">=</span> <span class="p">(</span><span class="n">select_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">select_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                                    <span class="n">select_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">select_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">X_sel</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">y_sel</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">w_sel</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">ids_sel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_complete_shuffle"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_complete_shuffle">[docs]</a>  <span class="k">def</span> <span class="nf">test_complete_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">shard_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="n">all_Xs</span><span class="p">,</span> <span class="n">all_ys</span><span class="p">,</span> <span class="n">all_ws</span><span class="p">,</span> <span class="n">all_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">shard_generator</span><span class="p">():</span>
+      <span class="k">for</span> <span class="n">sz</span> <span class="ow">in</span> <span class="n">shard_sizes</span><span class="p">:</span>
+        <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">)</span>
+
+        <span class="n">all_Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
+        <span class="n">all_ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_b</span><span class="p">)</span>
+        <span class="n">all_ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w_b</span><span class="p">)</span>
+        <span class="n">all_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ids_b</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span> <span class="n">ids_b</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">shard_generator</span><span class="p">())</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">complete_shuffle</span><span class="p">()</span>
+
+    <span class="c1"># approx 1/15! chance of equality</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">not_equal</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">X</span><span class="p">)),</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">not_equal</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">w</span><span class="p">)),</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">not_equal</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">not_equal</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">ids</span><span class="p">)),</span> <span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">ids</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_get_shape"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_get_shape">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that get_shape works.&quot;&quot;&quot;</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_tasks</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="c1"># Generate data</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
+
+    <span class="n">X_shape</span><span class="p">,</span> <span class="n">y_shape</span><span class="p">,</span> <span class="n">w_shape</span><span class="p">,</span> <span class="n">ids_shape</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">X_shape</span> <span class="o">==</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">y_shape</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">w_shape</span> <span class="o">==</span> <span class="n">w</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">ids_shape</span> <span class="o">==</span> <span class="n">ids</span><span class="o">.</span><span class="n">shape</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_iterbatches"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_iterbatches">[docs]</a>  <span class="k">def</span> <span class="nf">test_iterbatches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that iterating over batches of data works.&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">data_shape</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_data_shape</span><span class="p">()</span>
+    <span class="n">tasks</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_task_names</span><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span> <span class="n">ids_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
+      <span class="k">assert</span> <span class="n">X_b</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,)</span> <span class="o">+</span> <span class="n">data_shape</span>
+      <span class="k">assert</span> <span class="n">y_b</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,)</span> <span class="o">+</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">),)</span>
+      <span class="k">assert</span> <span class="n">w_b</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,)</span> <span class="o">+</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">),)</span>
+      <span class="k">assert</span> <span class="n">ids_b</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_itersamples_numpy"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_itersamples_numpy">[docs]</a>  <span class="k">def</span> <span class="nf">test_itersamples_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that iterating over samples in a NumpyDataset works.&quot;&quot;&quot;</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_tasks</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="c1"># Generate data</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sw</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">itersamples</span><span class="p">()):</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">sy</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">sw</span><span class="p">,</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">ids</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_itersamples_disk"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_itersamples_disk">[docs]</a>  <span class="k">def</span> <span class="nf">test_itersamples_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that iterating over samples in a DiskDataset works.&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">X</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">w</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sw</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solubility_dataset</span><span class="o">.</span><span class="n">itersamples</span><span class="p">()):</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">sy</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">sw</span><span class="p">,</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">ids</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_transform_numpy"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_transform_numpy">[docs]</a>  <span class="k">def</span> <span class="nf">test_transform_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that the transform() method works for NumpyDatasets.&quot;&quot;&quot;</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_tasks</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="c1"># Generate data</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
+
+    <span class="c1"># Transform it</span>
+
+    <span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+
+    <span class="n">transformed</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">X</span><span class="p">,</span> <span class="n">transformed</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">transformed</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">transformed</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">transformed</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_transform_disk"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_transform_disk">[docs]</a>  <span class="k">def</span> <span class="nf">test_transform_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that the transform() method works for DiskDatasets.&quot;&quot;&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span>
+
+    <span class="c1"># Transform it</span>
+    <span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+
+    <span class="n">transformed</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">X</span><span class="p">,</span> <span class="n">transformed</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">transformed</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">transformed</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">transformed</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_to_numpy"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_to_numpy">[docs]</a>  <span class="k">def</span> <span class="nf">test_to_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that transformation to numpy arrays is sensible.&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="n">data_shape</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_data_shape</span><span class="p">()</span>
+    <span class="n">tasks</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_task_names</span><span class="p">()</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">solubility_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                    <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">N_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">solubility_dataset</span><span class="p">)</span>
+    <span class="n">N_tasks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">N_samples</span><span class="p">,)</span> <span class="o">+</span> <span class="n">data_shape</span>
+    <span class="k">assert</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">N_samples</span><span class="p">,</span> <span class="n">N_tasks</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">w</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">N_samples</span><span class="p">,</span> <span class="n">N_tasks</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">ids</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">N_samples</span><span class="p">,)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_consistent_ordering"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_consistent_ordering">[docs]</a>  <span class="k">def</span> <span class="nf">test_consistent_ordering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that ordering of labels is consistent over time.&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+
+    <span class="n">ids1</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span>
+    <span class="n">ids2</span> <span class="o">=</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">ids1</span><span class="p">,</span> <span class="n">ids2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_get_statistics"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_get_statistics">[docs]</a>  <span class="k">def</span> <span class="nf">test_get_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test statistics computation of this dataset.&quot;&quot;&quot;</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span><span class="n">solubility_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                  <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">X_means</span><span class="p">,</span> <span class="n">y_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">X_stds</span><span class="p">,</span> <span class="n">y_stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">comp_X_means</span><span class="p">,</span> <span class="n">comp_X_stds</span><span class="p">,</span> <span class="n">comp_y_means</span><span class="p">,</span> <span class="n">comp_y_stds</span> <span class="o">=</span> \
+      <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">()</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">comp_X_means</span><span class="p">,</span> <span class="n">X_means</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">comp_y_means</span><span class="p">,</span> <span class="n">y_means</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">comp_X_stds</span><span class="p">,</span> <span class="n">X_stds</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">comp_y_stds</span><span class="p">,</span> <span class="n">y_stds</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_disk_iterate_batch_size"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_disk_iterate_batch_size">[docs]</a>  <span class="k">def</span> <span class="nf">test_disk_iterate_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span><span class="n">solubility_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                  <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">batch_sizes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+        <span class="mi">3</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+      <span class="n">batch_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">batch_sizes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_disk_pad_batches"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_disk_pad_batches">[docs]</a>  <span class="k">def</span> <span class="nf">test_disk_pad_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">shard_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">51</span><span class="p">]</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="n">all_Xs</span><span class="p">,</span> <span class="n">all_ys</span><span class="p">,</span> <span class="n">all_ws</span><span class="p">,</span> <span class="n">all_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">shard_generator</span><span class="p">():</span>
+      <span class="k">for</span> <span class="n">sz</span> <span class="ow">in</span> <span class="n">shard_sizes</span><span class="p">:</span>
+        <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">)</span>
+
+        <span class="n">all_Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
+        <span class="n">all_ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_b</span><span class="p">)</span>
+        <span class="n">all_ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w_b</span><span class="p">)</span>
+        <span class="n">all_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ids_b</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span> <span class="n">ids_b</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">shard_generator</span><span class="p">())</span>
+
+    <span class="n">all_Xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">all_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_ys</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">all_ws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_ws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">all_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">test_Xs</span><span class="p">,</span> <span class="n">test_ys</span><span class="p">,</span> <span class="n">test_ws</span><span class="p">,</span> <span class="n">test_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">bidx</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">)):</span>
+
+      <span class="n">test_Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+      <span class="n">test_ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+      <span class="n">test_ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+      <span class="n">test_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="n">test_Xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">test_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ys</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">test_ws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">test_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">total_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">shard_sizes</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">bidx</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_size</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="n">expected_batches</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_size</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">batch_size</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_Xs</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_batches</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_ys</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_batches</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_ws</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_batches</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_ids</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_batches</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_Xs</span><span class="p">,</span> <span class="n">test_Xs</span><span class="p">[:</span><span class="n">total_size</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_ys</span><span class="p">,</span> <span class="n">test_ys</span><span class="p">[:</span><span class="n">total_size</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_ws</span><span class="p">,</span> <span class="n">test_ws</span><span class="p">[:</span><span class="n">total_size</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_ids</span><span class="p">,</span> <span class="n">test_ids</span><span class="p">[:</span><span class="n">total_size</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_disk_iterate_y_w_None"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_disk_iterate_y_w_None">[docs]</a>  <span class="k">def</span> <span class="nf">test_disk_iterate_y_w_None</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">shard_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">51</span><span class="p">]</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="n">all_Xs</span><span class="p">,</span> <span class="n">all_ys</span><span class="p">,</span> <span class="n">all_ws</span><span class="p">,</span> <span class="n">all_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">shard_generator</span><span class="p">():</span>
+      <span class="k">for</span> <span class="n">sz</span> <span class="ow">in</span> <span class="n">shard_sizes</span><span class="p">:</span>
+        <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">)</span>
+
+        <span class="n">all_Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
+        <span class="n">all_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ids_b</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">X_b</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">ids_b</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">shard_generator</span><span class="p">())</span>
+
+    <span class="n">all_Xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">all_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">test_Xs</span><span class="p">,</span> <span class="n">test_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">bidx</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">)):</span>
+
+      <span class="n">test_Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+      <span class="n">test_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="n">test_Xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">test_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">total_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">shard_sizes</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">bidx</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_size</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="n">expected_batches</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_size</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">batch_size</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_Xs</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_batches</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_ids</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_batches</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_Xs</span><span class="p">,</span> <span class="n">test_Xs</span><span class="p">[:</span><span class="n">total_size</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_ids</span><span class="p">,</span> <span class="n">test_ids</span><span class="p">[:</span><span class="n">total_size</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_disk_iterate_batch"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_disk_iterate_batch">[docs]</a>  <span class="k">def</span> <span class="nf">test_disk_iterate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="n">all_batch_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">11</span><span class="p">]</span>
+    <span class="n">all_shard_sizes</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">31</span><span class="p">],</span>
+                       <span class="p">[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">51</span><span class="p">]]</span>
+
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">25</span><span class="p">):</span>
+      <span class="n">shard_length</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+      <span class="n">shard_sizes</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shard_length</span><span class="p">):</span>
+        <span class="n">shard_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">128</span><span class="p">))</span>
+      <span class="n">all_shard_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shard_sizes</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># special case to test</span>
+        <span class="n">all_batch_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_batch_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">shard_sizes</span><span class="p">,</span> <span class="n">batch_size</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">all_shard_sizes</span><span class="p">,</span> <span class="n">all_batch_sizes</span><span class="p">):</span>
+
+      <span class="n">all_Xs</span><span class="p">,</span> <span class="n">all_ys</span><span class="p">,</span> <span class="n">all_ws</span><span class="p">,</span> <span class="n">all_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+      <span class="k">def</span> <span class="nf">shard_generator</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">sz</span> <span class="ow">in</span> <span class="n">shard_sizes</span><span class="p">:</span>
+          <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+          <span class="n">y_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+          <span class="n">w_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+          <span class="n">ids_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">)</span>
+
+          <span class="n">all_Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
+          <span class="n">all_ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_b</span><span class="p">)</span>
+          <span class="n">all_ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w_b</span><span class="p">)</span>
+          <span class="n">all_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ids_b</span><span class="p">)</span>
+
+          <span class="k">yield</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span> <span class="n">ids_b</span>
+
+      <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">shard_generator</span><span class="p">())</span>
+
+      <span class="n">all_Xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">all_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_ys</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">all_ws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_ws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">all_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+      <span class="n">total_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">shard_sizes</span><span class="p">)</span>
+
+      <span class="k">assert</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">total_size</span>
+
+      <span class="c1"># deterministic</span>
+      <span class="n">test_Xs</span><span class="p">,</span> <span class="n">test_ys</span><span class="p">,</span> <span class="n">test_ws</span><span class="p">,</span> <span class="n">test_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">bidx</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+          <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+              <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">)):</span>
+
+        <span class="n">test_Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">test_ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">test_ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">test_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="n">batch_size</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">ty</span><span class="p">,</span> <span class="n">tw</span><span class="p">,</span> <span class="n">tids</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">test_Xs</span><span class="p">,</span> <span class="n">test_ys</span><span class="p">,</span> <span class="n">test_ws</span><span class="p">,</span> <span class="n">test_ids</span><span class="p">)):</span>
+          <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span> <span class="o">==</span> <span class="n">shard_sizes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+          <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ty</span><span class="p">)</span> <span class="o">==</span> <span class="n">shard_sizes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+          <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tw</span><span class="p">)</span> <span class="o">==</span> <span class="n">shard_sizes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+          <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tids</span><span class="p">)</span> <span class="o">==</span> <span class="n">shard_sizes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+      <span class="n">test_Xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">test_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ys</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">test_ws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">test_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="n">batch_size</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">bidx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">shard_sizes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">bidx</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_size</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_Xs</span><span class="p">,</span> <span class="n">test_Xs</span><span class="p">)</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_ys</span><span class="p">,</span> <span class="n">test_ys</span><span class="p">)</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_ws</span><span class="p">,</span> <span class="n">test_ws</span><span class="p">)</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">all_ids</span><span class="p">,</span> <span class="n">test_ids</span><span class="p">)</span>
+
+      <span class="c1"># non-deterministic</span>
+      <span class="n">test_Xs</span><span class="p">,</span> <span class="n">test_ys</span><span class="p">,</span> <span class="n">test_ws</span><span class="p">,</span> <span class="n">test_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+      <span class="k">for</span> <span class="n">bidx</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+          <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+              <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">False</span><span class="p">)):</span>
+
+        <span class="n">test_Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">test_ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">test_ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">test_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+      <span class="c1"># we don&#39;t know the order in which the shards are iterated in.</span>
+      <span class="n">test_Xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">test_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ys</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">test_ws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">test_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="n">batch_size</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">bidx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">shard_sizes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">bidx</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_size</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">all_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">test_Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">all_ys</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">test_ys</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">all_ws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">test_ws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">all_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">test_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_numpy_iterate_batch_size"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_numpy_iterate_batch_size">[docs]</a>  <span class="k">def</span> <span class="nf">test_numpy_iterate_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">load_solubility_data</span><span class="p">()</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span><span class="n">solubility_dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                  <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">solubility_dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">NumpyDataset</span><span class="o">.</span><span class="n">from_DiskDataset</span><span class="p">(</span>
+        <span class="n">solubility_dataset</span><span class="p">)</span>
+    <span class="n">batch_sizes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">solubility_dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+        <span class="mi">3</span><span class="p">,</span> <span class="n">pad_batches</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+      <span class="n">batch_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">batch_sizes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_merge"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_merge">[docs]</a>  <span class="k">def</span> <span class="nf">test_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test that dataset merge works.&quot;&quot;&quot;</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_tasks</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">num_datasets</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_datasets</span><span class="p">):</span>
+      <span class="n">Xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+      <span class="n">yi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+      <span class="n">wi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">num_datapoints</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">))</span>
+      <span class="n">idsi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+      <span class="n">dataseti</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">Xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">wi</span><span class="p">,</span> <span class="n">idsi</span><span class="p">)</span>
+      <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataseti</span><span class="p">)</span>
+
+    <span class="n">new_data</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">DiskDataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+
+    <span class="c1"># Check that we have all the data in</span>
+    <span class="k">assert</span> <span class="n">new_data</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">num_datapoints</span> <span class="o">*</span> <span class="n">num_datasets</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">new_data</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">num_datapoints</span> <span class="o">*</span> <span class="n">num_datasets</span><span class="p">,</span> <span class="n">num_tasks</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_data</span><span class="o">.</span><span class="n">tasks</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tasks</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestDatasets.test_make_iterator"><a class="viewcode-back" href="../../../../deepchem.data.tests.html#deepchem.data.tests.test_datasets.TestDatasets.test_make_iterator">[docs]</a>  <span class="k">def</span> <span class="nf">test_make_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test creating a Tensorflow Iterator from a Dataset.&quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">iterator</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">make_iterator</span><span class="p">(</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">next_element</span> <span class="o">=</span> <span class="n">iterator</span><span class="o">.</span><span class="n">get_next</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+        <span class="n">batch_X</span><span class="p">,</span> <span class="n">batch_y</span><span class="p">,</span> <span class="n">batch_w</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">next_element</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="p">:],</span> <span class="n">batch_X</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="p">:],</span> <span class="n">batch_y</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">batch_w</span><span class="p">)</span>
+      <span class="n">finished</span> <span class="o">=</span> <span class="bp">False</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">next_element</span><span class="p">)</span>
+      <span class="k">except</span> <span class="n">tf</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">OutOfRangeError</span><span class="p">:</span>
+        <span class="n">finished</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">finished</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

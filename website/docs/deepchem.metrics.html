@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.metrics package &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="index.html" />
+    <link rel="up" title="deepchem package" href="deepchem.html" />
+    <link rel="next" title="deepchem.metrics.tests package" href="deepchem.metrics.tests.html" />
+    <link rel="prev" title="deepchem.metalearning package" href="deepchem.metalearning.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">deepchem.metrics package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#module-deepchem.metrics">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-metrics-package">
+<h1>deepchem.metrics package<a class="headerlink" href="#deepchem-metrics-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deepchem.metrics.tests.html">deepchem.metrics.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.metrics.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.metrics.tests.html#module-deepchem.metrics.tests.metrics_test">deepchem.metrics.tests.metrics_test module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.metrics.tests.html#module-deepchem.metrics.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-deepchem.metrics">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.metrics" title="Permalink to this headline">¶</a></h2>
+<p>Evaluation metrics.</p>
+<dl class="class">
+<dt id="deepchem.metrics.Metric">
+<em class="property">class </em><code class="descclassname">deepchem.metrics.</code><code class="descname">Metric</code><span class="sig-paren">(</span><em>metric</em>, <em>task_averager=None</em>, <em>name=None</em>, <em>threshold=None</em>, <em>verbose=True</em>, <em>mode=None</em>, <em>compute_energy_metric=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#Metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.Metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Wrapper class for computing user-defined metrics.</p>
+<dl class="method">
+<dt id="deepchem.metrics.Metric.compute_metric">
+<code class="descname">compute_metric</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em>, <em>w=None</em>, <em>n_classes=2</em>, <em>filter_nans=True</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#Metric.compute_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.Metric.compute_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a performance metric for each task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>y_true</strong> (<em>np.ndarray</em>) &#8211; An np.ndarray containing true values for each task.</li>
+<li><strong>y_pred</strong> (<em>np.ndarray</em>) &#8211; An np.ndarray containing predicted values for each task.</li>
+<li><strong>w</strong> (<em>np.ndarray, optional</em>) &#8211; An np.ndarray containing weights for each datapoint.</li>
+<li><strong>n_classes</strong> (<em>int, optional</em>) &#8211; Number of classes in data for classification tasks.</li>
+<li><strong>filter_nans</strong> (<em>bool, optional</em>) &#8211; Remove NaN values in computed metrics</li>
+<li><strong>per_task_metrics</strong> (<em>bool, optional</em>) &#8211; If true, return computed metric for each task on multitask dataset.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A numpy nd.array containing metric values for each task.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.metrics.Metric.compute_singletask_metric">
+<code class="descname">compute_singletask_metric</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#Metric.compute_singletask_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.Metric.compute_singletask_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a metric value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>y_true</strong> &#8211; A list of arrays containing true values for each task.</li>
+<li><strong>y_pred</strong> &#8211; A list of arrays containing predicted values for each task.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Float metric value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NotImplementedError</span></code> &#8211;
+If metric_str is not in METRICS.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.balanced_accuracy_score">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">balanced_accuracy_score</code><span class="sig-paren">(</span><em>y</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#balanced_accuracy_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.balanced_accuracy_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes balanced accuracy score.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.compute_roc_auc_scores">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">compute_roc_auc_scores</code><span class="sig-paren">(</span><em>y</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#compute_roc_auc_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.compute_roc_auc_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms the results dict into roc-auc-scores and prints scores.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>results</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; </li>
+<li><strong>task_types</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; dict mapping task names to output type. Each output type must be either
+&#8220;classification&#8221; or &#8220;regression&#8221;.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.from_one_hot">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">from_one_hot</code><span class="sig-paren">(</span><em>y</em>, <em>axis=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#from_one_hot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.from_one_hot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transorms label vector from one-hot encoding.</p>
+<dl class="docutils">
+<dt>y: np.ndarray</dt>
+<dd>A vector of shape [n_samples, num_classes]</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.kappa_score">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">kappa_score</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#kappa_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.kappa_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate Cohen&#8217;s kappa for classification tasks.</p>
+<p>See <a class="reference external" href="https://en.wikipedia.org/wiki/Cohen%27s_kappa">https://en.wikipedia.org/wiki/Cohen%27s_kappa</a></p>
+<p>Note that this implementation of Cohen&#8217;s kappa expects binary labels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>y_true</strong> &#8211; Numpy array containing true values.</li>
+<li><strong>y_pred</strong> &#8211; Numpy array containing predicted values.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Numpy array containing kappa for each classification task.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">kappa</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">AssertionError</span></code> &#8211;
+If y_true and y_pred are not the same size, or if class
+labels are not in [0, 1].</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.mae_score">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">mae_score</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#mae_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.mae_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes MAE.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.pearson_r2_score">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">pearson_r2_score</code><span class="sig-paren">(</span><em>y</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#pearson_r2_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.pearson_r2_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes Pearson R^2 (square of Pearson correlation).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.prc_auc_score">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">prc_auc_score</code><span class="sig-paren">(</span><em>y</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#prc_auc_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.prc_auc_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute area under precision-recall curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.rms_score">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">rms_score</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#rms_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.rms_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes RMS error.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.metrics.to_one_hot">
+<code class="descclassname">deepchem.metrics.</code><code class="descname">to_one_hot</code><span class="sig-paren">(</span><em>y</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metrics.html#to_one_hot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metrics.to_one_hot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms label vector into one-hot encoding.</p>
+<p>Turns y into vector of shape [n_samples, 2] (assuming binary labels).</p>
+<dl class="docutils">
+<dt>y: np.ndarray</dt>
+<dd>A vector of shape [n_samples, 1]</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.metrics.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

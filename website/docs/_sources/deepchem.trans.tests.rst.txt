@@ -1,0 +1,22 @@
+deepchem\.trans\.tests package
+==============================
+
+Submodules
+----------
+
+deepchem\.trans\.tests\.test\_transformers module
+-------------------------------------------------
+
+.. automodule:: deepchem.trans.tests.test_transformers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.trans.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

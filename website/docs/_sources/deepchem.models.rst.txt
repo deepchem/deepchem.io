@@ -1,0 +1,42 @@
+deepchem\.models package
+========================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.models.autoencoder_models
+    deepchem.models.sklearn_models
+    deepchem.models.tensorflow_models
+    deepchem.models.tensorgraph
+    deepchem.models.tests
+    deepchem.models.xgboost_models
+
+Submodules
+----------
+
+deepchem\.models\.models module
+-------------------------------
+
+.. automodule:: deepchem.models.models
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem\.models\.multitask module
+----------------------------------
+
+.. automodule:: deepchem.models.multitask
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models
+    :members:
+    :undoc-members:
+    :show-inheritance:

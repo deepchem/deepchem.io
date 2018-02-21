@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.models &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains an abstract base class that supports different ML models.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Bharath Ramsundar and Joseph Gomes&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">joblib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">pad_features</span>
+<span class="kn">from</span> <span class="nn">deepchem.trans</span> <span class="kn">import</span> <span class="n">undo_transforms</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils.save</span> <span class="kn">import</span> <span class="n">load_from_disk</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils.save</span> <span class="kn">import</span> <span class="n">save_to_disk</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils.save</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils.evaluate</span> <span class="kn">import</span> <span class="n">Evaluator</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Abstract base class for different ML models.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">model_instance</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">model_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract class for all models.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    model_instance: object</span>
+<span class="sd">      Wrapper around ScikitLearn/Keras/Tensorflow model object.</span>
+<span class="sd">    model_dir: str</span>
+<span class="sd">      Path to directory where model will be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model_dir_is_temp</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">model_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">model_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">model_dir_is_temp</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">=</span> <span class="n">model_dir</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model_instance</span> <span class="o">=</span> <span class="n">model_instance</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span> <span class="o">=</span> <span class="n">model_instance</span><span class="o">.</span><span class="vm">__class__</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+  <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;model_dir_is_temp&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dir_is_temp</span><span class="p">:</span>
+      <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Model.fit_on_batch"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.fit_on_batch">[docs]</a>  <span class="k">def</span> <span class="nf">fit_on_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates existing model with new information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Each model is responsible for its own fit_on_batch method.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.predict_on_batch"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.predict_on_batch">[docs]</a>  <span class="k">def</span> <span class="nf">predict_on_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes predictions on given batch of new data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Each model is responsible for its own predict_on_batch method.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.predict_proba_on_batch"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.predict_proba_on_batch">[docs]</a>  <span class="k">def</span> <span class="nf">predict_proba_on_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes predictions of class probabilities on given batch of new data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.ndarray</span>
+<span class="sd">      Features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Each model is responsible for its own predict_on_batch method.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.reload"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.reload">[docs]</a>  <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reload trained model from disk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Each model is responsible for its own reload method.&quot;</span><span class="p">)</span></div>
+
+  <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Model.get_model_filename"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.get_model_filename">[docs]</a>  <span class="k">def</span> <span class="nf">get_model_filename</span><span class="p">(</span><span class="n">model_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given model directory, obtain filename for the model itself.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;model.joblib&quot;</span><span class="p">)</span></div>
+
+  <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Model.get_params_filename"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.get_params_filename">[docs]</a>  <span class="k">def</span> <span class="nf">get_params_filename</span><span class="p">(</span><span class="n">model_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given model directory, obtain filename for the model itself.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;model_params.joblib&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.save"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.save">[docs]</a>  <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dispatcher function for saving.</span>
+
+<span class="sd">    Each subclass is responsible for overriding this method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Model.fit"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">nb_epoch</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fits a model on data in a Dataset object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO(rbharath/enf): We need a structured way to deal with potential GPU</span>
+    <span class="c1">#                     memory overflows.</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_epoch</span><span class="p">):</span>
+      <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Starting epoch </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+      <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">w_batch</span><span class="p">,</span>
+           <span class="n">ids_batch</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
+        <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_on_batch</span><span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">w_batch</span><span class="p">))</span>
+      <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Avg loss for epoch </span><span class="si">%d</span><span class="s2">: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.predict"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.predict">[docs]</a>  <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses self to make predictions on provided Dataset object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      y_pred: numpy ndarray of shape (n_samples,)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y_preds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num_tasks</span><span class="p">()</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ids_batch</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+        <span class="n">batch_size</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+      <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_batch</span><span class="p">)</span>
+      <span class="n">y_pred_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_on_batch</span><span class="p">(</span><span class="n">X_batch</span><span class="p">)</span>
+      <span class="c1"># Discard any padded predictions</span>
+      <span class="n">y_pred_batch</span> <span class="o">=</span> <span class="n">y_pred_batch</span><span class="p">[:</span><span class="n">n_samples</span><span class="p">]</span>
+      <span class="n">y_pred_batch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_pred_batch</span><span class="p">,</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_tasks</span><span class="p">))</span>
+      <span class="n">y_pred_batch</span> <span class="o">=</span> <span class="n">undo_transforms</span><span class="p">(</span><span class="n">y_pred_batch</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+      <span class="n">y_preds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pred_batch</span><span class="p">)</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">y_preds</span><span class="p">)</span>
+
+    <span class="c1"># The iterbatches does padding with zero-weight examples on the last batch.</span>
+    <span class="c1"># Remove padded examples.</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_tasks</span><span class="p">))</span>
+    <span class="c1"># Special case to handle singletasks.</span>
+    <span class="k">if</span> <span class="n">n_tasks</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">y_pred</span></div>
+
+<div class="viewcode-block" id="Model.evaluate"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.evaluate">[docs]</a>  <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span> <span class="n">per_task_metrics</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluates the performance of this model on specified dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: dc.data.Dataset</span>
+<span class="sd">      Dataset object.</span>
+<span class="sd">    metric: deepchem.metrics.Metric</span>
+<span class="sd">      Evaluation metric</span>
+<span class="sd">    transformers: list</span>
+<span class="sd">      List of deepchem.transformers.Transformer</span>
+<span class="sd">    per_task_metrics: bool</span>
+<span class="sd">      If True, return per-task scores.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">      Maps tasks to scores under metric.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">evaluator</span> <span class="o">=</span> <span class="n">Evaluator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">per_task_metrics</span><span class="p">:</span>
+      <span class="n">scores</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">compute_model_performance</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">scores</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">scores</span><span class="p">,</span> <span class="n">per_task_scores</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">compute_model_performance</span><span class="p">(</span>
+          <span class="n">metrics</span><span class="p">,</span> <span class="n">per_task_metrics</span><span class="o">=</span><span class="n">per_task_metrics</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">scores</span><span class="p">,</span> <span class="n">per_task_scores</span></div>
+
+<div class="viewcode-block" id="Model.predict_proba"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.predict_proba">[docs]</a>  <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">dataset</span><span class="p">,</span>
+                    <span class="n">transformers</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">batch_size</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                    <span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TODO: Do transformers even make sense here?</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      y_pred: numpy ndarray of shape (n_samples, n_classes*n_tasks)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y_preds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num_tasks</span><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">w_batch</span><span class="p">,</span> <span class="n">ids_batch</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+        <span class="n">batch_size</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+      <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_batch</span><span class="p">)</span>
+      <span class="n">y_pred_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_proba_on_batch</span><span class="p">(</span><span class="n">X_batch</span><span class="p">)</span>
+      <span class="n">y_pred_batch</span> <span class="o">=</span> <span class="n">y_pred_batch</span><span class="p">[:</span><span class="n">n_samples</span><span class="p">]</span>
+      <span class="n">y_pred_batch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_pred_batch</span><span class="p">,</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_tasks</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">))</span>
+      <span class="n">y_pred_batch</span> <span class="o">=</span> <span class="n">undo_transforms</span><span class="p">(</span><span class="n">y_pred_batch</span><span class="p">,</span> <span class="n">transformers</span><span class="p">)</span>
+      <span class="n">y_preds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pred_batch</span><span class="p">)</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">y_preds</span><span class="p">)</span>
+    <span class="c1"># The iterbatches does padding with zero-weight examples on the last batch.</span>
+    <span class="c1"># Remove padded examples.</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_pred</span><span class="p">[:</span><span class="n">n_samples</span><span class="p">]</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_tasks</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">y_pred</span></div>
+
+<div class="viewcode-block" id="Model.get_task_type"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.get_task_type">[docs]</a>  <span class="k">def</span> <span class="nf">get_task_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Currently models can only be classifiers or regressors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Model.get_num_tasks"><a class="viewcode-back" href="../../../deepchem.models.html#deepchem.models.models.Model.get_num_tasks">[docs]</a>  <span class="k">def</span> <span class="nf">get_num_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get number of tasks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

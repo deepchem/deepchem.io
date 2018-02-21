@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quantum Machinery with gdb1k &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Quantum Machinery with gdb1k</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="quantum-machinery-with-gdb1k">
+<h1>Quantum Machinery with gdb1k<a class="headerlink" href="#quantum-machinery-with-gdb1k" title="Permalink to this headline">¶</a></h1>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
+%pdb off
+__author__ = &quot;Joseph Gomes and Bharath Ramsundar&quot;
+__copyright__ = &quot;Copyright 2016, Stanford University&quot;
+__license__ = &quot;LGPL&quot;
+
+import os
+import unittest
+
+import numpy as np
+import deepchem as dc
+import numpy.random
+from deepchem.utils.evaluate import Evaluator
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.kernel_ridge import KernelRidge
+</pre></div>
+</div>
+<p>Setting up model variables</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">feat</span><span class="o">.</span><span class="n">CoulombMatrixEig</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="n">remove_hydrogens</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;atomization_energy&quot;</span><span class="p">]</span>
+<span class="n">dataset_file</span> <span class="o">=</span> <span class="s2">&quot;../../datasets/gdb1k.sdf&quot;</span>
+<span class="n">smiles_field</span> <span class="o">=</span> <span class="s2">&quot;smiles&quot;</span>
+<span class="n">mol_field</span> <span class="o">=</span> <span class="s2">&quot;mol&quot;</span>
+</pre></div>
+</div>
+<p>Load featurized data</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">loader</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">SDFLoader</span><span class="p">(</span>
+      <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;atomization_energy&quot;</span><span class="p">],</span> <span class="n">smiles_field</span><span class="o">=</span><span class="s2">&quot;smiles&quot;</span><span class="p">,</span>
+      <span class="n">featurizer</span><span class="o">=</span><span class="n">featurizer</span><span class="p">,</span>
+      <span class="n">mol_field</span><span class="o">=</span><span class="s2">&quot;mol&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">dataset_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Perform Train, Validation, and Testing Split</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">random_splitter</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">splits</span><span class="o">.</span><span class="n">RandomSplitter</span><span class="p">()</span>
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">random_splitter</span><span class="o">.</span><span class="n">train_valid_test_split</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Transforming datasets</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">transformers</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">dc</span><span class="o">.</span><span class="n">trans</span><span class="o">.</span><span class="n">NormalizationTransformer</span><span class="p">(</span><span class="n">transform_X</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">),</span>
+    <span class="n">dc</span><span class="o">.</span><span class="n">trans</span><span class="o">.</span><span class="n">NormalizationTransformer</span><span class="p">(</span><span class="n">transform_y</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">)]</span>
+
+<span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">]:</span>
+  <span class="k">for</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="n">transformers</span><span class="p">:</span>
+      <span class="n">dataset</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Fit Random Forest with hyperparameter search</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rf_model_builder</span><span class="p">(</span><span class="n">model_params</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">):</span>
+  <span class="n">sklearn_model</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">SklearnModel</span><span class="p">(</span><span class="n">sklearn_model</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">)</span>
+<span class="n">params_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+    <span class="s2">&quot;max_features&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;sqrt&quot;</span><span class="p">,</span> <span class="s2">&quot;log2&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">metric</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Metric</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_absolute_error</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">hyper</span><span class="o">.</span><span class="n">HyperparamOpt</span><span class="p">(</span><span class="n">rf_model_builder</span><span class="p">)</span>
+<span class="n">best_rf</span><span class="p">,</span> <span class="n">best_rf_hyperparams</span><span class="p">,</span> <span class="n">all_rf_results</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">hyperparam_search</span><span class="p">(</span>
+    <span class="n">params_dict</span><span class="p">,</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">krr_model_builder</span><span class="p">(</span><span class="n">model_params</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">):</span>
+  <span class="n">sklearn_model</span> <span class="o">=</span> <span class="n">KernelRidge</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">SklearnModel</span><span class="p">(</span><span class="n">sklearn_model</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">)</span>
+
+<span class="n">params_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;laplacian&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0001</span><span class="p">],</span>
+    <span class="s2">&quot;gamma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0001</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">metric</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Metric</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_absolute_error</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">hyper</span><span class="o">.</span><span class="n">HyperparamOpt</span><span class="p">(</span><span class="n">krr_model_builder</span><span class="p">)</span>
+<span class="n">best_krr</span><span class="p">,</span> <span class="n">best_krr_hyperparams</span><span class="p">,</span> <span class="n">all_krr_results</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">hyperparam_search</span><span class="p">(</span>
+    <span class="n">params_dict</span><span class="p">,</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">transformers</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/notebooks/quantum_machine_gdb1k.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
