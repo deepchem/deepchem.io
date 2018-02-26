@@ -30,7 +30,7 @@
     <link rel="top" title="deepchem 1.2 documentation" href="index.html" />
     <link rel="up" title="deepchem package" href="deepchem.html" />
     <link rel="next" title="deepchem.models.autoencoder_models package" href="deepchem.models.autoencoder_models.html" />
-    <link rel="prev" title="deepchem.metrics.tests package" href="deepchem.metrics.tests.html" />
+    <link rel="prev" title="deepchem.metrics package" href="deepchem.metrics.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -85,10 +85,10 @@
 <li><a class="reference internal" href="#">deepchem.models package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#deepchem-models-models-module">deepchem.models.models module</a></li>
-<li><a class="reference internal" href="#deepchem-models-multitask-module">deepchem.models.multitask module</a></li>
-<li><a class="reference internal" href="#deepchem-models-sequential-module">deepchem.models.sequential module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.models">deepchem.models.models module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.multitask">deepchem.models.multitask module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.sequential">deepchem.models.sequential module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -128,114 +128,74 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="deepchem.models.autoencoder_models.html">deepchem.models.autoencoder_models package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#deepchem-models-autoencoder-models-autoencoder-module">deepchem.models.autoencoder_models.autoencoder module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#deepchem-models-autoencoder-models-model-module">deepchem.models.autoencoder_models.model module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#deepchem-models-autoencoder-models-test-tensorflowencoders-module">deepchem.models.autoencoder_models.test_tensorflowEncoders module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#module-deepchem.models.autoencoder_models.autoencoder">deepchem.models.autoencoder_models.autoencoder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#module-deepchem.models.autoencoder_models.model">deepchem.models.autoencoder_models.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#module-deepchem.models.autoencoder_models.test_tensorflowEncoders">deepchem.models.autoencoder_models.test_tensorflowEncoders module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.autoencoder_models.html#module-deepchem.models.autoencoder_models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="deepchem.models.sklearn_models.html">deepchem.models.sklearn_models package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.sklearn_models.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.sklearn_models.html#module-deepchem.models.sklearn_models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="deepchem.models.tensorflow_models.html">deepchem.models.tensorflow_models package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="deepchem.models.tensorflow_models.tests.html">deepchem.models.tensorflow_models.tests package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorflow_models.tests.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorflow_models.tests.html#deepchem-models-tensorflow-models-tests-test-progressive-module">deepchem.models.tensorflow_models.tests.test_progressive module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorflow_models.tests.html#deepchem-models-tensorflow-models-tests-test-utils-module">deepchem.models.tensorflow_models.tests.test_utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorflow_models.tests.html#module-contents">Module contents</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#subpackages">Subpackages</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#deepchem-models-tensorflow-models-irv-module">deepchem.models.tensorflow_models.IRV module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#deepchem-models-tensorflow-models-fcnet-module">deepchem.models.tensorflow_models.fcnet module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#deepchem-models-tensorflow-models-lr-module">deepchem.models.tensorflow_models.lr module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#deepchem-models-tensorflow-models-progressive-joint-module">deepchem.models.tensorflow_models.progressive_joint module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#deepchem-models-tensorflow-models-progressive-multitask-module">deepchem.models.tensorflow_models.progressive_multitask module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#deepchem-models-tensorflow-models-robust-multitask-module">deepchem.models.tensorflow_models.robust_multitask module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#deepchem-models-tensorflow-models-utils-module">deepchem.models.tensorflow_models.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-deepchem.models.tensorflow_models.IRV">deepchem.models.tensorflow_models.IRV module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-deepchem.models.tensorflow_models.fcnet">deepchem.models.tensorflow_models.fcnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-deepchem.models.tensorflow_models.lr">deepchem.models.tensorflow_models.lr module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-deepchem.models.tensorflow_models.progressive_joint">deepchem.models.tensorflow_models.progressive_joint module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-deepchem.models.tensorflow_models.progressive_multitask">deepchem.models.tensorflow_models.progressive_multitask module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-deepchem.models.tensorflow_models.robust_multitask">deepchem.models.tensorflow_models.robust_multitask module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-deepchem.models.tensorflow_models.utils">deepchem.models.tensorflow_models.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorflow_models.html#module-deepchem.models.tensorflow_models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="deepchem.models.tensorgraph.html">deepchem.models.tensorgraph package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deepchem.models.tensorgraph.models.html">deepchem.models.tensorgraph.models package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-atomic-conv-module">deepchem.models.tensorgraph.models.atomic_conv module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-gan-module">deepchem.models.tensorgraph.models.gan module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-graph-models-module">deepchem.models.tensorgraph.models.graph_models module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-robust-multitask-module">deepchem.models.tensorgraph.models.robust_multitask module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-seqtoseq-module">deepchem.models.tensorgraph.models.seqtoseq module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-symmetry-function-regression-module">deepchem.models.tensorgraph.models.symmetry_function_regression module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-test-graph-models-module">deepchem.models.tensorgraph.models.test_graph_models module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-test-symmetry-functions-module">deepchem.models.tensorgraph.models.test_symmetry_functions module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#deepchem-models-tensorgraph-models-text-cnn-module">deepchem.models.tensorgraph.models.text_cnn module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-contents">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html">deepchem.models.tensorgraph.tests package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#deepchem-models-tensorgraph-tests-test-gan-module">deepchem.models.tensorgraph.tests.test_gan module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#deepchem-models-tensorgraph-tests-test-layers-module">deepchem.models.tensorgraph.tests.test_layers module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#deepchem-models-tensorgraph-tests-test-layers-pickle-module">deepchem.models.tensorgraph.tests.test_layers_pickle module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#deepchem-models-tensorgraph-tests-test-nbr-list-module">deepchem.models.tensorgraph.tests.test_nbr_list module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#deepchem-models-tensorgraph-tests-test-optimizers-module">deepchem.models.tensorgraph.tests.test_optimizers module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#deepchem-models-tensorgraph-tests-test-seqtoseq-module">deepchem.models.tensorgraph.tests.test_seqtoseq module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#deepchem-models-tensorgraph-tests-test-tensor-graph-module">deepchem.models.tensorgraph.tests.test_tensor_graph module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.tests.html#module-contents">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.atomic_conv">deepchem.models.tensorgraph.models.atomic_conv module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.gan">deepchem.models.tensorgraph.models.gan module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.graph_models">deepchem.models.tensorgraph.models.graph_models module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.robust_multitask">deepchem.models.tensorgraph.models.robust_multitask module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.seqtoseq">deepchem.models.tensorgraph.models.seqtoseq module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.symmetry_function_regression">deepchem.models.tensorgraph.models.symmetry_function_regression module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.test_graph_models">deepchem.models.tensorgraph.models.test_graph_models module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.test_symmetry_functions">deepchem.models.tensorgraph.models.test_symmetry_functions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models.text_cnn">deepchem.models.tensorgraph.models.text_cnn module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tensorgraph.models.html#module-deepchem.models.tensorgraph.models">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#deepchem-models-tensorgraph-graph-layers-module">deepchem.models.tensorgraph.graph_layers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#deepchem-models-tensorgraph-layers-module">deepchem.models.tensorgraph.layers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#deepchem-models-tensorgraph-optimizers-module">deepchem.models.tensorgraph.optimizers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#deepchem-models-tensorgraph-symmetry-functions-module">deepchem.models.tensorgraph.symmetry_functions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#deepchem-models-tensorgraph-tensor-graph-module">deepchem.models.tensorgraph.tensor_graph module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#module-contents">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="deepchem.models.tests.html">deepchem.models.tests package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#deepchem-models-tests-test-api-module">deepchem.models.tests.test_api module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#deepchem-models-tests-test-generalize-module">deepchem.models.tests.test_generalize module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#deepchem-models-tests-test-multitask-module">deepchem.models.tests.test_multitask module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#deepchem-models-tests-test-overfit-module">deepchem.models.tests.test_overfit module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#deepchem-models-tests-test-predict-module">deepchem.models.tests.test_predict module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#deepchem-models-tests-test-reload-module">deepchem.models.tests.test_reload module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#deepchem-models-tests-test-sequential-module">deepchem.models.tests.test_sequential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#deepchem-models-tests-test-singletask-to-multitask-module">deepchem.models.tests.test_singletask_to_multitask module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tests.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#module-deepchem.models.tensorgraph.graph_layers">deepchem.models.tensorgraph.graph_layers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#module-deepchem.models.tensorgraph.layers">deepchem.models.tensorgraph.layers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#module-deepchem.models.tensorgraph.optimizers">deepchem.models.tensorgraph.optimizers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#module-deepchem.models.tensorgraph.symmetry_functions">deepchem.models.tensorgraph.symmetry_functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#module-deepchem.models.tensorgraph.tensor_graph">deepchem.models.tensorgraph.tensor_graph module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tensorgraph.html#module-deepchem.models.tensorgraph">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="deepchem.models.tf_new_models.html">deepchem.models.tf_new_models package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="deepchem.models.tf_new_models.tests.html">deepchem.models.tf_new_models.tests package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tf_new_models.tests.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tf_new_models.tests.html#deepchem-models-tf-new-models-tests-test-graph-models-module">deepchem.models.tf_new_models.tests.test_graph_models module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tf_new_models.tests.html#deepchem-models-tf-new-models-tests-test-graph-topology-module">deepchem.models.tf_new_models.tests.test_graph_topology module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tf_new_models.tests.html#deepchem-models-tf-new-models-tests-test-vina-model-module">deepchem.models.tf_new_models.tests.test_vina_model module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="deepchem.models.tf_new_models.tests.html#module-contents">Module contents</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#subpackages">Subpackages</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#deepchem-models-tf-new-models-graph-models-module">deepchem.models.tf_new_models.graph_models module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#deepchem-models-tf-new-models-graph-topology-module">deepchem.models.tf_new_models.graph_topology module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#deepchem-models-tf-new-models-multitask-classifier-module">deepchem.models.tf_new_models.multitask_classifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#deepchem-models-tf-new-models-multitask-regressor-module">deepchem.models.tf_new_models.multitask_regressor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#deepchem-models-tf-new-models-support-classifier-module">deepchem.models.tf_new_models.support_classifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#deepchem-models-tf-new-models-vina-model-module">deepchem.models.tf_new_models.vina_model module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#module-deepchem.models.tf_new_models.graph_models">deepchem.models.tf_new_models.graph_models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#module-deepchem.models.tf_new_models.graph_topology">deepchem.models.tf_new_models.graph_topology module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#module-deepchem.models.tf_new_models.multitask_classifier">deepchem.models.tf_new_models.multitask_classifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#module-deepchem.models.tf_new_models.multitask_regressor">deepchem.models.tf_new_models.multitask_regressor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#module-deepchem.models.tf_new_models.support_classifier">deepchem.models.tf_new_models.support_classifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#module-deepchem.models.tf_new_models.vina_model">deepchem.models.tf_new_models.vina_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.tf_new_models.html#module-deepchem.models.tf_new_models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="deepchem.models.xgboost_models.html">deepchem.models.xgboost_models package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.models.xgboost_models.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.models.xgboost_models.html#module-deepchem.models.xgboost_models">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -244,17 +204,678 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="deepchem-models-models-module">
-<h2>deepchem.models.models module<a class="headerlink" href="#deepchem-models-models-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.models.models">
+<span id="deepchem-models-models-module"></span><h2>deepchem.models.models module<a class="headerlink" href="#module-deepchem.models.models" title="Permalink to this headline">¶</a></h2>
+<p>Contains an abstract base class that supports different ML models.</p>
+<dl class="class">
+<dt id="deepchem.models.models.Model">
+<em class="property">class </em><code class="descclassname">deepchem.models.models.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>model_instance=None</em>, <em>model_dir=None</em>, <em>verbose=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
+<p>Abstract base class for different ML models.</p>
+<dl class="method">
+<dt id="deepchem.models.models.Model.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>nb_epoch=10</em>, <em>batch_size=50</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits a model on data in a Dataset object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.fit_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="deepchem.models.models.Model.get_model_filename">
+<em class="property">static </em><code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.get_model_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.get_num_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of tasks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.models.Model.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="deepchem.models.models.Model.get_params_filename">
+<em class="property">static </em><code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.get_params_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.get_task_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses self to make predictions on provided Dataset object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples,)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.predict_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Do transformers even make sense here?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples, n_classes*n_tasks)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.predict_proba_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions of class probabilities on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/models.html#Model.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.models.Model.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispatcher function for saving.</p>
+<p>Each subclass is responsible for overriding this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.models.Model.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.models.Model.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="deepchem-models-multitask-module">
-<h2>deepchem.models.multitask module<a class="headerlink" href="#deepchem-models-multitask-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.models.multitask">
+<span id="deepchem-models-multitask-module"></span><h2>deepchem.models.multitask module<a class="headerlink" href="#module-deepchem.models.multitask" title="Permalink to this headline">¶</a></h2>
+<p>Convenience class that lets singletask models fit on multitask data.</p>
+<dl class="class">
+<dt id="deepchem.models.multitask.SingletaskToMultitask">
+<em class="property">class </em><code class="descclassname">deepchem.models.multitask.</code><code class="descname">SingletaskToMultitask</code><span class="sig-paren">(</span><em>tasks</em>, <em>model_builder</em>, <em>model_dir=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/multitask.html#SingletaskToMultitask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.models.Model" title="deepchem.models.models.Model"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.models.Model</span></code></a></p>
+<p>Convenience class to let singletask models be fit on multitask data.</p>
+<p>Warning: This current implementation is only functional for sklearn models.</p>
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/multitask.html#SingletaskToMultitask.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates all singletask models with new information.</p>
+<p>Warning: This current implementation is only functional for sklearn models.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of tasks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/multitask.html#SingletaskToMultitask.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prediction for multitask models.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/multitask.html#SingletaskToMultitask.predict_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenates results from all singletask models.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/multitask.html#SingletaskToMultitask.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenates results from all singletask models.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/multitask.html#SingletaskToMultitask.predict_proba_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenates results from all singletask models.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/multitask.html#SingletaskToMultitask.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load all models</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/multitask.html#SingletaskToMultitask.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save all models</p>
+<p>TODO(rbharath): Saving is not yet supported for this model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.multitask.SingletaskToMultitask.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.multitask.SingletaskToMultitask.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="deepchem-models-sequential-module">
-<h2>deepchem.models.sequential module<a class="headerlink" href="#deepchem-models-sequential-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.models.sequential">
+<span id="deepchem-models-sequential-module"></span><h2>deepchem.models.sequential module<a class="headerlink" href="#module-deepchem.models.sequential" title="Permalink to this headline">¶</a></h2>
+<p>Contains Sequential model adapted from keras/keras/models.py.</p>
+<p>This class is adapted from Keras directly. Have cut out functionality
+and changed API to match DeepChem style.</p>
+<dl class="class">
+<dt id="deepchem.models.sequential.Sequential">
+<em class="property">class </em><code class="descclassname">deepchem.models.sequential.</code><code class="descname">Sequential</code><span class="sig-paren">(</span><em>name=None</em>, <em>logdir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.models.Model" title="deepchem.models.models.Model"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.models.Model</span></code></a></p>
+<p>Linear stack of layers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>layers</strong> (<em>list of layers to add to the model.</em>) &#8211; </td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The first layer passed to a Sequential model
+should have a defined input shape. What that
+means is that it should have received an <cite>input_shape</cite>
+or <cite>batch_input_shape</cite> argument,
+or for some type of layers (recurrent, Dense...)
+an <cite>input_dim</cite> argument.</p>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Example</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Sequential</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add features</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">add_features</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add labels</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">add_labels</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a layer instance on top of the layer stack.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>layer</strong> (<em>layer instance.</em>) &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.add_features">
+<code class="descname">add_features</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.add_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.add_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an input layer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.add_labels">
+<code class="descname">add_labels</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.add_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.add_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a layer for labels</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.add_loss">
+<code class="descname">add_loss</code><span class="sig-paren">(</span><em>loss</em>, <em>inputs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.add_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.add_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a loss to model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>losses</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>batch_size=32</em>, <em>verbose=1</em>, <em>sample_weight=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the loss on some input data, batch by batch.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>input data, as a Numpy array or list of Numpy arrays</em>) &#8211; (if the model has multiple inputs).</li>
+<li><strong>y</strong> (<em>labels, as a Numpy array.</em>) &#8211; </li>
+<li><strong>batch_size</strong> (<em>integer. Number of samples per gradient update.</em>) &#8211; </li>
+<li><strong>verbose</strong> (<em>verbosity mode, 0 or 1.</em>) &#8211; </li>
+<li><strong>sample_weight</strong> (<em>sample weights, as a Numpy array.</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>Scalar test loss (if the model has no metrics)</em></li>
+<li><em>or list of scalars (if the model computes other metrics).</em></li>
+<li>The attribute <cite>model.metrics_names</cite> will give you</li>
+<li><em>the display labels for the scalar outputs.</em></li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>nb_epoch=10</em>, <em>max_checkpoints_to_keep=5</em>, <em>log_every_N_batches=50</em>, <em>learning_rate=0.001</em>, <em>batch_size=50</em>, <em>checkpoint_interval=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains the model for a fixed number of epochs.</p>
+<p>TODO(rbharath0: This is mostly copied from TensorflowGraphModel. Should
+eventually refactor both together.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; </li>
+<li><strong>nb_epoch</strong> (<em>10</em>) &#8211; <p>Number of training epochs.
+Dataset object holding training data</p>
+<blockquote>
+<div>batch_size: integer. Number of samples per gradient update.
+nb_epoch: integer, the number of epochs to train the model.
+verbose: 0 for no logging to stdout,<blockquote>
+<div>1 for progress bar logging, 2 for one log line per epoch.</div></blockquote>
+<dl class="docutils">
+<dt>initial_epoch: epoch at which to start training</dt>
+<dd>(useful for resuming a previous training run)</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><strong>checkpoint_interval</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Frequency at which to write checkpoints, measured in epochs</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of tasks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>x</em>, <em>batch_size=32</em>, <em>verbose=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates output predictions for the input samples,
+processing the samples in a batched way.</p>
+<dl class="docutils">
+<dt># Arguments</dt>
+<dd>x: the input data, as a Numpy array.
+batch_size: integer.
+verbose: verbosity mode, 0 or 1.</dd>
+<dt># Returns</dt>
+<dd>A Numpy array of predictions.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.predict_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns predictions for a single batch of samples.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>x</em>, <em>batch_size=32</em>, <em>verbose=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates class probability predictions for the input samples
+batch by batch.</p>
+<dl class="docutils">
+<dt># Arguments</dt>
+<dd><dl class="first docutils">
+<dt>x: input data, as a Numpy array or list of Numpy arrays</dt>
+<dd>(if the model has multiple inputs).</dd>
+</dl>
+<p class="last">batch_size: integer.
+verbose: verbosity mode, 0 or 1.</p>
+</dd>
+<dt># Returns</dt>
+<dd>A Numpy array of probability predictions.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions of class probabilities on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispatcher function for saving.</p>
+<p>Each subclass is responsible for overriding this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.sequential.Sequential.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.test_on_batch">
+<code class="descname">test_on_batch</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>sample_weight=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.test_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.test_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the model over a single batch of samples.</p>
+<dl class="docutils">
+<dt># Arguments</dt>
+<dd><dl class="first docutils">
+<dt>x: input data, as a Numpy array or list of Numpy arrays</dt>
+<dd>(if the model has multiple inputs).</dd>
+</dl>
+<p class="last">y: labels, as a Numpy array.
+sample_weight: sample weights, as a Numpy array.</p>
+</dd>
+<dt># Returns</dt>
+<dd>Scalar test loss (if the model has no metrics)
+or list of scalars (if the model computes other metrics).
+The attribute <cite>model.metrics_names</cite> will give you
+the display labels for the scalar outputs.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.sequential.Sequential.train_on_batch">
+<code class="descname">train_on_batch</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>class_weight=None</em>, <em>sample_weight=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/sequential.html#Sequential.train_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.sequential.Sequential.train_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single gradient update over one batch of samples.</p>
+<dl class="docutils">
+<dt># Arguments</dt>
+<dd><dl class="first docutils">
+<dt>x: input data, as a Numpy array or list of Numpy arrays</dt>
+<dd>(if the model has multiple inputs).</dd>
+</dl>
+<p>y: labels, as a Numpy array.
+class_weight: dictionary mapping classes to a weight value,</p>
+<blockquote>
+<div>used for scaling the loss function (during training only).</div></blockquote>
+<p class="last">sample_weight: sample weights, as a Numpy array.</p>
+</dd>
+<dt># Returns</dt>
+<dd>Scalar training loss (if the model has no metrics)
+or list of scalars (if the model computes other metrics).
+The attribute <cite>model.metrics_names</cite> will give you
+the display labels for the scalar outputs.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.models.sequential.Sequential.uses_learning_phase">
+<code class="descname">uses_learning_phase</code><a class="headerlink" href="#deepchem.models.sequential.Sequential.uses_learning_phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.models" title="Permalink to this headline">¶</a></h2>
+<p>Gathers all models in one place for convenient imports</p>
 </div>
 </div>
 

@@ -29,8 +29,7 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="deepchem 1.2 documentation" href="index.html" />
     <link rel="up" title="deepchem package" href="deepchem.html" />
-    <link rel="next" title="deepchem.utils.test package" href="deepchem.utils.test.html" />
-    <link rel="prev" title="deepchem.trans.tests package" href="deepchem.trans.tests.html" />
+    <link rel="prev" title="deepchem.trans package" href="deepchem.trans.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -85,13 +84,13 @@
 <li><a class="reference internal" href="#">deepchem.utils package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#deepchem-utils-conformers-module">deepchem.utils.conformers module</a></li>
-<li><a class="reference internal" href="#deepchem-utils-evaluate-module">deepchem.utils.evaluate module</a></li>
-<li><a class="reference internal" href="#deepchem-utils-mol-xyz-util-module">deepchem.utils.mol_xyz_util module</a></li>
-<li><a class="reference internal" href="#deepchem-utils-rdkit-util-module">deepchem.utils.rdkit_util module</a></li>
-<li><a class="reference internal" href="#deepchem-utils-save-module">deepchem.utils.save module</a></li>
-<li><a class="reference internal" href="#deepchem-utils-visualization-module">deepchem.utils.visualization module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.conformers">deepchem.utils.conformers module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.evaluate">deepchem.utils.evaluate module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.mol_xyz_util">deepchem.utils.mol_xyz_util module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.rdkit_util">deepchem.utils.rdkit_util module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.save">deepchem.utils.save module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils.visualization">deepchem.utils.visualization module</a></li>
+<li><a class="reference internal" href="#module-deepchem.utils">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -128,40 +127,603 @@
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="deepchem.utils.test.html">deepchem.utils.test package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.utils.test.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.utils.test.html#deepchem-utils-test-test-generator-evaluator-module">deepchem.utils.test.test_generator_evaluator module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.utils.test.html#deepchem-utils-test-test-rdkit-util-module">deepchem.utils.test.test_rdkit_util module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.utils.test.html#module-contents">Module contents</a></li>
-</ul>
-</li>
+<ul class="simple">
 </ul>
 </div>
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="deepchem-utils-conformers-module">
-<h2>deepchem.utils.conformers module<a class="headerlink" href="#deepchem-utils-conformers-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.utils.conformers">
+<span id="deepchem-utils-conformers-module"></span><h2>deepchem.utils.conformers module<a class="headerlink" href="#module-deepchem.utils.conformers" title="Permalink to this headline">¶</a></h2>
+<p>Conformer generation.</p>
+<dl class="class">
+<dt id="deepchem.utils.conformers.ConformerGenerator">
+<em class="property">class </em><code class="descclassname">deepchem.utils.conformers.</code><code class="descname">ConformerGenerator</code><span class="sig-paren">(</span><em>max_conformers=1</em>, <em>rmsd_threshold=0.5</em>, <em>force_field='uff'</em>, <em>pool_multiplier=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate molecule conformers.</p>
+<ol class="arabic simple">
+<li>Generate a pool of conformers.</li>
+<li>Minimize conformers.</li>
+<li>Prune conformers using an RMSD threshold.</li>
+</ol>
+<p>Note that pruning is done _after_ minimization, which differs from the
+protocol described in the references.</p>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><a class="reference external" href="http://rdkit.org/docs/GettingStartedInPython.html">http://rdkit.org/docs/GettingStartedInPython.html</a>
+#working-with-3d-molecules</li>
+<li><a class="reference external" href="http://pubs.acs.org/doi/full/10.1021/ci2004658">http://pubs.acs.org/doi/full/10.1021/ci2004658</a></li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>max_conformers</strong> (<em>int, optional (default 1)</em>) &#8211; Maximum number of conformers to generate (after pruning).</li>
+<li><strong>rmsd_threshold</strong> (<em>float, optional (default 0.5)</em>) &#8211; RMSD threshold for pruning conformers. If None or negative, no
+pruning is performed.</li>
+<li><strong>force_field</strong> (<em>str, optional (default 'uff')</em>) &#8211; Force field to use for conformer energy calculation and
+minimization. Options are &#8216;uff&#8217;, &#8216;mmff94&#8217;, and &#8216;mmff94s&#8217;.</li>
+<li><strong>pool_multiplier</strong> (<em>int, optional (default 10)</em>) &#8211; Factor to multiply by max_conformers to generate the initial
+conformer pool. Since conformers are pruned after energy
+minimization, increasing the size of the pool increases the chance
+of identifying max_conformers unique conformers.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.utils.conformers.ConformerGenerator.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate conformers for a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<em>RDKit Mol</em>) &#8211; Molecule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.conformers.ConformerGenerator.embed_molecule">
+<code class="descname">embed_molecule</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator.embed_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator.embed_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate conformers, possibly with pruning.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<em>RDKit Mol</em>) &#8211; Molecule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.conformers.ConformerGenerator.generate_conformers">
+<code class="descname">generate_conformers</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator.generate_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator.generate_conformers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate conformers for a molecule.</p>
+<p>This function returns a copy of the original molecule with embedded
+conformers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<em>RDKit Mol</em>) &#8211; Molecule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.conformers.ConformerGenerator.get_conformer_energies">
+<code class="descname">get_conformer_energies</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator.get_conformer_energies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator.get_conformer_energies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate conformer energies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<em>RDKit Mol</em>) &#8211; Molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>energies</strong> &#8211;
+Minimized conformer energies.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array_like</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="deepchem.utils.conformers.ConformerGenerator.get_conformer_rmsd">
+<em class="property">static </em><code class="descname">get_conformer_rmsd</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator.get_conformer_rmsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator.get_conformer_rmsd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate conformer-conformer RMSD.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<em>RDKit Mol</em>) &#8211; Molecule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.conformers.ConformerGenerator.get_molecule_force_field">
+<code class="descname">get_molecule_force_field</code><span class="sig-paren">(</span><em>mol</em>, <em>conf_id=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator.get_molecule_force_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator.get_molecule_force_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a force field for a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<em>RDKit Mol</em>) &#8211; Molecule.</li>
+<li><strong>conf_id</strong> (<em>int, optional</em>) &#8211; ID of the conformer to associate with the force field.</li>
+<li><strong>kwargs</strong> (<em>dict, optional</em>) &#8211; Keyword arguments for force field constructor.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.conformers.ConformerGenerator.minimize_conformers">
+<code class="descname">minimize_conformers</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator.minimize_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator.minimize_conformers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimize molecule conformers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<em>RDKit Mol</em>) &#8211; Molecule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.conformers.ConformerGenerator.prune_conformers">
+<code class="descname">prune_conformers</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/conformers.html#ConformerGenerator.prune_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.conformers.ConformerGenerator.prune_conformers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prune conformers from a molecule using an RMSD threshold, starting
+with the lowest energy conformer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<em>RDKit Mol</em>) &#8211; Molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><em>A new RDKit Mol containing the chosen conformers, sorted by</em></li>
+<li><em>increasing energy.</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="deepchem-utils-evaluate-module">
-<h2>deepchem.utils.evaluate module<a class="headerlink" href="#deepchem-utils-evaluate-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.utils.evaluate">
+<span id="deepchem-utils-evaluate-module"></span><h2>deepchem.utils.evaluate module<a class="headerlink" href="#module-deepchem.utils.evaluate" title="Permalink to this headline">¶</a></h2>
+<p>Utility functions to evaluate models on datasets.</p>
+<dl class="class">
+<dt id="deepchem.utils.evaluate.Evaluator">
+<em class="property">class </em><code class="descclassname">deepchem.utils.evaluate.</code><code class="descname">Evaluator</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>transformers</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/evaluate.html#Evaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.evaluate.Evaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class that evaluates a model on a given dataset.</p>
+<dl class="method">
+<dt id="deepchem.utils.evaluate.Evaluator.compute_model_performance">
+<code class="descname">compute_model_performance</code><span class="sig-paren">(</span><em>metrics</em>, <em>csv_out=None</em>, <em>stats_out=None</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/evaluate.html#Evaluator.compute_model_performance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.evaluate.Evaluator.compute_model_performance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes statistics of model on test data and saves results to csv.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of dc.metrics.Metric objects</li>
+<li><strong>csv_out</strong> (<em>str, optional</em>) &#8211; Filename to write CSV of model predictions.</li>
+<li><strong>stats_out</strong> (<em>str, optional</em>) &#8211; Filename to write computed statistics.</li>
+<li><strong>per_task_metrics</strong> (<em>bool, optional</em>) &#8211; If true, return computed metric for each task on multitask dataset.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.evaluate.Evaluator.output_predictions">
+<code class="descname">output_predictions</code><span class="sig-paren">(</span><em>y_preds</em>, <em>csv_out</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/evaluate.html#Evaluator.output_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.evaluate.Evaluator.output_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes predictions to file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>y_preds</strong> &#8211; np.ndarray</li>
+<li><strong>csvfile</strong> &#8211; Open file object.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.evaluate.Evaluator.output_statistics">
+<code class="descname">output_statistics</code><span class="sig-paren">(</span><em>scores</em>, <em>stats_out</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/evaluate.html#Evaluator.output_statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.evaluate.Evaluator.output_statistics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write computed stats to file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.utils.evaluate.GeneratorEvaluator">
+<em class="property">class </em><code class="descclassname">deepchem.utils.evaluate.</code><code class="descname">GeneratorEvaluator</code><span class="sig-paren">(</span><em>model</em>, <em>generator</em>, <em>transformers</em>, <em>labels</em>, <em>outputs=None</em>, <em>n_tasks=1</em>, <em>n_classes=2</em>, <em>weights=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/evaluate.html#GeneratorEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.evaluate.GeneratorEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Partner class to Evaluator.
+Instead of operating over datasets this class operates over Generator.
+Evaluate a Metric over a model and Generator.</p>
+<dl class="method">
+<dt id="deepchem.utils.evaluate.GeneratorEvaluator.compute_model_performance">
+<code class="descname">compute_model_performance</code><span class="sig-paren">(</span><em>metrics</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/evaluate.html#GeneratorEvaluator.compute_model_performance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.evaluate.GeneratorEvaluator.compute_model_performance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes statistics of model on test data and saves results to csv.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of dc.metrics.Metric objects</li>
+<li><strong>per_task_metrics</strong> (<em>bool, optional</em>) &#8211; If true, return computed metric for each task on multitask dataset.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.evaluate.relative_difference">
+<code class="descclassname">deepchem.utils.evaluate.</code><code class="descname">relative_difference</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/evaluate.html#relative_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.evaluate.relative_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the relative difference between x and y</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.evaluate.threshold_predictions">
+<code class="descclassname">deepchem.utils.evaluate.</code><code class="descname">threshold_predictions</code><span class="sig-paren">(</span><em>y</em>, <em>threshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/evaluate.html#threshold_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.evaluate.threshold_predictions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="deepchem-utils-mol-xyz-util-module">
-<h2>deepchem.utils.mol_xyz_util module<a class="headerlink" href="#deepchem-utils-mol-xyz-util-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.utils.mol_xyz_util">
+<span id="deepchem-utils-mol-xyz-util-module"></span><h2>deepchem.utils.mol_xyz_util module<a class="headerlink" href="#module-deepchem.utils.mol_xyz_util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="deepchem.utils.mol_xyz_util.get_molecule_centroid">
+<code class="descclassname">deepchem.utils.mol_xyz_util.</code><code class="descname">get_molecule_centroid</code><span class="sig-paren">(</span><em>molecule_xyz</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/mol_xyz_util.html#get_molecule_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.mol_xyz_util.get_molecule_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses compute centroid and range of 3D coordinents</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.mol_xyz_util.get_molecule_range">
+<code class="descclassname">deepchem.utils.mol_xyz_util.</code><code class="descname">get_molecule_range</code><span class="sig-paren">(</span><em>molecule_xyz</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/mol_xyz_util.html#get_molecule_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.mol_xyz_util.get_molecule_range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="deepchem-utils-rdkit-util-module">
-<h2>deepchem.utils.rdkit_util module<a class="headerlink" href="#deepchem-utils-rdkit-util-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.utils.rdkit_util">
+<span id="deepchem-utils-rdkit-util-module"></span><h2>deepchem.utils.rdkit_util module<a class="headerlink" href="#module-deepchem.utils.rdkit_util" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="deepchem.utils.rdkit_util.MoleculeLoadException">
+<em class="property">exception </em><code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">MoleculeLoadException</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#MoleculeLoadException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.MoleculeLoadException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></a></p>
+<dl class="attribute">
+<dt id="deepchem.utils.rdkit_util.MoleculeLoadException.args">
+<code class="descname">args</code><a class="headerlink" href="#deepchem.utils.rdkit_util.MoleculeLoadException.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.utils.rdkit_util.MoleculeLoadException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.utils.rdkit_util.MoleculeLoadException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.utils.rdkit_util.PdbqtLigandWriter">
+<em class="property">class </em><code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">PdbqtLigandWriter</code><span class="sig-paren">(</span><em>mol</em>, <em>outfile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#PdbqtLigandWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.PdbqtLigandWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Create a torsion tree and write to pdbqt file</p>
+<dl class="method">
+<dt id="deepchem.utils.rdkit_util.PdbqtLigandWriter.convert">
+<code class="descname">convert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#PdbqtLigandWriter.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.PdbqtLigandWriter.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>The single public function of this class.
+It converts a molecule and a pdb file into a pdbqt file stored in outfile</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.add_hydrogens_to_mol">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">add_hydrogens_to_mol</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#add_hydrogens_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.add_hydrogens_to_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add hydrogens to a molecule object
+TODO (LESWING) see if there are more flags to add here for default
+:param mol: Rdkit Mol
+:return: Rdkit Mol</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.compute_charges">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">compute_charges</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#compute_charges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.compute_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to compute Gasteiger Charges on Mol
+This also has the side effect of calculating charges on mol.
+The mol passed into this function has to already have been sanitized
+:param mol: rdkit molecule
+:return: molecule with charges</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.get_xyz_from_mol">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">get_xyz_from_mol</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#get_xyz_from_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.get_xyz_from_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns an m x 3 np array of 3d coords
+of given rdkit molecule</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.load_molecule">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">load_molecule</code><span class="sig-paren">(</span><em>molecule_file</em>, <em>add_hydrogens=True</em>, <em>calc_charges=True</em>, <em>sanitize=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#load_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.load_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts molecule file to (xyz-coords, obmol object)</p>
+<p>Given molecule_file, returns a tuple of xyz coords of molecule
+and an rdkit object representing that molecule
+:param molecule_file: filename for molecule
+:param add_hydrogens: should add hydrogens via pdbfixer?
+:param calc_charges: should add charges vis rdkit
+:return: (xyz, mol)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.merge_molecules">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">merge_molecules</code><span class="sig-paren">(</span><em>ligand</em>, <em>protein</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#merge_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.merge_molecules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.merge_molecules_xyz">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">merge_molecules_xyz</code><span class="sig-paren">(</span><em>protein_xyz</em>, <em>ligand_xyz</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#merge_molecules_xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.merge_molecules_xyz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges coordinates of protein and ligand.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.pdbqt_file_hack_ligand">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">pdbqt_file_hack_ligand</code><span class="sig-paren">(</span><em>mol</em>, <em>outfile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#pdbqt_file_hack_ligand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.pdbqt_file_hack_ligand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hack to convert a pdb ligand into a pdbqt ligand
+:param mol: rdkit Mol Object
+:param outfile: filename which already has a valid pdb representation of mol</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.pdbqt_file_hack_protein">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">pdbqt_file_hack_protein</code><span class="sig-paren">(</span><em>mol</em>, <em>outfile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#pdbqt_file_hack_protein"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.pdbqt_file_hack_protein" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hack to convert a pdb protein into a pdbqt protein
+:param mol: rdkit Mol of protein
+:param outfile: filename which already has a valid pdb representation of mol</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.pdbqt_to_pdb">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">pdbqt_to_pdb</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#pdbqt_to_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.pdbqt_to_pdb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.rdkit_util.write_molecule">
+<code class="descclassname">deepchem.utils.rdkit_util.</code><code class="descname">write_molecule</code><span class="sig-paren">(</span><em>mol</em>, <em>outfile</em>, <em>is_protein=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/rdkit_util.html#write_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.rdkit_util.write_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Write molecule to a file</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> &#8211; rdkit Mol object</li>
+<li><strong>outfile</strong> &#8211; filename to write mol to</li>
+<li><strong>is_protein</strong> &#8211; is this molecule a protein?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="deepchem-utils-save-module">
-<h2>deepchem.utils.save module<a class="headerlink" href="#deepchem-utils-save-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.utils.save">
+<span id="deepchem-utils-save-module"></span><h2>deepchem.utils.save module<a class="headerlink" href="#module-deepchem.utils.save" title="Permalink to this headline">¶</a></h2>
+<p>Simple utils to save and load from disk.</p>
+<dl class="function">
+<dt id="deepchem.utils.save.get_input_type">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">get_input_type</code><span class="sig-paren">(</span><em>input_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#get_input_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.get_input_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get type of input file. Must be csv/pkl.gz/sdf file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.load_csv_files">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">load_csv_files</code><span class="sig-paren">(</span><em>filenames</em>, <em>shard_size=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#load_csv_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.load_csv_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load data as pandas dataframe.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.load_data">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">load_data</code><span class="sig-paren">(</span><em>input_files</em>, <em>shard_size=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#load_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data from disk.</p>
+<p>For CSV files, supports sharded loading for large files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.load_dataset_from_disk">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">load_dataset_from_disk</code><span class="sig-paren">(</span><em>save_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#load_dataset_from_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.load_dataset_from_disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.load_from_disk">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">load_from_disk</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#load_from_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.load_from_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a dataset from file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.load_pickle_from_disk">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">load_pickle_from_disk</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#load_pickle_from_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.load_pickle_from_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load dataset from pickle file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.load_sdf_files">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">load_sdf_files</code><span class="sig-paren">(</span><em>input_files</em>, <em>clean_mols</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#load_sdf_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.load_sdf_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load SDF file into dataframe.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.load_sharded_csv">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">load_sharded_csv</code><span class="sig-paren">(</span><em>filenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#load_sharded_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.load_sharded_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a dataset from multiple files. Each file MUST have same column headers</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.log">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">log</code><span class="sig-paren">(</span><em>string</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print string if verbose.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.save_dataset_to_disk">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">save_dataset_to_disk</code><span class="sig-paren">(</span><em>save_dir</em>, <em>train</em>, <em>valid</em>, <em>test</em>, <em>transformers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#save_dataset_to_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.save_dataset_to_disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.save_metadata">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">save_metadata</code><span class="sig-paren">(</span><em>tasks</em>, <em>metadata_df</em>, <em>data_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#save_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.save_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the metadata for a DiskDataset
+:param tasks: Tasks of DiskDataset
+:type tasks: list of str
+:param metadata_df:
+:type metadata_df: pd.DataFrame
+:param data_dir: Directory to store metadata
+:type data_dir: str</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.save.save_to_disk">
+<code class="descclassname">deepchem.utils.save.</code><code class="descname">save_to_disk</code><span class="sig-paren">(</span><em>dataset</em>, <em>filename</em>, <em>compress=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils/save.html#save_to_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.save.save_to_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a dataset to file.</p>
+</dd></dl>
+
 </div>
-<div class="section" id="deepchem-utils-visualization-module">
-<h2>deepchem.utils.visualization module<a class="headerlink" href="#deepchem-utils-visualization-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.utils.visualization">
+<span id="deepchem-utils-visualization-module"></span><h2>deepchem.utils.visualization module<a class="headerlink" href="#module-deepchem.utils.visualization" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.utils" title="Permalink to this headline">¶</a></h2>
+<p>Miscellaneous utility functions.</p>
+<dl class="class">
+<dt id="deepchem.utils.ScaffoldGenerator">
+<em class="property">class </em><code class="descclassname">deepchem.utils.</code><code class="descname">ScaffoldGenerator</code><span class="sig-paren">(</span><em>include_chirality=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils.html#ScaffoldGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.ScaffoldGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate molecular scaffolds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>include_chirality</strong> (<em>: bool, optional (default False)</em>) &#8211; Include chirality in scaffolds.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.utils.ScaffoldGenerator.get_scaffold">
+<code class="descname">get_scaffold</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils.html#ScaffoldGenerator.get_scaffold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.ScaffoldGenerator.get_scaffold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Murcko scaffolds for molecules.</p>
+<p>Murcko scaffolds are described in DOI: 10.1021/jm9602928. They are
+essentially that part of the molecule consisting of rings and the
+linker atoms between them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mols</strong> (<em>array_like</em>) &#8211; Molecules.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.download_url">
+<code class="descclassname">deepchem.utils.</code><code class="descname">download_url</code><span class="sig-paren">(</span><em>url</em>, <em>dest_dir='/tmp'</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils.html#download_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.download_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a file to disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the URL to download from</li>
+<li><strong>dest_dir</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the directory to save the file in</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the file name to save it as.  If omitted, it will try to extract a file name from the URL</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.get_data_dir">
+<code class="descclassname">deepchem.utils.</code><code class="descname">get_data_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils.html#get_data_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.get_data_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the DeepChem data directory.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.pad_array">
+<code class="descclassname">deepchem.utils.</code><code class="descname">pad_array</code><span class="sig-paren">(</span><em>x</em>, <em>shape</em>, <em>fill=0</em>, <em>both=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils.html#pad_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.pad_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pad an array with a fill value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<em>ndarray</em>) &#8211; Matrix.</li>
+<li><strong>shape</strong> (<em>tuple or int</em>) &#8211; Desired shape. If int, all dimensions are padded to that size.</li>
+<li><strong>fill</strong> (<em>object, optional (default 0)</em>) &#8211; Fill value.</li>
+<li><strong>both</strong> (<em>bool, optional (default False)</em>) &#8211; If True, split the padding on both sides of each axis. If False,
+padding is applied to the end of each axis.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.utils.untargz_file">
+<code class="descclassname">deepchem.utils.</code><code class="descname">untargz_file</code><span class="sig-paren">(</span><em>file</em>, <em>dest_dir='/tmp'</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/utils.html#untargz_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.utils.untargz_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Untar and unzip a .tar.gz file to disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the filepath to decompress</li>
+<li><strong>dest_dir</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the directory to save the file in</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the file name to save it as.  If omitted, it will use the file name</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 

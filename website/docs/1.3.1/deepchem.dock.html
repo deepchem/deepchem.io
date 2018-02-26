@@ -29,8 +29,8 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="deepchem 1.2 documentation" href="index.html" />
     <link rel="up" title="deepchem package" href="deepchem.html" />
-    <link rel="next" title="deepchem.dock.tests package" href="deepchem.dock.tests.html" />
-    <link rel="prev" title="deepchem.data.tests package" href="deepchem.data.tests.html" />
+    <link rel="next" title="deepchem.feat package" href="deepchem.feat.html" />
+    <link rel="prev" title="deepchem.data package" href="deepchem.data.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -85,11 +85,11 @@
 <li><a class="reference internal" href="#">deepchem.dock package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#deepchem-dock-binding-pocket-module">deepchem.dock.binding_pocket module</a></li>
-<li><a class="reference internal" href="#deepchem-dock-docking-module">deepchem.dock.docking module</a></li>
-<li><a class="reference internal" href="#deepchem-dock-pose-generation-module">deepchem.dock.pose_generation module</a></li>
-<li><a class="reference internal" href="#deepchem-dock-pose-scoring-module">deepchem.dock.pose_scoring module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-deepchem.dock.binding_pocket">deepchem.dock.binding_pocket module</a></li>
+<li><a class="reference internal" href="#module-deepchem.dock.docking">deepchem.dock.docking module</a></li>
+<li><a class="reference internal" href="#module-deepchem.dock.pose_generation">deepchem.dock.pose_generation module</a></li>
+<li><a class="reference internal" href="#module-deepchem.dock.pose_scoring">deepchem.dock.pose_scoring module</a></li>
+<li><a class="reference internal" href="#module-deepchem.dock">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -126,36 +126,222 @@
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="deepchem.dock.tests.html">deepchem.dock.tests package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.dock.tests.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.dock.tests.html#deepchem-dock-tests-test-binding-pocket-module">deepchem.dock.tests.test_binding_pocket module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.dock.tests.html#deepchem-dock-tests-test-docking-module">deepchem.dock.tests.test_docking module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.dock.tests.html#deepchem-dock-tests-test-pose-generation-module">deepchem.dock.tests.test_pose_generation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.dock.tests.html#deepchem-dock-tests-test-pose-scoring-module">deepchem.dock.tests.test_pose_scoring module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deepchem.dock.tests.html#module-contents">Module contents</a></li>
-</ul>
-</li>
+<ul class="simple">
 </ul>
 </div>
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="deepchem-dock-binding-pocket-module">
-<h2>deepchem.dock.binding_pocket module<a class="headerlink" href="#deepchem-dock-binding-pocket-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.dock.binding_pocket">
+<span id="deepchem-dock-binding-pocket-module"></span><h2>deepchem.dock.binding_pocket module<a class="headerlink" href="#module-deepchem.dock.binding_pocket" title="Permalink to this headline">¶</a></h2>
+<p>Computes putative binding pockets on protein.</p>
+<dl class="class">
+<dt id="deepchem.dock.binding_pocket.BindingPocketFinder">
+<em class="property">class </em><code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">BindingPocketFinder</code><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#BindingPocketFinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.BindingPocketFinder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Abstract superclass for binding pocket detectors</p>
+<dl class="method">
+<dt id="deepchem.dock.binding_pocket.BindingPocketFinder.find_pockets">
+<code class="descname">find_pockets</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#BindingPocketFinder.find_pockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.BindingPocketFinder.find_pockets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds potential binding pockets in proteins.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.dock.binding_pocket.ConvexHullPocketFinder">
+<em class="property">class </em><code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">ConvexHullPocketFinder</code><span class="sig-paren">(</span><em>pad=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#ConvexHullPocketFinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.ConvexHullPocketFinder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.dock.binding_pocket.BindingPocketFinder" title="deepchem.dock.binding_pocket.BindingPocketFinder"><code class="xref py py-class docutils literal"><span class="pre">deepchem.dock.binding_pocket.BindingPocketFinder</span></code></a></p>
+<p>Implementation that uses convex hull of protein to find pockets.</p>
+<p>Based on <a class="reference external" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4112621/pdf/1472-6807-14-18.pdf">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4112621/pdf/1472-6807-14-18.pdf</a></p>
+<dl class="method">
+<dt id="deepchem.dock.binding_pocket.ConvexHullPocketFinder.find_all_pockets">
+<code class="descname">find_all_pockets</code><span class="sig-paren">(</span><em>protein_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#ConvexHullPocketFinder.find_all_pockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.ConvexHullPocketFinder.find_all_pockets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find list of binding pockets on protein.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.dock.binding_pocket.ConvexHullPocketFinder.find_pockets">
+<code class="descname">find_pockets</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#ConvexHullPocketFinder.find_pockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.ConvexHullPocketFinder.find_pockets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find list of suitable binding pockets on protein.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.dock.binding_pocket.RFConvexHullPocketFinder">
+<em class="property">class </em><code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">RFConvexHullPocketFinder</code><span class="sig-paren">(</span><em>pad=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#RFConvexHullPocketFinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.RFConvexHullPocketFinder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.dock.binding_pocket.BindingPocketFinder" title="deepchem.dock.binding_pocket.BindingPocketFinder"><code class="xref py py-class docutils literal"><span class="pre">deepchem.dock.binding_pocket.BindingPocketFinder</span></code></a></p>
+<p>Uses pre-trained RF model + ConvexHulPocketFinder to select pockets.</p>
+<dl class="method">
+<dt id="deepchem.dock.binding_pocket.RFConvexHullPocketFinder.find_pockets">
+<code class="descname">find_pockets</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#RFConvexHullPocketFinder.find_pockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.RFConvexHullPocketFinder.find_pockets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute features for a given complex</p>
+<p>TODO(rbharath): This has a log of code overlap with
+compute_binding_pocket_features in
+examples/binding_pockets/binding_pocket_datasets.py. Find way to refactor
+to avoid code duplication.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.dock.binding_pocket.boxes_to_atoms">
+<code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">boxes_to_atoms</code><span class="sig-paren">(</span><em>atom_coords</em>, <em>boxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#boxes_to_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.boxes_to_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps each box to a list of atoms in that box.</p>
+<p>TODO(rbharath): This does a num_atoms x num_boxes computations. Is
+there a reasonable heuristic we can use to speed this up?</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.dock.binding_pocket.compute_overlap">
+<code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">compute_overlap</code><span class="sig-paren">(</span><em>mapping</em>, <em>box1</em>, <em>box2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#compute_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.compute_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes overlap between the two boxes.</p>
+<p>Overlap is defined as % atoms of box1 in box2. Note that
+overlap is not a symmetric measurement.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.dock.binding_pocket.extract_active_site">
+<code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">extract_active_site</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em>, <em>cutoff=4</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#extract_active_site"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.extract_active_site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts a box for the active site.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.dock.binding_pocket.get_all_boxes">
+<code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">get_all_boxes</code><span class="sig-paren">(</span><em>coords</em>, <em>pad=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#get_all_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.get_all_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all pocket boxes for protein coords.</p>
+<p>We pad all boxes the prescribed number of angstroms.</p>
+<p>TODO(rbharath): It looks like this may perhaps be non-deterministic?</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.dock.binding_pocket.merge_boxes">
+<code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">merge_boxes</code><span class="sig-paren">(</span><em>box1</em>, <em>box2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#merge_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.merge_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges two boxes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.dock.binding_pocket.merge_overlapping_boxes">
+<code class="descclassname">deepchem.dock.binding_pocket.</code><code class="descname">merge_overlapping_boxes</code><span class="sig-paren">(</span><em>mapping</em>, <em>boxes</em>, <em>threshold=0.8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/binding_pocket.html#merge_overlapping_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.binding_pocket.merge_overlapping_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge boxes which have an overlap greater than threshold.</p>
+<p>TODO(rbharath): This merge code is terribly inelegant. It&#8217;s also quadratic
+in number of boxes. It feels like there ought to be an elegant divide and
+conquer approach here. Figure out later...</p>
+</dd></dl>
+
 </div>
-<div class="section" id="deepchem-dock-docking-module">
-<h2>deepchem.dock.docking module<a class="headerlink" href="#deepchem-dock-docking-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.dock.docking">
+<span id="deepchem-dock-docking-module"></span><h2>deepchem.dock.docking module<a class="headerlink" href="#module-deepchem.dock.docking" title="Permalink to this headline">¶</a></h2>
+<p>Docks protein-ligand pairs</p>
+<dl class="class">
+<dt id="deepchem.dock.docking.Docker">
+<em class="property">class </em><code class="descclassname">deepchem.dock.docking.</code><code class="descname">Docker</code><a class="reference internal" href="_modules/deepchem/dock/docking.html#Docker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.docking.Docker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Abstract Class specifying API for Docking.</p>
+<dl class="method">
+<dt id="deepchem.dock.docking.Docker.dock">
+<code class="descname">dock</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em>, <em>centroid=None</em>, <em>box_dims=None</em>, <em>dry_run=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/docking.html#Docker.dock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.docking.Docker.dock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.dock.docking.VinaGridDNNDocker">
+<em class="property">class </em><code class="descclassname">deepchem.dock.docking.</code><code class="descname">VinaGridDNNDocker</code><span class="sig-paren">(</span><em>exhaustiveness=10</em>, <em>detect_pockets=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/docking.html#VinaGridDNNDocker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.docking.VinaGridDNNDocker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Vina pose-generation, DNN-models on grid-featurization of complexes.</p>
+<dl class="method">
+<dt id="deepchem.dock.docking.VinaGridDNNDocker.dock">
+<code class="descname">dock</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em>, <em>centroid=None</em>, <em>box_dims=None</em>, <em>dry_run=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/docking.html#VinaGridDNNDocker.dock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.docking.VinaGridDNNDocker.dock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Docks using Vina and DNNs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.dock.docking.VinaGridRFDocker">
+<em class="property">class </em><code class="descclassname">deepchem.dock.docking.</code><code class="descname">VinaGridRFDocker</code><span class="sig-paren">(</span><em>exhaustiveness=10</em>, <em>detect_pockets=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/docking.html#VinaGridRFDocker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.docking.VinaGridRFDocker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.dock.docking.Docker" title="deepchem.dock.docking.Docker"><code class="xref py py-class docutils literal"><span class="pre">deepchem.dock.docking.Docker</span></code></a></p>
+<p>Vina pose-generation, RF-models on grid-featurization of complexes.</p>
+<dl class="method">
+<dt id="deepchem.dock.docking.VinaGridRFDocker.dock">
+<code class="descname">dock</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em>, <em>centroid=None</em>, <em>box_dims=None</em>, <em>dry_run=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/docking.html#VinaGridRFDocker.dock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.docking.VinaGridRFDocker.dock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Docks using Vina and RF.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="deepchem-dock-pose-generation-module">
-<h2>deepchem.dock.pose_generation module<a class="headerlink" href="#deepchem-dock-pose-generation-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.dock.pose_generation">
+<span id="deepchem-dock-pose-generation-module"></span><h2>deepchem.dock.pose_generation module<a class="headerlink" href="#module-deepchem.dock.pose_generation" title="Permalink to this headline">¶</a></h2>
+<p>Generates protein-ligand docked poses using Autodock Vina.</p>
+<dl class="class">
+<dt id="deepchem.dock.pose_generation.PoseGenerator">
+<em class="property">class </em><code class="descclassname">deepchem.dock.pose_generation.</code><code class="descname">PoseGenerator</code><a class="reference internal" href="_modules/deepchem/dock/pose_generation.html#PoseGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_generation.PoseGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Abstract superclass for all pose-generation routines.</p>
+<dl class="method">
+<dt id="deepchem.dock.pose_generation.PoseGenerator.generate_poses">
+<code class="descname">generate_poses</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em>, <em>out_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/pose_generation.html#PoseGenerator.generate_poses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_generation.PoseGenerator.generate_poses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the docked complex and outputs files for docked complex.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.dock.pose_generation.VinaPoseGenerator">
+<em class="property">class </em><code class="descclassname">deepchem.dock.pose_generation.</code><code class="descname">VinaPoseGenerator</code><span class="sig-paren">(</span><em>exhaustiveness=10</em>, <em>detect_pockets=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/pose_generation.html#VinaPoseGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_generation.VinaPoseGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.dock.pose_generation.PoseGenerator" title="deepchem.dock.pose_generation.PoseGenerator"><code class="xref py py-class docutils literal"><span class="pre">deepchem.dock.pose_generation.PoseGenerator</span></code></a></p>
+<p>Uses Autodock Vina to generate binding poses.</p>
+<dl class="method">
+<dt id="deepchem.dock.pose_generation.VinaPoseGenerator.generate_poses">
+<code class="descname">generate_poses</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em>, <em>centroid=None</em>, <em>box_dims=None</em>, <em>dry_run=False</em>, <em>out_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/pose_generation.html#VinaPoseGenerator.generate_poses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_generation.VinaPoseGenerator.generate_poses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the docked complex and outputs files for docked complex.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.dock.pose_generation.write_conf">
+<code class="descclassname">deepchem.dock.pose_generation.</code><code class="descname">write_conf</code><span class="sig-paren">(</span><em>receptor_filename</em>, <em>ligand_filename</em>, <em>centroid</em>, <em>box_dims</em>, <em>conf_filename</em>, <em>exhaustiveness=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/pose_generation.html#write_conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_generation.write_conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes Vina configuration file to disk.</p>
+</dd></dl>
+
 </div>
-<div class="section" id="deepchem-dock-pose-scoring-module">
-<h2>deepchem.dock.pose_scoring module<a class="headerlink" href="#deepchem-dock-pose-scoring-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.dock.pose_scoring">
+<span id="deepchem-dock-pose-scoring-module"></span><h2>deepchem.dock.pose_scoring module<a class="headerlink" href="#module-deepchem.dock.pose_scoring" title="Permalink to this headline">¶</a></h2>
+<p>Scores protein-ligand poses using DeepChem.</p>
+<dl class="class">
+<dt id="deepchem.dock.pose_scoring.GridPoseScorer">
+<em class="property">class </em><code class="descclassname">deepchem.dock.pose_scoring.</code><code class="descname">GridPoseScorer</code><span class="sig-paren">(</span><em>model</em>, <em>feat='grid'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/pose_scoring.html#GridPoseScorer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_scoring.GridPoseScorer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="deepchem.dock.pose_scoring.GridPoseScorer.score">
+<code class="descname">score</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/pose_scoring.html#GridPoseScorer.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_scoring.GridPoseScorer.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a score for a protein/ligand pair.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.dock.pose_scoring.PoseScorer">
+<em class="property">class </em><code class="descclassname">deepchem.dock.pose_scoring.</code><code class="descname">PoseScorer</code><a class="reference internal" href="_modules/deepchem/dock/pose_scoring.html#PoseScorer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_scoring.PoseScorer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Abstract superclass for all scoring methods.</p>
+<dl class="method">
+<dt id="deepchem.dock.pose_scoring.PoseScorer.score">
+<code class="descname">score</code><span class="sig-paren">(</span><em>protein_file</em>, <em>ligand_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/dock/pose_scoring.html#PoseScorer.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.dock.pose_scoring.PoseScorer.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a score for a protein/ligand pair.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deepchem.dock">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.dock" title="Permalink to this headline">¶</a></h2>
+<p>Imports all submodules</p>
 </div>
 </div>
 
