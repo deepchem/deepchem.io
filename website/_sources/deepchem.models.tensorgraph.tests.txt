@@ -1,0 +1,70 @@
+deepchem.models.tensorgraph.tests package
+=========================================
+
+Submodules
+----------
+
+deepchem.models.tensorgraph.tests.test_gan module
+-------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.tests.test_gan
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.tests.test_layers module
+----------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.tests.test_layers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.tests.test_layers_pickle module
+-----------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.tests.test_layers_pickle
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.tests.test_nbr_list module
+------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.tests.test_nbr_list
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.tests.test_optimizers module
+--------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.tests.test_optimizers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.tests.test_seqtoseq module
+------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.tests.test_seqtoseq
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorgraph.tests.test_tensor_graph module
+----------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorgraph.tests.test_tensor_graph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.tensorgraph.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

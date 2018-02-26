@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tf_new_models.graph_models &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tf_new_models.graph_models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Convenience classes for assembling graph models.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Han Altae-Tran and Bharath Ramsundar&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn.layers</span> <span class="kn">import</span> <span class="n">GraphGather</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tf_new_models.graph_topology</span> <span class="kn">import</span> <span class="n">GraphTopology</span><span class="p">,</span> <span class="n">DTNNGraphTopology</span><span class="p">,</span> <span class="n">DAGGraphTopology</span><span class="p">,</span> <span class="n">WeaveGraphTopology</span><span class="p">,</span> <span class="n">AlternateWeaveGraphTopology</span>
+
+
+<div class="viewcode-block" id="SequentialGraph"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialGraph">[docs]</a><span class="k">class</span> <span class="nc">SequentialGraph</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;An analog of Keras Sequential class for Graph data.</span>
+
+<span class="sd">  Like the Sequential class from Keras, but automatically passes topology</span>
+<span class="sd">  placeholders from GraphTopology to each graph layer (from layers) added</span>
+<span class="sd">  to the network. Non graph layers don&#39;t get the extra placeholders. </span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_feat: int</span>
+<span class="sd">      Number of features per atom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;SequentialGraph is deprecated. &quot;</span>
+                  <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span> <span class="o">=</span> <span class="n">GraphTopology</span><span class="p">(</span><span class="n">n_feat</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_atom_features_placeholder</span><span class="p">()</span>
+    <span class="c1"># Keep track of the layers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SequentialGraph.add"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialGraph.add">[docs]</a>  <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a new layer to model.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="c1"># For graphical layers, add connectivity placeholders</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GraphConv&#39;</span><span class="p">,</span> <span class="s1">&#39;GraphGather&#39;</span><span class="p">,</span> <span class="s1">&#39;GraphPool&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;__name__&quot;</span><span class="p">)):</span>
+          <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s2">&quot;GraphGather&quot;</span><span class="p">,</span> \
+                  <span class="s1">&#39;Cannot use GraphConv or GraphGather layers after a GraphGather&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">]</span> <span class="o">+</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_topology_placeholders</span><span class="p">())</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+
+      <span class="c1"># Add layer to the layer list</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SequentialGraph.get_graph_topology"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialGraph.get_graph_topology">[docs]</a>  <span class="k">def</span> <span class="nf">get_graph_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span></div>
+
+<div class="viewcode-block" id="SequentialGraph.get_num_output_features"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialGraph.get_num_output_features">[docs]</a>  <span class="k">def</span> <span class="nf">get_num_output_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the output shape of the featurization layers of the network&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">output_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SequentialGraph.return_outputs"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialGraph.return_outputs">[docs]</a>  <span class="k">def</span> <span class="nf">return_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span></div>
+
+<div class="viewcode-block" id="SequentialGraph.return_inputs"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialGraph.return_inputs">[docs]</a>  <span class="k">def</span> <span class="nf">return_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_input_placeholders</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SequentialGraph.get_layer"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialGraph.get_layer">[docs]</a>  <span class="k">def</span> <span class="nf">get_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_id</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="SequentialDTNNGraph"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph">[docs]</a><span class="k">class</span> <span class="nc">SequentialDTNNGraph</span><span class="p">(</span><span class="n">SequentialGraph</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;An analog of Keras Sequential class for Coulomb Matrix data.</span>
+
+<span class="sd">  automatically generates and passes topology placeholders to each layer. </span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_distance</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">distance_min</span><span class="o">=-</span><span class="mf">1.</span><span class="p">,</span> <span class="n">distance_max</span><span class="o">=</span><span class="mf">18.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_distance: int, optional</span>
+<span class="sd">      granularity of distance matrix</span>
+<span class="sd">      step size will be (distance_max-distance_min)/n_distance</span>
+<span class="sd">    distance_min: float, optional</span>
+<span class="sd">      minimum distance of atom pairs, default = -1 Angstorm</span>
+<span class="sd">    distance_max: float, optional</span>
+<span class="sd">      maximum distance of atom pairs, default = 18 Angstorm</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;SequentialDTNNGraph is deprecated. &quot;</span>
+                  <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span> <span class="o">=</span> <span class="n">DTNNGraphTopology</span><span class="p">(</span>
+          <span class="n">n_distance</span><span class="p">,</span> <span class="n">distance_min</span><span class="o">=</span><span class="n">distance_min</span><span class="p">,</span> <span class="n">distance_max</span><span class="o">=</span><span class="n">distance_max</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_atom_number_placeholder</span><span class="p">()</span>
+    <span class="c1"># Keep track of the layers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SequentialDTNNGraph.add"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.add">[docs]</a>  <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a new layer to model.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DTNNStep&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">]</span> <span class="o">+</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_topology_placeholders</span><span class="p">())</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DTNNGather&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">atom_membership_placeholder</span><span class="p">])</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SequentialDAGGraph"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph">[docs]</a><span class="k">class</span> <span class="nc">SequentialDAGGraph</span><span class="p">(</span><span class="n">SequentialGraph</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;SequentialGraph for DAG models</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atom_feat</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">max_atoms</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_atom_feat: int, optional</span>
+<span class="sd">      Number of features per atom.</span>
+<span class="sd">    max_atoms: int, optional</span>
+<span class="sd">      Maximum number of atoms in a molecule, should be defined based on dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;SequentialDAGGraph is deprecated. &quot;</span>
+                  <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span> <span class="o">=</span> <span class="n">DAGGraphTopology</span><span class="p">(</span>
+          <span class="n">n_atom_feat</span><span class="o">=</span><span class="n">n_atom_feat</span><span class="p">,</span> <span class="n">max_atoms</span><span class="o">=</span><span class="n">max_atoms</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_atom_features_placeholder</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SequentialDAGGraph.add"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.add">[docs]</a>  <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a new layer to model.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DAGLayer&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">]</span> <span class="o">+</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_topology_placeholders</span><span class="p">())</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DAGGather&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">membership_placeholder</span><span class="p">])</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SequentialWeaveGraph"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph">[docs]</a><span class="k">class</span> <span class="nc">SequentialWeaveGraph</span><span class="p">(</span><span class="n">SequentialGraph</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;SequentialGraph for Weave models</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_atoms</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_atom_feat</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">n_pair_feat</span><span class="o">=</span><span class="mi">14</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_atoms: int, optional</span>
+<span class="sd">      Maximum number of atoms in a molecule, should be defined based on dataset</span>
+<span class="sd">    n_atom_feat: int, optional</span>
+<span class="sd">      Number of features per atom.</span>
+<span class="sd">    n_pair_feat: int, optional</span>
+<span class="sd">      Number of features per pair of atoms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;SequentialWeaveGraph is deprecated. &quot;</span>
+                  <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_atom_feat</span> <span class="o">=</span> <span class="n">n_atom_feat</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_pair_feat</span> <span class="o">=</span> <span class="n">n_pair_feat</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span> <span class="o">=</span> <span class="n">WeaveGraphTopology</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atom_feat</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">n_pair_feat</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_atom_features_placeholder</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">output_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_pair_features_placeholder</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SequentialWeaveGraph.add"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.add">[docs]</a>  <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a new layer to model.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;WeaveLayer&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_P</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_P</span>
+        <span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_topology_placeholders</span><span class="p">())</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;WeaveConcat&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">atom_mask_placeholder</span><span class="p">])</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;WeaveGather&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">membership_placeholder</span><span class="p">])</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="AlternateSequentialWeaveGraph"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph">[docs]</a><span class="k">class</span> <span class="nc">AlternateSequentialWeaveGraph</span><span class="p">(</span><span class="n">SequentialGraph</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Alternate implementation of SequentialGraph for Weave models</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">max_atoms</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_atom_feat</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">n_pair_feat</span><span class="o">=</span><span class="mi">14</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    batch_size: int</span>
+<span class="sd">      number of molecules in a batch</span>
+<span class="sd">    max_atoms: int, optional</span>
+<span class="sd">      Maximum number of atoms in a molecule, should be defined based on dataset</span>
+<span class="sd">    n_atom_feat: int, optional</span>
+<span class="sd">      Number of features per atom.</span>
+<span class="sd">    n_pair_feat: int, optional</span>
+<span class="sd">      Number of features per pair of atoms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;AlternateSequentialWeaveGraph is deprecated. &quot;</span>
+                  <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_atom_feat</span> <span class="o">=</span> <span class="n">n_atom_feat</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_pair_feat</span> <span class="o">=</span> <span class="n">n_pair_feat</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span> <span class="o">=</span> <span class="n">AlternateWeaveGraphTopology</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atom_feat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pair_feat</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_atom_features_placeholder</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">output_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_pair_features_placeholder</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="AlternateSequentialWeaveGraph.add"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.add">[docs]</a>  <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a new layer to model.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;AlternateWeaveLayer&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_P</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_P</span>
+        <span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">get_topology_placeholders</span><span class="p">())</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;AlternateWeaveGather&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_topology</span><span class="o">.</span><span class="n">atom_split_placeholder</span><span class="p">])</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SequentialSupportGraph"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph">[docs]</a><span class="k">class</span> <span class="nc">SequentialSupportGraph</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;An analog of Keras Sequential model for test/support models.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_feat: int</span>
+<span class="sd">      Number of atomic features.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;SequentialSupportWeaveGraph is deprecated. &quot;</span>
+                  <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="c1"># Create graph topology and x</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">test_graph_topology</span> <span class="o">=</span> <span class="n">GraphTopology</span><span class="p">(</span><span class="n">n_feat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">support_graph_topology</span> <span class="o">=</span> <span class="n">GraphTopology</span><span class="p">(</span><span class="n">n_feat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;support&#39;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_graph_topology</span><span class="o">.</span><span class="n">get_atom_features_placeholder</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">support_graph_topology</span><span class="o">.</span><span class="n">get_atom_features_placeholder</span><span class="p">()</span>
+
+    <span class="c1"># Keep track of the layers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Whether or not we have used the GraphGather layer yet</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bool_pre_gather</span> <span class="o">=</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="SequentialSupportGraph.add"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add">[docs]</a>  <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a layer to both test/support stacks.</span>
+
+<span class="sd">    Note that the layer transformation is performed independently on the</span>
+<span class="sd">    test/support tensors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+      <span class="c1"># Update new value of x</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GraphConv&#39;</span><span class="p">,</span> <span class="s1">&#39;GraphGather&#39;</span><span class="p">,</span> <span class="s1">&#39;GraphPool&#39;</span><span class="p">]:</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">bool_pre_gather</span><span class="p">,</span> <span class="s2">&quot;Cannot apply graphical layers after gather.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_graph_topology</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">]</span> <span class="o">+</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">support_graph_topology</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;GraphGather&#39;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bool_pre_gather</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># Set flag to stop adding topology</span></div>
+
+<div class="viewcode-block" id="SequentialSupportGraph.add_test"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add_test">[docs]</a>  <span class="k">def</span> <span class="nf">add_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a layer to test.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+      <span class="c1"># Update new value of x</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GraphConv&#39;</span><span class="p">,</span> <span class="s1">&#39;GraphPool&#39;</span><span class="p">,</span> <span class="s1">&#39;GraphGather&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_graph_topology</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SequentialSupportGraph.add_support"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add_support">[docs]</a>  <span class="k">def</span> <span class="nf">add_support</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a layer to support.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+      <span class="c1"># Update new value of x</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GraphConv&#39;</span><span class="p">,</span> <span class="s1">&#39;GraphPool&#39;</span><span class="p">,</span> <span class="s1">&#39;GraphGather&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">]</span> <span class="o">+</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">support_graph_topology</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SequentialSupportGraph.join"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.join">[docs]</a>  <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Joins test and support to a two input two output layer&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">layer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="SequentialSupportGraph.get_test_output"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.get_test_output">[docs]</a>  <span class="k">def</span> <span class="nf">get_test_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span></div>
+
+<div class="viewcode-block" id="SequentialSupportGraph.get_support_output"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.get_support_output">[docs]</a>  <span class="k">def</span> <span class="nf">get_support_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span></div>
+
+<div class="viewcode-block" id="SequentialSupportGraph.return_outputs"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.return_outputs">[docs]</a>  <span class="k">def</span> <span class="nf">return_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SequentialSupportGraph.return_inputs"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.return_inputs">[docs]</a>  <span class="k">def</span> <span class="nf">return_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_graph_topology</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">support_graph_topology</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">())</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

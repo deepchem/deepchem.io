@@ -1,0 +1,30 @@
+deepchem.splits.tests package
+=============================
+
+Submodules
+----------
+
+deepchem.splits.tests.test_splitter module
+------------------------------------------
+
+.. automodule:: deepchem.splits.tests.test_splitter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.splits.tests.test_task_splitter module
+-----------------------------------------------
+
+.. automodule:: deepchem.splits.tests.test_task_splitter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.splits.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

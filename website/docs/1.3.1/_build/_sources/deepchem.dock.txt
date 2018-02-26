@@ -1,0 +1,53 @@
+deepchem.dock package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.dock.tests
+
+Submodules
+----------
+
+deepchem.dock.binding_pocket module
+-----------------------------------
+
+.. automodule:: deepchem.dock.binding_pocket
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.dock.docking module
+----------------------------
+
+.. automodule:: deepchem.dock.docking
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.dock.pose_generation module
+------------------------------------
+
+.. automodule:: deepchem.dock.pose_generation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.dock.pose_scoring module
+---------------------------------
+
+.. automodule:: deepchem.dock.pose_scoring
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.dock
+    :members:
+    :undoc-members:
+    :show-inheritance:

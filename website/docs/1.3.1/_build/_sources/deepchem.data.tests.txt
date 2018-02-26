@@ -1,0 +1,78 @@
+deepchem.data.tests package
+===========================
+
+Submodules
+----------
+
+deepchem.data.tests.test_data_loader module
+-------------------------------------------
+
+.. automodule:: deepchem.data.tests.test_data_loader
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.data.tests.test_datasets module
+----------------------------------------
+
+.. automodule:: deepchem.data.tests.test_datasets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.data.tests.test_drop module
+------------------------------------
+
+.. automodule:: deepchem.data.tests.test_drop
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.data.tests.test_load module
+------------------------------------
+
+.. automodule:: deepchem.data.tests.test_load
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.data.tests.test_merge module
+-------------------------------------
+
+.. automodule:: deepchem.data.tests.test_merge
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.data.tests.test_reload module
+--------------------------------------
+
+.. automodule:: deepchem.data.tests.test_reload
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.data.tests.test_shuffle module
+---------------------------------------
+
+.. automodule:: deepchem.data.tests.test_shuffle
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.data.tests.test_support_generator module
+-------------------------------------------------
+
+.. automodule:: deepchem.data.tests.test_support_generator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.data.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

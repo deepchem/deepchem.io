@@ -1,0 +1,22 @@
+deepchem.metrics.tests package
+==============================
+
+Submodules
+----------
+
+deepchem.metrics.tests.metrics_test module
+------------------------------------------
+
+.. automodule:: deepchem.metrics.tests.metrics_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.metrics.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.molnet package &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="index.html" />
+    <link rel="up" title="deepchem package" href="deepchem.html" />
+    <link rel="next" title="deepchem.molnet.load_function package" href="deepchem.molnet.load_function.html" />
+    <link rel="prev" title="deepchem.models.xgboost_models package" href="deepchem.models.xgboost_models.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">deepchem.molnet package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#deepchem-molnet-check-availability-module">deepchem.molnet.check_availability module</a></li>
+<li><a class="reference internal" href="#deepchem-molnet-preset-hyper-parameters-module">deepchem.molnet.preset_hyper_parameters module</a></li>
+<li><a class="reference internal" href="#deepchem-molnet-run-benchmark-module">deepchem.molnet.run_benchmark module</a></li>
+<li><a class="reference internal" href="#deepchem-molnet-run-benchmark-low-data-module">deepchem.molnet.run_benchmark_low_data module</a></li>
+<li><a class="reference internal" href="#deepchem-molnet-run-benchmark-models-module">deepchem.molnet.run_benchmark_models module</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-molnet-package">
+<h1>deepchem.molnet package<a class="headerlink" href="#deepchem-molnet-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deepchem.molnet.load_function.html">deepchem.molnet.load_function package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-bace-datasets-module">deepchem.molnet.load_function.bace_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-bace-features-module">deepchem.molnet.load_function.bace_features module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-bbbp-datasets-module">deepchem.molnet.load_function.bbbp_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-chembl-datasets-module">deepchem.molnet.load_function.chembl_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-chembl-tasks-module">deepchem.molnet.load_function.chembl_tasks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-clearance-datasets-module">deepchem.molnet.load_function.clearance_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-clintox-datasets-module">deepchem.molnet.load_function.clintox_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-delaney-datasets-module">deepchem.molnet.load_function.delaney_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-hiv-datasets-module">deepchem.molnet.load_function.hiv_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-hopv-datasets-module">deepchem.molnet.load_function.hopv_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-kaggle-datasets-module">deepchem.molnet.load_function.kaggle_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-kaggle-features-module">deepchem.molnet.load_function.kaggle_features module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-lipo-datasets-module">deepchem.molnet.load_function.lipo_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-muv-datasets-module">deepchem.molnet.load_function.muv_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-nci-datasets-module">deepchem.molnet.load_function.nci_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-pcba-datasets-module">deepchem.molnet.load_function.pcba_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-pdbbind-datasets-module">deepchem.molnet.load_function.pdbbind_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-ppb-datasets-module">deepchem.molnet.load_function.ppb_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-qm7-datasets-module">deepchem.molnet.load_function.qm7_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-qm8-datasets-module">deepchem.molnet.load_function.qm8_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-qm9-datasets-module">deepchem.molnet.load_function.qm9_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-sampl-datasets-module">deepchem.molnet.load_function.sampl_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-sider-datasets-module">deepchem.molnet.load_function.sider_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-tox21-datasets-module">deepchem.molnet.load_function.tox21_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#deepchem-molnet-load-function-toxcast-datasets-module">deepchem.molnet.load_function.toxcast_datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.load_function.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deepchem.molnet.tests.html">deepchem.molnet.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.tests.html#deepchem-molnet-tests-test-molnet-module">deepchem.molnet.tests.test_molnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.molnet.tests.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="deepchem-molnet-check-availability-module">
+<h2>deepchem.molnet.check_availability module<a class="headerlink" href="#deepchem-molnet-check-availability-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="deepchem-molnet-preset-hyper-parameters-module">
+<h2>deepchem.molnet.preset_hyper_parameters module<a class="headerlink" href="#deepchem-molnet-preset-hyper-parameters-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="deepchem-molnet-run-benchmark-module">
+<h2>deepchem.molnet.run_benchmark module<a class="headerlink" href="#deepchem-molnet-run-benchmark-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="deepchem-molnet-run-benchmark-low-data-module">
+<h2>deepchem.molnet.run_benchmark_low_data module<a class="headerlink" href="#deepchem-molnet-run-benchmark-low-data-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="deepchem-molnet-run-benchmark-models-module">
+<h2>deepchem.molnet.run_benchmark_models module<a class="headerlink" href="#deepchem-molnet-run-benchmark-models-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.molnet.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

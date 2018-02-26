@@ -1,0 +1,30 @@
+deepchem.models.tensorflow_models.tests package
+===============================================
+
+Submodules
+----------
+
+deepchem.models.tensorflow_models.tests.test_progressive module
+---------------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.tests.test_progressive
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.tensorflow_models.tests.test_utils module
+---------------------------------------------------------
+
+.. automodule:: deepchem.models.tensorflow_models.tests.test_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.tensorflow_models.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.splits package &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="index.html" />
+    <link rel="up" title="deepchem package" href="deepchem.html" />
+    <link rel="next" title="deepchem.trans package" href="deepchem.trans.html" />
+    <link rel="prev" title="deepchem.rl.envs package" href="deepchem.rl.envs.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">deepchem.splits package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-deepchem.splits.splitters">deepchem.splits.splitters module</a></li>
+<li><a class="reference internal" href="#module-deepchem.splits.task_splitter">deepchem.splits.task_splitter module</a></li>
+<li><a class="reference internal" href="#module-deepchem.splits">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-splits-package">
+<h1>deepchem.splits package<a class="headerlink" href="#deepchem-splits-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deepchem.splits.splitters">
+<span id="deepchem-splits-splitters-module"></span><h2>deepchem.splits.splitters module<a class="headerlink" href="#module-deepchem.splits.splitters" title="Permalink to this headline">¶</a></h2>
+<p>Contains an abstract base class that supports chemically aware data splits.</p>
+<dl class="class">
+<dt id="deepchem.splits.splitters.ButinaSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">ButinaSplitter</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#ButinaSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.ButinaSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class for doing data splits based on the butina clustering of a bulk tanimoto
+fingerprint matrix.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.ButinaSplitter.k_fold_split" title="deepchem.splits.splitters.ButinaSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.ButinaSplitter.split" title="deepchem.splits.splitters.ButinaSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;frac_train,&nbsp;frac_valid,&nbsp;...])</td>
+<td>Splits internal compounds into train and validation based on the butina clustering algorithm.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.ButinaSplitter.train_test_split" title="deepchem.splits.splitters.ButinaSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.ButinaSplitter.train_valid_test_split" title="deepchem.splits.splitters.ButinaSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.ButinaSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.ButinaSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.ButinaSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>frac_train=None</em>, <em>frac_valid=None</em>, <em>frac_test=None</em>, <em>log_every_n=1000</em>, <em>cutoff=0.18</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#ButinaSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.ButinaSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits internal compounds into train and validation based on the butina
+clustering algorithm. This splitting algorithm has an O(N^2) run time, where N
+is the number of elements in the dataset. The dataset is expected to be a classification
+dataset.</p>
+<p>This algorithm is designed to generate validation data that are novel chemotypes.</p>
+<p>Note that this function entirely disregards the ratios for frac_train, frac_valid,
+and frac_test. Furthermore, it does not generate a test set, only a train and valid set.</p>
+<p>Setting a small cutoff value will generate smaller, finer clusters of high similarity,
+whereas setting a large cutoff value will generate larger, coarser clusters of low similarity.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.ButinaSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.ButinaSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.ButinaSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.ButinaSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.splits.splitters.ClusterFps">
+<code class="descclassname">deepchem.splits.splitters.</code><code class="descname">ClusterFps</code><span class="sig-paren">(</span><em>fps</em>, <em>cutoff=0.2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#ClusterFps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.ClusterFps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.FingerprintSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">FingerprintSplitter</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#FingerprintSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.FingerprintSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class for doing data splits based on the fingerprints of small molecules
+O(N**2) algorithm</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.FingerprintSplitter.k_fold_split" title="deepchem.splits.splitters.FingerprintSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.FingerprintSplitter.split" title="deepchem.splits.splitters.FingerprintSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;frac_train,&nbsp;frac_valid,&nbsp;...])</td>
+<td>Splits internal compounds into train/validation/test by fingerprint.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.FingerprintSplitter.train_test_split" title="deepchem.splits.splitters.FingerprintSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.FingerprintSplitter.train_valid_test_split" title="deepchem.splits.splitters.FingerprintSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.FingerprintSplitter.update_distances" title="deepchem.splits.splitters.FingerprintSplitter.update_distances"><code class="xref py py-obj docutils literal"><span class="pre">update_distances</span></code></a>(last_selected,&nbsp;...)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.FingerprintSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.FingerprintSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.FingerprintSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#FingerprintSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.FingerprintSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits internal compounds into train/validation/test by fingerprint.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.FingerprintSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.FingerprintSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.FingerprintSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.FingerprintSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.FingerprintSplitter.update_distances">
+<code class="descname">update_distances</code><span class="sig-paren">(</span><em>last_selected</em>, <em>cur_distances</em>, <em>distance_matrix</em>, <em>dont_update</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#FingerprintSplitter.update_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.FingerprintSplitter.update_distances" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.IndexSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">IndexSplitter</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#IndexSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.IndexSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class for simple order based splits.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.IndexSplitter.k_fold_split" title="deepchem.splits.splitters.IndexSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.IndexSplitter.split" title="deepchem.splits.splitters.IndexSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;seed,&nbsp;frac_train,&nbsp;...])</td>
+<td>Splits internal compounds into train/validation/test in provided order.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.IndexSplitter.train_test_split" title="deepchem.splits.splitters.IndexSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.IndexSplitter.train_valid_test_split" title="deepchem.splits.splitters.IndexSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.IndexSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.IndexSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.IndexSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#IndexSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.IndexSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits internal compounds into train/validation/test in provided order.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.IndexSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.IndexSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.IndexSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.IndexSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.IndiceSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">IndiceSplitter</code><span class="sig-paren">(</span><em>verbose=False</em>, <em>valid_indices=None</em>, <em>test_indices=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#IndiceSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.IndiceSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class for splits based on input order.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.IndiceSplitter.k_fold_split" title="deepchem.splits.splitters.IndiceSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.IndiceSplitter.split" title="deepchem.splits.splitters.IndiceSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;seed,&nbsp;frac_train,&nbsp;...])</td>
+<td>Splits internal compounds into train/validation/test in designated order.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.IndiceSplitter.train_test_split" title="deepchem.splits.splitters.IndiceSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.IndiceSplitter.train_valid_test_split" title="deepchem.splits.splitters.IndiceSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.IndiceSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.IndiceSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.IndiceSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#IndiceSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.IndiceSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits internal compounds into train/validation/test in designated order.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.IndiceSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.IndiceSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.IndiceSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.IndiceSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.MolecularWeightSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">MolecularWeightSplitter</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#MolecularWeightSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.MolecularWeightSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class for doing data splits by molecular weight.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.MolecularWeightSplitter.k_fold_split" title="deepchem.splits.splitters.MolecularWeightSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.MolecularWeightSplitter.split" title="deepchem.splits.splitters.MolecularWeightSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;seed,&nbsp;frac_train,&nbsp;...])</td>
+<td>Splits internal compounds into train/validation/test using the MW calculated by SMILES string.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.MolecularWeightSplitter.train_test_split" title="deepchem.splits.splitters.MolecularWeightSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.MolecularWeightSplitter.train_valid_test_split" title="deepchem.splits.splitters.MolecularWeightSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.MolecularWeightSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.MolecularWeightSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.MolecularWeightSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#MolecularWeightSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.MolecularWeightSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits internal compounds into train/validation/test using the MW calculated
+by SMILES string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.MolecularWeightSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.MolecularWeightSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.MolecularWeightSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.MolecularWeightSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.RandomGroupSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">RandomGroupSplitter</code><span class="sig-paren">(</span><em>groups</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomGroupSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomGroupSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomGroupSplitter.k_fold_split" title="deepchem.splits.splitters.RandomGroupSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomGroupSplitter.split" title="deepchem.splits.splitters.RandomGroupSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;seed,&nbsp;frac_train,&nbsp;...])</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomGroupSplitter.train_test_split" title="deepchem.splits.splitters.RandomGroupSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomGroupSplitter.train_valid_test_split" title="deepchem.splits.splitters.RandomGroupSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomGroupSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.RandomGroupSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomGroupSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomGroupSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomGroupSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomGroupSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.RandomGroupSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomGroupSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.RandomGroupSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.RandomSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">RandomSplitter</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class for doing random data splits.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomSplitter.k_fold_split" title="deepchem.splits.splitters.RandomSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomSplitter.split" title="deepchem.splits.splitters.RandomSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;seed,&nbsp;frac_train,&nbsp;...])</td>
+<td>Splits internal compounds randomly into train/validation/test.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomSplitter.train_test_split" title="deepchem.splits.splitters.RandomSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomSplitter.train_valid_test_split" title="deepchem.splits.splitters.RandomSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.RandomSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits internal compounds randomly into train/validation/test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.RandomSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.RandomSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.RandomStratifiedSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">RandomStratifiedSplitter</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomStratifiedSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomStratifiedSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>RandomStratified Splitter class.</p>
+<p>For sparse multitask datasets, a standard split offers no guarantees that the
+splits will have any activate compounds. This class guarantees that each task
+will have a proportional split of the activates in a split. TO do this, a
+ragged split is performed with different numbers of compounds taken from each
+task. Thus, the length of the split arrays may exceed the split of the
+original array. That said, no datapoint is copied to more than one split, so
+correctness is still ensured.</p>
+<p>Note that this splitter is only valid for boolean label data.</p>
+<p>TODO(rbharath): This splitter should be refactored to match style of other
+splitter classes.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomStratifiedSplitter.get_task_split_indices" title="deepchem.splits.splitters.RandomStratifiedSplitter.get_task_split_indices"><code class="xref py py-obj docutils literal"><span class="pre">get_task_split_indices</span></code></a>(y,&nbsp;w,&nbsp;frac_split)</td>
+<td>Returns num datapoints needed per task to split properly.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomStratifiedSplitter.k_fold_split" title="deepchem.splits.splitters.RandomStratifiedSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td>Needs custom implementation due to ragged splits for stratification.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomStratifiedSplitter.split" title="deepchem.splits.splitters.RandomStratifiedSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset,&nbsp;frac_split[,&nbsp;split_dirs])</td>
+<td>Method that does bulk of splitting dataset.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomStratifiedSplitter.train_test_split" title="deepchem.splits.splitters.RandomStratifiedSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.RandomStratifiedSplitter.train_valid_test_split" title="deepchem.splits.splitters.RandomStratifiedSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Custom split due to raggedness in original split.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomStratifiedSplitter.get_task_split_indices">
+<code class="descname">get_task_split_indices</code><span class="sig-paren">(</span><em>y</em>, <em>w</em>, <em>frac_split</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomStratifiedSplitter.get_task_split_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomStratifiedSplitter.get_task_split_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns num datapoints needed per task to split properly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomStratifiedSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomStratifiedSplitter.k_fold_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomStratifiedSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Needs custom implementation due to ragged splits for stratification.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomStratifiedSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>frac_split</em>, <em>split_dirs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomStratifiedSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomStratifiedSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that does bulk of splitting dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomStratifiedSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.RandomStratifiedSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.RandomStratifiedSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#RandomStratifiedSplitter.train_valid_test_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.RandomStratifiedSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom split due to raggedness in original split.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.ScaffoldSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">ScaffoldSplitter</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#ScaffoldSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.ScaffoldSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class for doing data splits based on the scaffold of small molecules.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.ScaffoldSplitter.k_fold_split" title="deepchem.splits.splitters.ScaffoldSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.ScaffoldSplitter.split" title="deepchem.splits.splitters.ScaffoldSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;frac_train,&nbsp;frac_valid,&nbsp;...])</td>
+<td>Splits internal compounds into train/validation/test by scaffold.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.ScaffoldSplitter.train_test_split" title="deepchem.splits.splitters.ScaffoldSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.ScaffoldSplitter.train_valid_test_split" title="deepchem.splits.splitters.ScaffoldSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.ScaffoldSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.ScaffoldSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.ScaffoldSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#ScaffoldSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.ScaffoldSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits internal compounds into train/validation/test by scaffold.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.ScaffoldSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.ScaffoldSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.ScaffoldSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.ScaffoldSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.SingletaskStratifiedSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">SingletaskStratifiedSplitter</code><span class="sig-paren">(</span><em>task_number=0</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#SingletaskStratifiedSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class for doing data splits by stratification on a single task.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n_features</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n_tasks</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_tasks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">DiskDataset</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span><span class="n">n_tasks</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span><span class="n">n_tasks</span><span class="p">)),</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">splitter</span> <span class="o">=</span> <span class="n">SingletaskStratifiedSplitter</span><span class="p">(</span><span class="n">task_number</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">splitter</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter.k_fold_split" title="deepchem.splits.splitters.SingletaskStratifiedSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories,&nbsp;...])</td>
+<td>Splits compounds into k-folds using stratified sampling.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter.split" title="deepchem.splits.splitters.SingletaskStratifiedSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;seed,&nbsp;frac_train,&nbsp;...])</td>
+<td>Splits compounds into train/validation/test using stratified sampling.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter.train_test_split" title="deepchem.splits.splitters.SingletaskStratifiedSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter.train_valid_test_split" title="deepchem.splits.splitters.SingletaskStratifiedSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.SingletaskStratifiedSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>seed=None</em>, <em>log_every_n=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#SingletaskStratifiedSplitter.k_fold_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits compounds into k-folds using stratified sampling.
+Overriding base class k_fold_split.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: dc.data.Dataset object</strong></p>
+<blockquote>
+<div><p>Dataset.</p>
+</div></blockquote>
+<p><strong>k: int</strong></p>
+<blockquote>
+<div><p>Number of folds.</p>
+</div></blockquote>
+<p><strong>seed: int (Optional, Default None)</strong></p>
+<blockquote>
+<div><p>Random seed.</p>
+</div></blockquote>
+<p><strong>log_every_n: int (Optional, Default None)</strong></p>
+<blockquote>
+<div><p>Log every n examples (not currently used).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">fold_datasets: List</p>
+<blockquote class="last">
+<div><p>List containing dc.data.Dataset objects</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.SingletaskStratifiedSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#SingletaskStratifiedSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits compounds into train/validation/test using stratified sampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: dc.data.Dataset object</strong></p>
+<blockquote>
+<div><p>Dataset.</p>
+</div></blockquote>
+<p><strong>seed: int (Optional, Default None)</strong></p>
+<blockquote>
+<div><p>Random seed.</p>
+</div></blockquote>
+<p><strong>frac_train: float (Optional, Default .8)</strong></p>
+<blockquote>
+<div><p>Fraction of dataset put into training data.</p>
+</div></blockquote>
+<p><strong>frac_valid: float (Optional, Default .1)</strong></p>
+<blockquote>
+<div><p>Fraction of dataset put into validation data.</p>
+</div></blockquote>
+<p><strong>frac_test: float (Optional, Default .1)</strong></p>
+<blockquote>
+<div><p>Fraction of dataset put into test data.</p>
+</div></blockquote>
+<p><strong>log_every_n: int (Optional, Default None)</strong></p>
+<blockquote>
+<div><p>Log every n examples (not currently used).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">retval: Tuple</p>
+<blockquote class="last">
+<div><p>Tuple containing train indices, valid indices, and test indices</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.SingletaskStratifiedSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.SingletaskStratifiedSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.SingletaskStratifiedSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.SpecifiedSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">SpecifiedSplitter</code><span class="sig-paren">(</span><em>input_file</em>, <em>split_field</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#SpecifiedSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.SpecifiedSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Class that splits data according to user specification.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.SpecifiedSplitter.k_fold_split" title="deepchem.splits.splitters.SpecifiedSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.SpecifiedSplitter.split" title="deepchem.splits.splitters.SpecifiedSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;frac_train,&nbsp;frac_valid,&nbsp;...])</td>
+<td>Splits internal compounds into train/validation/test by user-specification.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.SpecifiedSplitter.train_test_split" title="deepchem.splits.splitters.SpecifiedSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.SpecifiedSplitter.train_valid_test_split" title="deepchem.splits.splitters.SpecifiedSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.SpecifiedSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.SpecifiedSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.SpecifiedSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#SpecifiedSplitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.SpecifiedSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits internal compounds into train/validation/test by user-specification.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.SpecifiedSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.SpecifiedSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.SpecifiedSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.SpecifiedSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.Splitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">Splitter</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#Splitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.Splitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Abstract base class for chemically aware splits..</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.Splitter.k_fold_split" title="deepchem.splits.splitters.Splitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.Splitter.split" title="deepchem.splits.splitters.Splitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;frac_train,&nbsp;frac_valid,&nbsp;...])</td>
+<td>Stub to be filled in by child classes.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.Splitter.train_test_split" title="deepchem.splits.splitters.Splitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.Splitter.train_valid_test_split" title="deepchem.splits.splitters.Splitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.Splitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#Splitter.k_fold_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.Splitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.Splitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>frac_train=None</em>, <em>frac_valid=None</em>, <em>frac_test=None</em>, <em>log_every_n=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#Splitter.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.Splitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stub to be filled in by child classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.Splitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#Splitter.train_test_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.Splitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.Splitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#Splitter.train_valid_test_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.Splitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.splits.splitters.TimeSplitterPDBbind">
+<em class="property">class </em><code class="descclassname">deepchem.splits.splitters.</code><code class="descname">TimeSplitterPDBbind</code><span class="sig-paren">(</span><em>ids</em>, <em>year_file=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#TimeSplitterPDBbind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.TimeSplitterPDBbind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.TimeSplitterPDBbind.k_fold_split" title="deepchem.splits.splitters.TimeSplitterPDBbind.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;k[,&nbsp;directories])</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.TimeSplitterPDBbind.split" title="deepchem.splits.splitters.TimeSplitterPDBbind.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;seed,&nbsp;frac_train,&nbsp;...])</td>
+<td>Splits protein-ligand pairs in PDBbind into train/validation/test in time order.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.splitters.TimeSplitterPDBbind.train_test_split" title="deepchem.splits.splitters.TimeSplitterPDBbind.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.splitters.TimeSplitterPDBbind.train_valid_test_split" title="deepchem.splits.splitters.TimeSplitterPDBbind.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/validation/test sets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.splitters.TimeSplitterPDBbind.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>k</em>, <em>directories=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.TimeSplitterPDBbind.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<p><strong>Dataset to do a k-fold split</strong></p>
+<p><strong>k: int</strong></p>
+<p><strong>number of folds</strong></p>
+<p><strong>directories: list of str</strong></p>
+<p><strong>list of length 2*k filepaths to save the result disk-datasets</strong></p>
+<p><strong>kwargs</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of length k tuples of (train, cv)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.TimeSplitterPDBbind.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>log_every_n=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#TimeSplitterPDBbind.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.TimeSplitterPDBbind.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits protein-ligand pairs in PDBbind into train/validation/test in time order.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.TimeSplitterPDBbind.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.TimeSplitterPDBbind.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.splitters.TimeSplitterPDBbind.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>valid_dir=None</em>, <em>test_dir=None</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em>, <em>seed=None</em>, <em>log_every_n=1000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.splitters.TimeSplitterPDBbind.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/validation/test sets.</p>
+<p>Returns Dataset objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.splits.splitters.generate_scaffold">
+<code class="descclassname">deepchem.splits.splitters.</code><code class="descname">generate_scaffold</code><span class="sig-paren">(</span><em>smiles</em>, <em>include_chirality=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#generate_scaffold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.generate_scaffold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Bemis-Murcko scaffold for a SMILES string.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.splits.splitters.randomize_arrays">
+<code class="descclassname">deepchem.splits.splitters.</code><code class="descname">randomize_arrays</code><span class="sig-paren">(</span><em>array_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/splitters.html#randomize_arrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.splitters.randomize_arrays" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.splits.task_splitter">
+<span id="deepchem-splits-task-splitter-module"></span><h2>deepchem.splits.task_splitter module<a class="headerlink" href="#module-deepchem.splits.task_splitter" title="Permalink to this headline">¶</a></h2>
+<p>Contains an abstract base class that supports chemically aware data splits.</p>
+<dl class="class">
+<dt id="deepchem.splits.task_splitter.TaskSplitter">
+<em class="property">class </em><code class="descclassname">deepchem.splits.task_splitter.</code><code class="descname">TaskSplitter</code><a class="reference internal" href="_modules/deepchem/splits/task_splitter.html#TaskSplitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.task_splitter.TaskSplitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.splits.splitters.Splitter" title="deepchem.splits.splitters.Splitter"><code class="xref py py-class docutils literal"><span class="pre">deepchem.splits.splitters.Splitter</span></code></a></p>
+<p>Provides a simple interface for splitting datasets task-wise.</p>
+<p>For some learning problems, the training and test datasets should
+have different tasks entirely. This is a different paradigm from the
+usual Splitter, which ensures that split datasets have different
+datapoints, not different tasks.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.task_splitter.TaskSplitter.k_fold_split" title="deepchem.splits.task_splitter.TaskSplitter.k_fold_split"><code class="xref py py-obj docutils literal"><span class="pre">k_fold_split</span></code></a>(dataset,&nbsp;K)</td>
+<td>Performs a K-fold split of the tasks for dataset.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.task_splitter.TaskSplitter.split" title="deepchem.splits.task_splitter.TaskSplitter.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(dataset[,&nbsp;frac_train,&nbsp;frac_valid,&nbsp;...])</td>
+<td>Stub to be filled in by child classes.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#deepchem.splits.task_splitter.TaskSplitter.train_test_split" title="deepchem.splits.task_splitter.TaskSplitter.train_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_test_split</span></code></a>(dataset[,&nbsp;train_dir,&nbsp;...])</td>
+<td>Splits self into train/test sets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#deepchem.splits.task_splitter.TaskSplitter.train_valid_test_split" title="deepchem.splits.task_splitter.TaskSplitter.train_valid_test_split"><code class="xref py py-obj docutils literal"><span class="pre">train_valid_test_split</span></code></a>(dataset[,&nbsp;...])</td>
+<td>Performs a train/valid/test split of the tasks for dataset.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="deepchem.splits.task_splitter.TaskSplitter.k_fold_split">
+<code class="descname">k_fold_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>K</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/task_splitter.html#TaskSplitter.k_fold_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.task_splitter.TaskSplitter.k_fold_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a K-fold split of the tasks for dataset.</p>
+<p>If split is uneven, spillover goes to last fold.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: dc.data.Dataset</strong></p>
+<blockquote>
+<div><p>Dataset to be split</p>
+</div></blockquote>
+<p><strong>K: int</strong></p>
+<blockquote class="last">
+<div><p>Number of splits to be made</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.task_splitter.TaskSplitter.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>dataset</em>, <em>frac_train=None</em>, <em>frac_valid=None</em>, <em>frac_test=None</em>, <em>log_every_n=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.task_splitter.TaskSplitter.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stub to be filled in by child classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.task_splitter.TaskSplitter.train_test_split">
+<code class="descname">train_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>train_dir=None</em>, <em>test_dir=None</em>, <em>seed=None</em>, <em>frac_train=0.8</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.splits.task_splitter.TaskSplitter.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits self into train/test sets.
+Returns Dataset objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.splits.task_splitter.TaskSplitter.train_valid_test_split">
+<code class="descname">train_valid_test_split</code><span class="sig-paren">(</span><em>dataset</em>, <em>frac_train=0.8</em>, <em>frac_valid=0.1</em>, <em>frac_test=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/task_splitter.html#TaskSplitter.train_valid_test_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.task_splitter.TaskSplitter.train_valid_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a train/valid/test split of the tasks for dataset.</p>
+<p>If split is uneven, spillover goes to test.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: dc.data.Dataset</strong></p>
+<blockquote>
+<div><p>Dataset to be split</p>
+</div></blockquote>
+<p><strong>frac_train: float, optional</strong></p>
+<blockquote>
+<div><p>Proportion of tasks to be put into train. Rounded to nearest int.</p>
+</div></blockquote>
+<p><strong>frac_valid: float, optional</strong></p>
+<blockquote>
+<div><p>Proportion of tasks to be put into valid. Rounded to nearest int.</p>
+</div></blockquote>
+<p><strong>frac_test: float, optional</strong></p>
+<blockquote class="last">
+<div><p>Proportion of tasks to be put into test. Rounded to nearest int.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.splits.task_splitter.merge_fold_datasets">
+<code class="descclassname">deepchem.splits.task_splitter.</code><code class="descname">merge_fold_datasets</code><span class="sig-paren">(</span><em>fold_datasets</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/splits/task_splitter.html#merge_fold_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.splits.task_splitter.merge_fold_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges fold datasets together.</p>
+<p>Assumes that fold_datasets were outputted from k_fold_split. Specifically,
+assumes that each dataset contains the same datapoints, listed in the same
+ordering.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.splits">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.splits" title="Permalink to this headline">¶</a></h2>
+<p>Gathers all splitters in one place for convenient imports</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.splits.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
