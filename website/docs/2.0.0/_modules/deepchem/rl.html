@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.rl &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.rl</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Interface for reinforcement learning.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.rl.a3c</span> <span class="kn">import</span> <span class="n">A3C</span>
+<span class="kn">from</span> <span class="nn">deepchem.rl.ppo</span> <span class="kn">import</span> <span class="n">PPO</span>
+
+
+<div class="viewcode-block" id="Environment"><a class="viewcode-back" href="../../deepchem.rl.html#deepchem.rl.Environment">[docs]</a><span class="k">class</span> <span class="nc">Environment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;An environment in which an actor performs actions to accomplish a task.</span>
+
+<span class="sd">  An environment has a current state, which is represented as either a single NumPy</span>
+<span class="sd">  array, or optionally a list of NumPy arrays.  When an action is taken, that causes</span>
+<span class="sd">  the state to be updated.  Exactly what is meant by an &quot;action&quot; is defined by each</span>
+<span class="sd">  subclass.  As far as this interface is concerned, it is simply an arbitrary object.</span>
+<span class="sd">  The environment also computes a reward for each action, and reports when the task</span>
+<span class="sd">  has been terminated (meaning that no more actions may be taken).</span>
+
+<span class="sd">  Environment objects should be written to support pickle and deepcopy operations.</span>
+<span class="sd">  Many algorithms involve creating multiple copies of the Environment, possibly</span>
+<span class="sd">  running in different processes or even on different computers.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_shape</span><span class="p">,</span> <span class="n">n_actions</span><span class="p">,</span> <span class="n">state_dtype</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclasses should call the superclass constructor in addition to doing their own initialization.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_state_shape</span> <span class="o">=</span> <span class="n">state_shape</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_n_actions</span> <span class="o">=</span> <span class="n">n_actions</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_terminated</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">state_dtype</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="c1"># Assume all arrays are float32.</span>
+      <span class="kn">import</span> <span class="nn">numpy</span>
+      <span class="kn">import</span> <span class="nn">collections</span>
+      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">collections</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_dtype</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">state_shape</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_dtype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_state_dtype</span> <span class="o">=</span> <span class="n">state_dtype</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The current state of the environment, represented as either a NumPy array or list of arrays.</span>
+
+<span class="sd">    If reset() has not yet been called at least once, this is undefined.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Whether the task has reached its end.</span>
+
+<span class="sd">    If reset() has not yet been called at least once, this is undefined.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminated</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">state_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The shape of the arrays that describe a state.</span>
+
+<span class="sd">    If the state is a single array, this returns a tuple giving the shape of that array.</span>
+<span class="sd">    If the state is a list of arrays, this returns a list of tuples where each tuple is</span>
+<span class="sd">    the shape of one array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_shape</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">state_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The dtypes of the arrays that describe a state.</span>
+
+<span class="sd">    If the state is a single array, this returns the dtype of that array.  If the state</span>
+<span class="sd">    is a list of arrays, this returns a list containing the dtypes of the arrays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_dtype</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">n_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The number of possible actions that can be performed in this Environment.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_actions</span>
+
+<div class="viewcode-block" id="Environment.reset"><a class="viewcode-back" href="../../deepchem.rl.html#deepchem.rl.Environment.reset">[docs]</a>  <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize the environment in preparation for doing calculations with it.</span>
+
+<span class="sd">    This must be called before calling step() or querying the state.  You can call it</span>
+<span class="sd">    again later to reset the environment back to its original state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s2">&quot;Subclasses must implement this&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Environment.step"><a class="viewcode-back" href="../../deepchem.rl.html#deepchem.rl.Environment.step">[docs]</a>  <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take a time step by performing an action.</span>
+
+<span class="sd">    This causes the &quot;state&quot; and &quot;terminated&quot; properties to be updated.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    action: object</span>
+<span class="sd">      an object describing the action to take</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    the reward earned by taking the action, represented as a floating point number</span>
+<span class="sd">    (higher values are better)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s2">&quot;Subclasses must implement this&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GymEnvironment"><a class="viewcode-back" href="../../deepchem.rl.html#deepchem.rl.GymEnvironment">[docs]</a><span class="k">class</span> <span class="nc">GymEnvironment</span><span class="p">(</span><span class="n">Environment</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;This is a convenience class for working with environments from OpenAI Gym.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an Environment wrapping the OpenAI Gym environment with a specified name.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">gym</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">GymEnvironment</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GymEnvironment.reset"><a class="viewcode-back" href="../../deepchem.rl.html#deepchem.rl.GymEnvironment.reset">[docs]</a>  <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_terminated</span> <span class="o">=</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="GymEnvironment.step"><a class="viewcode-back" href="../../deepchem.rl.html#deepchem.rl.GymEnvironment.step">[docs]</a>  <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminated</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">reward</span></div>
+
+  <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">GymEnvironment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Policy"><a class="viewcode-back" href="../../deepchem.rl.html#deepchem.rl.Policy">[docs]</a><span class="k">class</span> <span class="nc">Policy</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;A policy for taking actions within an environment.</span>
+
+<span class="sd">  A policy is defined by a set of TensorGraph Layer objects that perform the</span>
+<span class="sd">  necessary calculations.  There are many algorithms for reinforcement learning,</span>
+<span class="sd">  and they differ in what values they require a policy to compute.  That makes</span>
+<span class="sd">  it impossible to define a single interface allowing any policy to be optimized</span>
+<span class="sd">  with any algorithm.  Instead, this interface just tries to be as flexible and</span>
+<span class="sd">  generic as possible.  Each algorithm must document what values it expects</span>
+<span class="sd">  create_layers() to return.</span>
+
+<span class="sd">  Policy objects should be written to support pickling.  Many algorithms involve</span>
+<span class="sd">  creating multiple copies of the Policy, possibly running in different processes</span>
+<span class="sd">  or even on different computers.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Policy.create_layers"><a class="viewcode-back" href="../../deepchem.rl.html#deepchem.rl.Policy.create_layers">[docs]</a>  <span class="k">def</span> <span class="nf">create_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the TensorGraph Layers that define the policy.</span>
+
+<span class="sd">    The arguments always include a list of Feature layers representing the current</span>
+<span class="sd">    state of the environment (one layer for each array in the state).  Depending on</span>
+<span class="sd">    the algorithm being used, other arguments might get passed as well.  It is up</span>
+<span class="sd">    to each algorithm to document that.</span>
+
+<span class="sd">    This method should construct and return a dict that maps strings to Layer</span>
+<span class="sd">    objects.  Each algorithm must document what Layers it expects the policy to</span>
+<span class="sd">    create.  If this method is called multiple times, it should create a new set</span>
+<span class="sd">    of Layers every time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s2">&quot;Subclasses must implement this&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

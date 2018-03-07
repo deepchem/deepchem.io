@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tensorgraph.models.symmetry_function_regression &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html"><span><img src="../../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tensorgraph.models.symmetry_function_regression</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python2</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Jul  6 20:31:47 2017</span>
+
+<span class="sd">@author: zqwu</span>
+<span class="sd">@contributors: ytz</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">scipy.optimize</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+
+<span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">Concat</span><span class="p">,</span> <span class="n">WeightedError</span><span class="p">,</span> <span class="n">Stack</span><span class="p">,</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">ANIFeat</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">L2Loss</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Weights</span><span class="p">,</span> <span class="n">Feature</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.tensor_graph</span> <span class="kn">import</span> <span class="n">TensorGraph</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.graph_layers</span> <span class="kn">import</span> <span class="n">DTNNEmbedding</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.symmetry_functions</span> <span class="kn">import</span> <span class="n">DistanceMatrix</span><span class="p">,</span> \
+    <span class="n">DistanceCutoff</span><span class="p">,</span> <span class="n">RadialSymmetry</span><span class="p">,</span> <span class="n">AngularSymmetry</span><span class="p">,</span> <span class="n">AngularSymmetryMod</span><span class="p">,</span> \
+    <span class="n">BPFeatureMerge</span><span class="p">,</span> <span class="n">BPGather</span><span class="p">,</span> <span class="n">AtomicDifferentiatedDense</span>
+
+
+<div class="viewcode-block" id="BPSymmetryFunctionRegression"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.BPSymmetryFunctionRegression">[docs]</a><span class="k">class</span> <span class="nc">BPSymmetryFunctionRegression</span><span class="p">(</span><span class="n">TensorGraph</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_tasks</span><span class="p">,</span>
+               <span class="n">max_atoms</span><span class="p">,</span>
+               <span class="n">n_feat</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
+               <span class="n">layer_structures</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_tasks: int</span>
+<span class="sd">      Number of tasks</span>
+<span class="sd">    max_atoms: int</span>
+<span class="sd">      Maximum number of atoms in the dataset</span>
+<span class="sd">    n_hidden: int, optional</span>
+<span class="sd">      Number of hidden units in the readout function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span> <span class="o">=</span> <span class="n">n_tasks</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_feat</span> <span class="o">=</span> <span class="n">n_feat</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_structures</span> <span class="o">=</span> <span class="n">layer_structures</span>
+
+    <span class="nb">super</span><span class="p">(</span><span class="n">BPSymmetryFunctionRegression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">build_graph</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BPSymmetryFunctionRegression.build_graph"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.BPSymmetryFunctionRegression.build_graph">[docs]</a>  <span class="k">def</span> <span class="nf">build_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atom_flags</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atom_feats</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_feat</span><span class="p">))</span>
+    <span class="n">previous_layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_feats</span>
+
+    <span class="n">Hiddens</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n_hidden</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_structures</span><span class="p">:</span>
+      <span class="n">Hidden</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span>
+          <span class="n">out_channels</span><span class="o">=</span><span class="n">n_hidden</span><span class="p">,</span>
+          <span class="n">activation_fn</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span>
+          <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">previous_layer</span><span class="p">])</span>
+      <span class="n">Hiddens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Hidden</span><span class="p">)</span>
+      <span class="n">previous_layer</span> <span class="o">=</span> <span class="n">Hiddens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">costs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span><span class="p">):</span>
+      <span class="n">regression</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span>
+          <span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation_fn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">Hiddens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="n">BPGather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">regression</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_flags</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+      <span class="n">label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+      <span class="n">cost</span> <span class="o">=</span> <span class="n">L2Loss</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">label</span><span class="p">,</span> <span class="n">output</span><span class="p">])</span>
+      <span class="n">costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+
+    <span class="n">all_cost</span> <span class="o">=</span> <span class="n">Stack</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="n">costs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">Weights</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span><span class="p">))</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">WeightedError</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">all_cost</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BPSymmetryFunctionRegression.default_generator"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.BPSymmetryFunctionRegression.default_generator">[docs]</a>  <span class="k">def</span> <span class="nf">default_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">dataset</span><span class="p">,</span>
+                        <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">predict</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                        <span class="n">pad_batches</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Starting epoch </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">)</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span> <span class="n">ids_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+          <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+          <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+          <span class="n">pad_batches</span><span class="o">=</span><span class="n">pad_batches</span><span class="p">):</span>
+
+        <span class="n">feed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">y_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+          <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span><span class="p">):</span>
+            <span class="n">feed_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_b</span><span class="p">[:,</span> <span class="n">index</span><span class="p">:</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">w_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">]</span> <span class="o">=</span> <span class="n">w_b</span>
+
+        <span class="n">flags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_b</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_flags</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">flags</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span>\
+            <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">flags</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_feats</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_b</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">feed_dict</span></div></div>
+
+
+<div class="viewcode-block" id="ANIRegression"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression">[docs]</a><span class="k">class</span> <span class="nc">ANIRegression</span><span class="p">(</span><span class="n">TensorGraph</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_tasks</span><span class="p">,</span>
+               <span class="n">max_atoms</span><span class="p">,</span>
+               <span class="n">layer_structures</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span>
+               <span class="n">atom_number_cases</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_tasks: int</span>
+<span class="sd">      Number of tasks</span>
+<span class="sd">    max_atoms: int</span>
+<span class="sd">      Maximum number of atoms in the dataset</span>
+<span class="sd">    n_hidden: int, optional</span>
+<span class="sd">      Number of hidden units in the readout function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span> <span class="o">=</span> <span class="n">n_tasks</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_structures</span> <span class="o">=</span> <span class="n">layer_structures</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atom_number_cases</span> <span class="o">=</span> <span class="n">atom_number_cases</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">ANIRegression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># (ytz): this is really dirty but needed for restoring models</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;n_tasks&quot;</span><span class="p">:</span> <span class="n">n_tasks</span><span class="p">,</span>
+        <span class="s2">&quot;max_atoms&quot;</span><span class="p">:</span> <span class="n">max_atoms</span><span class="p">,</span>
+        <span class="s2">&quot;layer_structures&quot;</span><span class="p">:</span> <span class="n">layer_structures</span><span class="p">,</span>
+        <span class="s2">&quot;atom_number_cases&quot;</span><span class="p">:</span> <span class="n">atom_number_cases</span>
+    <span class="p">}</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">build_graph</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="ANIRegression.save"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.save">[docs]</a>  <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># recompute grad on restore</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">ANIRegression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ANIRegression.build_grad"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.build_grad">[docs]</a>  <span class="k">def</span> <span class="nf">build_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gradients</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_feats</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ANIRegression.compute_grad"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.compute_grad">[docs]</a>  <span class="k">def</span> <span class="nf">compute_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">upper_lim</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes a batched gradients given an input dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: dc.Dataset</span>
+<span class="sd">      dataset-like object whose X values will be used to compute</span>
+<span class="sd">      gradients from</span>
+<span class="sd">    upper_lim: int</span>
+<span class="sd">      subset of dataset used.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.array</span>
+<span class="sd">      Gradients of the input of shape (max_atoms, 4). Note that it is up to</span>
+<span class="sd">      the end user to slice this matrix into the correct shape, since it&#39;s very</span>
+<span class="sd">      likely the derivatives with respect to the atomic numbers are zero.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_grad</span><span class="p">()</span>
+
+      <span class="n">feed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+      <span class="n">X</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span>
+      <span class="n">flags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="n">upper_lim</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]))</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_flags</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">flags</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span>\
+          <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">flags</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_numbers</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="n">upper_lim</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+      <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_feats</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="n">upper_lim</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">grad</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ANIRegression.pred_one"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.pred_one">[docs]</a>  <span class="k">def</span> <span class="nf">pred_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">atomic_nums</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes an energy prediction for a set of atomic coordinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.array</span>
+<span class="sd">      numpy array of shape (a, 3) where a &lt;= max_atoms and</span>
+<span class="sd">      dtype is float-like</span>
+<span class="sd">    atomic_nums: np.array</span>
+<span class="sd">      numpy array of shape (a,) where a is the same as that of X. </span>
+<span class="sd">    constraints: unused</span>
+<span class="sd">      This parameter is mainly for compatibility purposes for scipy optimize</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">      Predicted energy. Note that the meaning of the returned value is</span>
+<span class="sd">      dependent on the training y-values both in semantics (relative vs absolute)</span>
+<span class="sd">      and units (kcal/mol vs Hartrees)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">atomic_nums</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">atomic_nums</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">atomic_nums</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">Z</span><span class="p">[:</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">:</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="n">Z</span><span class="p">[:</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">A</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">Z</span>
+    <span class="n">dd</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">NumpyDataset</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">dd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ANIRegression.grad_one"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.grad_one">[docs]</a>  <span class="k">def</span> <span class="nf">grad_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">atomic_nums</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes gradients for that of a single structure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.array</span>
+<span class="sd">      numpy array of shape (a, 3) where a &lt;= max_atoms and</span>
+<span class="sd">      dtype is float-like</span>
+<span class="sd">    atomic_nums: np.array</span>
+<span class="sd">      numpy array of shape (a,) where a is the same as that of X. </span>
+<span class="sd">    constraints: np.array</span>
+<span class="sd">      numpy array of indices of X used for constraining a subset</span>
+<span class="sd">      of the atoms of the molecule.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.array</span>
+<span class="sd">      derivatives of the same shape and type as input parameter X.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">atomic_nums</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">atomic_nums</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">atomic_nums</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">Z</span><span class="p">[:</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">:</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="n">Z</span><span class="p">[:</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">A</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">Z</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">dd</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">NumpyDataset</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_grad</span><span class="p">(</span><span class="n">dd</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">[:</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">if</span> <span class="n">constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">:</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">num_atoms</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,))</span></div>
+
+<div class="viewcode-block" id="ANIRegression.minimize_structure"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.minimize_structure">[docs]</a>  <span class="k">def</span> <span class="nf">minimize_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">atomic_nums</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimizes a structure, as defined by a set of coordinates and their atomic</span>
+<span class="sd">    numbers.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: np.array</span>
+<span class="sd">      numpy array of shape (a, 3) where a &lt;= max_atoms and</span>
+<span class="sd">      dtype is float-like</span>
+<span class="sd">    atomic_nums: np.array</span>
+<span class="sd">      numpy array of shape (a,) where a is the same as that of X. </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.array</span>
+<span class="sd">      minimized coordinates of the same shape and type as input parameter X.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">atomic_nums</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_one</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">atomic_nums</span><span class="p">,</span> <span class="n">constraints</span><span class="p">),</span>
+        <span class="n">jac</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grad_one</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;BFGS&quot;</span><span class="p">,</span>
+        <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ANIRegression.build_graph"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.build_graph">[docs]</a>  <span class="k">def</span> <span class="nf">build_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">atom_numbers</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atom_flags</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atom_feats</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="n">previous_layer</span> <span class="o">=</span> <span class="n">ANIFeat</span><span class="p">(</span>
+        <span class="n">in_layers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_feats</span><span class="p">,</span> <span class="n">max_atoms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">featurized</span> <span class="o">=</span> <span class="n">previous_layer</span>
+
+    <span class="n">Hiddens</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n_hidden</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_structures</span><span class="p">:</span>
+      <span class="n">Hidden</span> <span class="o">=</span> <span class="n">AtomicDifferentiatedDense</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span>
+          <span class="n">n_hidden</span><span class="p">,</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">atom_number_cases</span><span class="p">,</span>
+          <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;tanh&#39;</span><span class="p">,</span>
+          <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">previous_layer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_numbers</span><span class="p">])</span>
+      <span class="n">Hiddens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Hidden</span><span class="p">)</span>
+      <span class="n">previous_layer</span> <span class="o">=</span> <span class="n">Hiddens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">costs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span><span class="p">):</span>
+      <span class="n">regression</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span>
+          <span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation_fn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">Hiddens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="n">BPGather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">regression</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_flags</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+      <span class="n">label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+      <span class="n">cost</span> <span class="o">=</span> <span class="n">L2Loss</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">label</span><span class="p">,</span> <span class="n">output</span><span class="p">])</span>
+      <span class="n">costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+
+    <span class="n">all_cost</span> <span class="o">=</span> <span class="n">Stack</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="n">costs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">Weights</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tasks</span><span class="p">))</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">WeightedError</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">all_cost</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ANIRegression.default_generator"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.default_generator">[docs]</a>  <span class="k">def</span> <span class="nf">default_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">dataset</span><span class="p">,</span>
+                        <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">predict</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                        <span class="n">deterministic</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">pad_batches</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Starting epoch </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">)</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">,</span> <span class="n">w_b</span><span class="p">,</span> <span class="n">ids_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterbatches</span><span class="p">(</span>
+          <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+          <span class="n">deterministic</span><span class="o">=</span><span class="n">deterministic</span><span class="p">,</span>
+          <span class="n">pad_batches</span><span class="o">=</span><span class="n">pad_batches</span><span class="p">):</span>
+
+        <span class="n">feed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">y_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+          <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels_fd</span><span class="p">):</span>
+            <span class="n">feed_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_b</span><span class="p">[:,</span> <span class="n">index</span><span class="p">:</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">w_b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">predict</span><span class="p">:</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">]</span> <span class="o">=</span> <span class="n">w_b</span>
+
+        <span class="n">flags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_b</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_flags</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">flags</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span>\
+            <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">flags</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_numbers</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_b</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_feats</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_b</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">feed_dict</span></div>
+
+<div class="viewcode-block" id="ANIRegression.save_numpy"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.save_numpy">[docs]</a>  <span class="k">def</span> <span class="nf">save_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save to a portable numpy file. Note that this relies on the names to be consistent</span>
+<span class="sd">    across different versions. The file is saved as save_pickle.npz under the model_dir.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;save_pickle.npz&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">all_vars</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">()</span>
+      <span class="n">all_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">all_vars</span><span class="p">)</span>
+      <span class="n">save_dict</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_vars</span><span class="p">):</span>
+        <span class="n">save_dict</span><span class="p">[</span><span class="n">all_vars</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_vals</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+      <span class="n">save_dict</span><span class="p">[</span><span class="s2">&quot;_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+          <span class="p">[</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">)</span>
+
+      <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">save_dict</span><span class="p">)</span></div>
+
+  <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ANIRegression.load_numpy"><a class="viewcode-back" href="../../../../../deepchem.models.tensorgraph.models.html#deepchem.models.tensorgraph.models.symmetry_function_regression.ANIRegression.load_numpy">[docs]</a>  <span class="k">def</span> <span class="nf">load_numpy</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load from a portable numpy file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_dir: str</span>
+<span class="sd">      Location of the model directory.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;save_pickle.npz&quot;</span><span class="p">)</span>
+    <span class="n">npo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="n">json_blob</span> <span class="o">=</span> <span class="n">npo</span><span class="p">[</span><span class="s2">&quot;_kwargs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">)</span>
+
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_blob</span><span class="p">)</span>
+
+    <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+
+    <span class="n">all_ops</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">_get_tf</span><span class="p">(</span><span class="s2">&quot;Graph&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">g</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">all_vars</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">npo</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;_kwargs&quot;</span><span class="p">:</span>
+          <span class="k">continue</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="n">npo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">tensor</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">get_tensor_by_name</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">all_ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+
+      <span class="n">obj</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">all_ops</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">obj</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

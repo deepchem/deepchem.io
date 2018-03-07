@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tf_new_models package &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="index.html" />
+    <link rel="up" title="deepchem.models package" href="deepchem.models.html" />
+    <link rel="next" title="deepchem.models.xgboost_models package" href="deepchem.models.xgboost_models.html" />
+    <link rel="prev" title="deepchem.models.tensorgraph.models package" href="deepchem.models.tensorgraph.models.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">deepchem.models.tf_new_models package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.tf_new_models.graph_models">deepchem.models.tf_new_models.graph_models module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.tf_new_models.graph_topology">deepchem.models.tf_new_models.graph_topology module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.tf_new_models.multitask_classifier">deepchem.models.tf_new_models.multitask_classifier module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.tf_new_models.multitask_regressor">deepchem.models.tf_new_models.multitask_regressor module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.tf_new_models.support_classifier">deepchem.models.tf_new_models.support_classifier module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.tf_new_models.vina_model">deepchem.models.tf_new_models.vina_model module</a></li>
+<li><a class="reference internal" href="#module-deepchem.models.tf_new_models">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-models-tf-new-models-package">
+<h1>deepchem.models.tf_new_models package<a class="headerlink" href="#deepchem-models-tf-new-models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deepchem.models.tf_new_models.graph_models">
+<span id="deepchem-models-tf-new-models-graph-models-module"></span><h2>deepchem.models.tf_new_models.graph_models module<a class="headerlink" href="#module-deepchem.models.tf_new_models.graph_models" title="Permalink to this headline">¶</a></h2>
+<p>Convenience classes for assembling graph models.</p>
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_models.</code><code class="descname">AlternateSequentialWeaveGraph</code><span class="sig-paren">(</span><em>batch_size</em>, <em>max_atoms=50</em>, <em>n_atom_feat=75</em>, <em>n_pair_feat=14</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#AlternateSequentialWeaveGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph" title="deepchem.models.tf_new_models.graph_models.SequentialGraph"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.graph_models.SequentialGraph</span></code></a></p>
+<p>Alternate implementation of SequentialGraph for Weave models</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#AlternateSequentialWeaveGraph.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new layer to model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.get_graph_topology">
+<code class="descname">get_graph_topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.get_graph_topology" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.get_layer">
+<code class="descname">get_layer</code><span class="sig-paren">(</span><em>layer_id</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.get_layer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.get_num_output_features">
+<code class="descname">get_num_output_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.get_num_output_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the output shape of the featurization layers of the network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.return_inputs">
+<code class="descname">return_inputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.return_inputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.return_outputs">
+<code class="descname">return_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.AlternateSequentialWeaveGraph.return_outputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDAGGraph">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_models.</code><code class="descname">SequentialDAGGraph</code><span class="sig-paren">(</span><em>n_atom_feat=75</em>, <em>max_atoms=50</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialDAGGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph" title="deepchem.models.tf_new_models.graph_models.SequentialGraph"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.graph_models.SequentialGraph</span></code></a></p>
+<p>SequentialGraph for DAG models</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialDAGGraph.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new layer to model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.get_graph_topology">
+<code class="descname">get_graph_topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.get_graph_topology" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.get_layer">
+<code class="descname">get_layer</code><span class="sig-paren">(</span><em>layer_id</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.get_layer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.get_num_output_features">
+<code class="descname">get_num_output_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.get_num_output_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the output shape of the featurization layers of the network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.return_inputs">
+<code class="descname">return_inputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.return_inputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.return_outputs">
+<code class="descname">return_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDAGGraph.return_outputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_models.</code><code class="descname">SequentialDTNNGraph</code><span class="sig-paren">(</span><em>n_distance=100</em>, <em>distance_min=-1.0</em>, <em>distance_max=18.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialDTNNGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph" title="deepchem.models.tf_new_models.graph_models.SequentialGraph"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.graph_models.SequentialGraph</span></code></a></p>
+<p>An analog of Keras Sequential class for Coulomb Matrix data.</p>
+<p>automatically generates and passes topology placeholders to each layer.</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialDTNNGraph.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new layer to model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.get_graph_topology">
+<code class="descname">get_graph_topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.get_graph_topology" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.get_layer">
+<code class="descname">get_layer</code><span class="sig-paren">(</span><em>layer_id</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.get_layer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.get_num_output_features">
+<code class="descname">get_num_output_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.get_num_output_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the output shape of the featurization layers of the network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.return_inputs">
+<code class="descname">return_inputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.return_inputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.return_outputs">
+<code class="descname">return_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialDTNNGraph.return_outputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialGraph">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_models.</code><code class="descname">SequentialGraph</code><span class="sig-paren">(</span><em>n_feat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>An analog of Keras Sequential class for Graph data.</p>
+<p>Like the Sequential class from Keras, but automatically passes topology
+placeholders from GraphTopology to each graph layer (from layers) added
+to the network. Non graph layers don&#8217;t get the extra placeholders.</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialGraph.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialGraph.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new layer to model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialGraph.get_graph_topology">
+<code class="descname">get_graph_topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialGraph.get_graph_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph.get_graph_topology" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialGraph.get_layer">
+<code class="descname">get_layer</code><span class="sig-paren">(</span><em>layer_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialGraph.get_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph.get_layer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialGraph.get_num_output_features">
+<code class="descname">get_num_output_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialGraph.get_num_output_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph.get_num_output_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the output shape of the featurization layers of the network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialGraph.return_inputs">
+<code class="descname">return_inputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialGraph.return_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph.return_inputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialGraph.return_outputs">
+<code class="descname">return_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialGraph.return_outputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph.return_outputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_models.</code><code class="descname">SequentialSupportGraph</code><span class="sig-paren">(</span><em>n_feat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>An analog of Keras Sequential model for test/support models.</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a layer to both test/support stacks.</p>
+<p>Note that the layer transformation is performed independently on the
+test/support tensors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add_support">
+<code class="descname">add_support</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph.add_support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add_support" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a layer to support.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add_test">
+<code class="descname">add_test</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph.add_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.add_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a layer to test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.get_support_output">
+<code class="descname">get_support_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph.get_support_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.get_support_output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.get_test_output">
+<code class="descname">get_test_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph.get_test_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.get_test_output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.join">
+<code class="descname">join</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joins test and support to a two input two output layer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.return_inputs">
+<code class="descname">return_inputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph.return_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.return_inputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.return_outputs">
+<code class="descname">return_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialSupportGraph.return_outputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialSupportGraph.return_outputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_models.</code><code class="descname">SequentialWeaveGraph</code><span class="sig-paren">(</span><em>max_atoms=50</em>, <em>n_atom_feat=75</em>, <em>n_pair_feat=14</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialWeaveGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.graph_models.SequentialGraph" title="deepchem.models.tf_new_models.graph_models.SequentialGraph"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.graph_models.SequentialGraph</span></code></a></p>
+<p>SequentialGraph for Weave models</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_models.html#SequentialWeaveGraph.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new layer to model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.get_graph_topology">
+<code class="descname">get_graph_topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.get_graph_topology" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.get_layer">
+<code class="descname">get_layer</code><span class="sig-paren">(</span><em>layer_id</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.get_layer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.get_num_output_features">
+<code class="descname">get_num_output_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.get_num_output_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the output shape of the featurization layers of the network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.return_inputs">
+<code class="descname">return_inputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.return_inputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.return_outputs">
+<code class="descname">return_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_models.SequentialWeaveGraph.return_outputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.tf_new_models.graph_topology">
+<span id="deepchem-models-tf-new-models-graph-topology-module"></span><h2>deepchem.models.tf_new_models.graph_topology module<a class="headerlink" href="#module-deepchem.models.tf_new_models.graph_topology" title="Permalink to this headline">¶</a></h2>
+<p>Manages Placeholders for Graph convolution networks.</p>
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_topology.</code><code class="descname">AlternateWeaveGraphTopology</code><span class="sig-paren">(</span><em>batch_size</em>, <em>max_atoms=50</em>, <em>n_atom_feat=75</em>, <em>n_pair_feat=14</em>, <em>name='Weave_topology'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#AlternateWeaveGraphTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology" title="deepchem.models.tf_new_models.graph_topology.GraphTopology"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.graph_topology.GraphTopology</span></code></a></p>
+<p>Manages placeholders associated with batch of graphs and their topology</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.batch_to_feed_dict">
+<code class="descname">batch_to_feed_dict</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#AlternateWeaveGraphTopology.batch_to_feed_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.batch_to_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the current batch of WeaveMol into tensorflow feed_dict.</p>
+<p>Assigns the atom features and pair features to the
+placeholders tensors</p>
+<dl class="docutils">
+<dt>batch <span class="classifier-delimiter">:</span> <span class="classifier">np.ndarray</span></dt>
+<dd>Array of WeaveMol</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>feed_dict</strong> &#8211;
+Can be merged with other feed_dicts for input into tensorflow</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_atom_features_placeholder">
+<code class="descname">get_atom_features_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_atom_features_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_deg_adjacency_lists_placeholders">
+<code class="descname">get_deg_adjacency_lists_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_deg_adjacency_lists_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_deg_slice_placeholder">
+<code class="descname">get_deg_slice_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_deg_slice_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_input_placeholders">
+<code class="descname">get_input_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_input_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>All placeholders.</p>
+<p>Contains atom_features placeholder and topology placeholders.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_membership_placeholder">
+<code class="descname">get_membership_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_membership_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_pair_features_placeholder">
+<code class="descname">get_pair_features_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#AlternateWeaveGraphTopology.get_pair_features_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_pair_features_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_topology_placeholders">
+<code class="descname">get_topology_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.AlternateWeaveGraphTopology.get_topology_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns topology placeholders</p>
+<p>Consists of deg_slice_placeholder, membership_placeholder, and the
+deg_adj_list_placeholders.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_topology.</code><code class="descname">DAGGraphTopology</code><span class="sig-paren">(</span><em>n_atom_feat=75</em>, <em>max_atoms=50</em>, <em>name='topology'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#DAGGraphTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology" title="deepchem.models.tf_new_models.graph_topology.GraphTopology"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.graph_topology.GraphTopology</span></code></a></p>
+<p>GraphTopology for DAG models</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.batch_to_feed_dict">
+<code class="descname">batch_to_feed_dict</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#DAGGraphTopology.batch_to_feed_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.batch_to_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the current batch of mol_graphs into tensorflow feed_dict.</p>
+<p>Assigns the graph information in array of ConvMol objects to the
+placeholders tensors for DAG models</p>
+<dl class="docutils">
+<dt>batch <span class="classifier-delimiter">:</span> <span class="classifier">np.ndarray</span></dt>
+<dd>Array of ConvMol objects</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>feed_dict</strong> &#8211;
+Can be merged with other feed_dicts for input into tensorflow</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_atom_features_placeholder">
+<code class="descname">get_atom_features_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_atom_features_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_calculation_orders_placeholder">
+<code class="descname">get_calculation_orders_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#DAGGraphTopology.get_calculation_orders_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_calculation_orders_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_deg_adjacency_lists_placeholders">
+<code class="descname">get_deg_adjacency_lists_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_deg_adjacency_lists_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_deg_slice_placeholder">
+<code class="descname">get_deg_slice_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_deg_slice_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_input_placeholders">
+<code class="descname">get_input_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_input_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>All placeholders.</p>
+<p>Contains atom_features placeholder and topology placeholders.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_membership_placeholder">
+<code class="descname">get_membership_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_membership_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_parents_placeholder">
+<code class="descname">get_parents_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#DAGGraphTopology.get_parents_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_parents_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_topology_placeholders">
+<code class="descname">get_topology_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DAGGraphTopology.get_topology_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns topology placeholders</p>
+<p>Consists of deg_slice_placeholder, membership_placeholder, and the
+deg_adj_list_placeholders.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_topology.</code><code class="descname">DTNNGraphTopology</code><span class="sig-paren">(</span><em>n_distance=100</em>, <em>distance_min=-1.0</em>, <em>distance_max=18.0</em>, <em>name='DTNN_topology'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#DTNNGraphTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology" title="deepchem.models.tf_new_models.graph_topology.GraphTopology"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.graph_topology.GraphTopology</span></code></a></p>
+<p>Manages placeholders associated with batch of graphs and their topology</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.batch_to_feed_dict">
+<code class="descname">batch_to_feed_dict</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#DTNNGraphTopology.batch_to_feed_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.batch_to_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the current batch of Coulomb Matrix into tensorflow feed_dict.</p>
+<p>Assigns the atom number and distance info to the
+placeholders tensors</p>
+<dl class="docutils">
+<dt>batch <span class="classifier-delimiter">:</span> <span class="classifier">np.ndarray</span></dt>
+<dd>Array of Coulomb Matrix</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>feed_dict</strong> &#8211;
+Can be merged with other feed_dicts for input into tensorflow</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_atom_features_placeholder">
+<code class="descname">get_atom_features_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_atom_features_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_atom_number_placeholder">
+<code class="descname">get_atom_number_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#DTNNGraphTopology.get_atom_number_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_atom_number_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_deg_adjacency_lists_placeholders">
+<code class="descname">get_deg_adjacency_lists_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_deg_adjacency_lists_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_deg_slice_placeholder">
+<code class="descname">get_deg_slice_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_deg_slice_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_distance_placeholder">
+<code class="descname">get_distance_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#DTNNGraphTopology.get_distance_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_distance_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_input_placeholders">
+<code class="descname">get_input_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_input_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>All placeholders.</p>
+<p>Contains atom_features placeholder and topology placeholders.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_membership_placeholder">
+<code class="descname">get_membership_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_membership_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_topology_placeholders">
+<code class="descname">get_topology_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.DTNNGraphTopology.get_topology_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns topology placeholders</p>
+<p>Consists of deg_slice_placeholder, membership_placeholder, and the
+deg_adj_list_placeholders.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_topology.GraphTopology">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_topology.</code><code class="descname">GraphTopology</code><span class="sig-paren">(</span><em>n_feat</em>, <em>name='topology'</em>, <em>max_deg=10</em>, <em>min_deg=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#GraphTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Manages placeholders associated with batch of graphs and their topology</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.GraphTopology.batch_to_feed_dict">
+<code class="descname">batch_to_feed_dict</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#GraphTopology.batch_to_feed_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology.batch_to_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the current batch of mol_graphs into tensorflow feed_dict.</p>
+<p>Assigns the graph information in array of ConvMol objects to the
+placeholders tensors</p>
+<dl class="docutils">
+<dt>batch <span class="classifier-delimiter">:</span> <span class="classifier">np.ndarray</span></dt>
+<dd>Array of ConvMol objects</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>feed_dict</strong> &#8211;
+Can be merged with other feed_dicts for input into tensorflow</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.GraphTopology.get_atom_features_placeholder">
+<code class="descname">get_atom_features_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#GraphTopology.get_atom_features_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology.get_atom_features_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.GraphTopology.get_deg_adjacency_lists_placeholders">
+<code class="descname">get_deg_adjacency_lists_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#GraphTopology.get_deg_adjacency_lists_placeholders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology.get_deg_adjacency_lists_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.GraphTopology.get_deg_slice_placeholder">
+<code class="descname">get_deg_slice_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#GraphTopology.get_deg_slice_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology.get_deg_slice_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.GraphTopology.get_input_placeholders">
+<code class="descname">get_input_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#GraphTopology.get_input_placeholders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology.get_input_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>All placeholders.</p>
+<p>Contains atom_features placeholder and topology placeholders.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.GraphTopology.get_membership_placeholder">
+<code class="descname">get_membership_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#GraphTopology.get_membership_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology.get_membership_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.GraphTopology.get_topology_placeholders">
+<code class="descname">get_topology_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#GraphTopology.get_topology_placeholders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology.get_topology_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns topology placeholders</p>
+<p>Consists of deg_slice_placeholder, membership_placeholder, and the
+deg_adj_list_placeholders.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.graph_topology.</code><code class="descname">WeaveGraphTopology</code><span class="sig-paren">(</span><em>max_atoms=50</em>, <em>n_atom_feat=75</em>, <em>n_pair_feat=14</em>, <em>name='Weave_topology'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#WeaveGraphTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.graph_topology.GraphTopology" title="deepchem.models.tf_new_models.graph_topology.GraphTopology"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.graph_topology.GraphTopology</span></code></a></p>
+<p>Manages placeholders associated with batch of graphs and their topology</p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.batch_to_feed_dict">
+<code class="descname">batch_to_feed_dict</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#WeaveGraphTopology.batch_to_feed_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.batch_to_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the current batch of WeaveMol into tensorflow feed_dict.</p>
+<p>Assigns the atom features and pair features to the
+placeholders tensors</p>
+<dl class="docutils">
+<dt>batch <span class="classifier-delimiter">:</span> <span class="classifier">np.ndarray</span></dt>
+<dd>Array of WeaveMol</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>feed_dict</strong> &#8211;
+Can be merged with other feed_dicts for input into tensorflow</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_atom_features_placeholder">
+<code class="descname">get_atom_features_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_atom_features_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_deg_adjacency_lists_placeholders">
+<code class="descname">get_deg_adjacency_lists_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_deg_adjacency_lists_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_deg_slice_placeholder">
+<code class="descname">get_deg_slice_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_deg_slice_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_input_placeholders">
+<code class="descname">get_input_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_input_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>All placeholders.</p>
+<p>Contains atom_features placeholder and topology placeholders.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_membership_placeholder">
+<code class="descname">get_membership_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_membership_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_pair_features_placeholder">
+<code class="descname">get_pair_features_placeholder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#WeaveGraphTopology.get_pair_features_placeholder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_pair_features_placeholder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_topology_placeholders">
+<code class="descname">get_topology_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.WeaveGraphTopology.get_topology_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns topology placeholders</p>
+<p>Consists of deg_slice_placeholder, membership_placeholder, and the
+deg_adj_list_placeholders.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.graph_topology.merge_dicts">
+<code class="descclassname">deepchem.models.tf_new_models.graph_topology.</code><code class="descname">merge_dicts</code><span class="sig-paren">(</span><em>l</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#merge_dicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.merge_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function to merge list of dictionaries.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.graph_topology.merge_two_dicts">
+<code class="descclassname">deepchem.models.tf_new_models.graph_topology.</code><code class="descname">merge_two_dicts</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/graph_topology.html#merge_two_dicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.graph_topology.merge_two_dicts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.tf_new_models.multitask_classifier">
+<span id="deepchem-models-tf-new-models-multitask-classifier-module"></span><h2>deepchem.models.tf_new_models.multitask_classifier module<a class="headerlink" href="#module-deepchem.models.tf_new_models.multitask_classifier" title="Permalink to this headline">¶</a></h2>
+<p>Implements a multitask graph convolutional classifier.</p>
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.multitask_classifier.</code><code class="descname">MultitaskGraphClassifier</code><span class="sig-paren">(</span><em>model</em>, <em>n_tasks</em>, <em>n_feat</em>, <em>logdir=None</em>, <em>batch_size=50</em>, <em>final_loss='cross_entropy'</em>, <em>learning_rate=0.001</em>, <em>optimizer_type='adam'</em>, <em>learning_rate_decay_time=1000</em>, <em>beta1=0.9</em>, <em>beta2=0.999</em>, <em>pad_batches=True</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="deepchem.models.html#deepchem.models.models.Model" title="deepchem.models.models.Model"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.models.Model</span></code></a></p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.add_optimizer">
+<code class="descname">add_optimizer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.add_optimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.add_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.add_softmax">
+<code class="descname">add_softmax</code><span class="sig-paren">(</span><em>outputs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.add_softmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.add_softmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace logits with softmax outputs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.add_training_loss">
+<code class="descname">add_training_loss</code><span class="sig-paren">(</span><em>final_loss</em>, <em>logits</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.add_training_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.add_training_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes loss using logits.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.build">
+<code class="descname">build</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.construct_feed_dict">
+<code class="descname">construct_feed_dict</code><span class="sig-paren">(</span><em>X_b</em>, <em>y_b=None</em>, <em>w_b=None</em>, <em>training=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.construct_feed_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.construct_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get initial information about task normalization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>nb_epoch=10</em>, <em>max_checkpoints_to_keep=5</em>, <em>log_every_N_batches=50</em>, <em>checkpoint_interval=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.get_num_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Needed to use Model.predict() from superclass.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps predict to set batch_size/padding.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.predict_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return model output for the provided input.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>n_classes=2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps predict_proba to set batch_size/padding.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.predict_proba_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns class probabilities on batch</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#MultitaskGraphClassifier.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>No-op since this model doesn&#8217;t currently support saving...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.MultitaskGraphClassifier.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.multitask_classifier.get_loss_fn">
+<code class="descclassname">deepchem.models.tf_new_models.multitask_classifier.</code><code class="descname">get_loss_fn</code><span class="sig-paren">(</span><em>final_loss</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_classifier.html#get_loss_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_classifier.get_loss_fn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.tf_new_models.multitask_regressor">
+<span id="deepchem-models-tf-new-models-multitask-regressor-module"></span><h2>deepchem.models.tf_new_models.multitask_regressor module<a class="headerlink" href="#module-deepchem.models.tf_new_models.multitask_regressor" title="Permalink to this headline">¶</a></h2>
+<p>Implements a multitask graph-convolutional regression.</p>
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.multitask_regressor.</code><code class="descname">DTNNMultitaskGraphRegressor</code><span class="sig-paren">(</span><em>model</em>, <em>n_tasks</em>, <em>n_feat</em>, <em>logdir=None</em>, <em>batch_size=50</em>, <em>final_loss='weighted_L2'</em>, <em>learning_rate=0.001</em>, <em>optimizer_type='adam'</em>, <em>learning_rate_decay_time=1000</em>, <em>beta1=0.9</em>, <em>beta2=0.999</em>, <em>pad_batches=True</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#DTNNMultitaskGraphRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor" title="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor</span></code></a></p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.add_optimizer">
+<code class="descname">add_optimizer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.add_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.add_training_loss">
+<code class="descname">add_training_loss</code><span class="sig-paren">(</span><em>final_loss</em>, <em>outputs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.add_training_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes loss using logits.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.build">
+<code class="descname">build</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#DTNNMultitaskGraphRegressor.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.construct_feed_dict">
+<code class="descname">construct_feed_dict</code><span class="sig-paren">(</span><em>X_b</em>, <em>y_b=None</em>, <em>w_b=None</em>, <em>training=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.construct_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get initial information about task normalization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>nb_epoch=10</em>, <em>max_checkpoints_to_keep=5</em>, <em>log_every_N_batches=50</em>, <em>checkpoint_interval=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Needed to use Model.predict() from superclass.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps predict to set batch_size/padding.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return model output for the provided input.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Do transformers even make sense here?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples, n_classes*n_tasks)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions of class probabilities on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>No-op since this model doesn&#8217;t currently support saving...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.DTNNMultitaskGraphRegressor.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.multitask_regressor.</code><code class="descname">MultitaskGraphRegressor</code><span class="sig-paren">(</span><em>model</em>, <em>n_tasks</em>, <em>n_feat</em>, <em>logdir=None</em>, <em>batch_size=50</em>, <em>final_loss='weighted_L2'</em>, <em>learning_rate=0.001</em>, <em>optimizer_type='adam'</em>, <em>learning_rate_decay_time=1000</em>, <em>beta1=0.9</em>, <em>beta2=0.999</em>, <em>pad_batches=True</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="deepchem.models.html#deepchem.models.models.Model" title="deepchem.models.models.Model"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.models.Model</span></code></a></p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.add_optimizer">
+<code class="descname">add_optimizer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.add_optimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.add_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.add_training_loss">
+<code class="descname">add_training_loss</code><span class="sig-paren">(</span><em>final_loss</em>, <em>outputs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.add_training_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.add_training_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes loss using logits.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.build">
+<code class="descname">build</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.construct_feed_dict">
+<code class="descname">construct_feed_dict</code><span class="sig-paren">(</span><em>X_b</em>, <em>y_b=None</em>, <em>w_b=None</em>, <em>training=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.construct_feed_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.construct_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get initial information about task normalization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>nb_epoch=10</em>, <em>max_checkpoints_to_keep=5</em>, <em>log_every_N_batches=50</em>, <em>checkpoint_interval=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.get_num_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Needed to use Model.predict() from superclass.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps predict to set batch_size/padding.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.predict_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return model output for the provided input.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Do transformers even make sense here?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples, n_classes*n_tasks)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions of class probabilities on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/multitask_regressor.html#MultitaskGraphRegressor.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>No-op since this model doesn&#8217;t currently support saving...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.multitask_regressor.MultitaskGraphRegressor.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.tf_new_models.support_classifier">
+<span id="deepchem-models-tf-new-models-support-classifier-module"></span><h2>deepchem.models.tf_new_models.support_classifier module<a class="headerlink" href="#module-deepchem.models.tf_new_models.support_classifier" title="Permalink to this headline">¶</a></h2>
+<p>Train support-based models.</p>
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.support_classifier.</code><code class="descname">SupportGraphClassifier</code><span class="sig-paren">(</span><em>model</em>, <em>test_batch_size=10</em>, <em>support_batch_size=10</em>, <em>learning_rate=0.001</em>, <em>similarity='cosine'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="deepchem.models.html#deepchem.models.models.Model" title="deepchem.models.models.Model"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.models.Model</span></code></a></p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.add_placeholders">
+<code class="descname">add_placeholders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.add_placeholders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.add_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds placeholders to graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.add_training_loss">
+<code class="descname">add_training_loss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.add_training_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.add_training_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds training loss and scores for network.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.construct_feed_dict">
+<code class="descname">construct_feed_dict</code><span class="sig-paren">(</span><em>test</em>, <em>support</em>, <em>training=True</em>, <em>add_phase=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.construct_feed_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.construct_feed_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs tensorflow feed from test/support sets.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metric</em>, <em>n_pos</em>, <em>n_neg</em>, <em>n_trials=1000</em>, <em>exclude_support=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate performance on dataset according to metrics</p>
+<p>Evaluates the performance of the trained model by sampling supports randomly
+for each task in dataset. For each sampled support, the accuracy of the
+model with support provided is computed on all data for that task. If
+exclude_support is True (by default), the support set is excluded from this
+accuracy calculation. exclude_support should be set to false if model&#8217;s
+memorization capacity wants to be evaluated.</p>
+<p>Since the accuracy on a task is dependent on the choice of random support,
+the evaluation experiment is repeated n_trials times for each task.
+(Each task gets n_trials experiments). The computed accuracies
+are averaged across trials.</p>
+<p>TODO(rbharath): Currently does not support any transformers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset to test on.</li>
+<li><strong>metrics</strong> (<em>dc.metrics.Metric</em>) &#8211; Evaluation metric.</li>
+<li><strong>n_pos</strong> (<em>int, optional</em>) &#8211; Number of positive samples per support.</li>
+<li><strong>n_neg</strong> (<em>int, optional</em>) &#8211; Number of negative samples per support.</li>
+<li><strong>exclude_support</strong> (<em>bool, optional</em>) &#8211; Whether support set should be excluded when computing model accuracy.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>n_episodes_per_epoch=1000</em>, <em>nb_epochs=1</em>, <em>n_pos=1</em>, <em>n_neg=9</em>, <em>log_every_n_samples=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits model on dataset using cached supports.</p>
+<p>For each epcoh, sample n_episodes_per_epoch (support, test) pairs and does
+gradient descent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset to fit model on.</li>
+<li><strong>nb_epochs</strong> (<em>int, optional</em>) &#8211; number of epochs of training.</li>
+<li><strong>n_episodes_per_epoch</strong> (<em>int, optional</em>) &#8211; Number of (support, test) pairs to sample and train on per epoch.</li>
+<li><strong>n_pos</strong> (<em>int, optional</em>) &#8211; Number of positive examples per support.</li>
+<li><strong>n_neg</strong> (<em>int, optional</em>) &#8211; Number of negative examples per support.</li>
+<li><strong>log_every_n_samples</strong> (<em>int, optional</em>) &#8211; Displays info every this number of samples</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of tasks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_scores">
+<code class="descname">get_scores</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.get_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds tensor operations for computing scores.</p>
+<p>Computes prediction yhat (eqn (1) in Matching networks) of class for test
+compounds.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_training_op">
+<code class="descname">get_training_op</code><span class="sig-paren">(</span><em>loss</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.get_training_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.get_training_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attaches an optimizer to the graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>support</em>, <em>test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions on test given support.</p>
+<p>TODO(rbharath): Does not currently support any transforms.
+TODO(rbharath): Only for 1 task at a time currently. Is there a better way?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>support</em>, <em>test_batch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.predict_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make predictions on batch of data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>support</em>, <em>test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions on test given support.</p>
+<p>TODO(rbharath): Does not currently support any transforms.
+TODO(rbharath): Only for 1 task at a time currently. Is there a better way?
+:param support: The support dataset
+:type support: dc.data.Dataset
+:param test: The test dataset</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>support</em>, <em>test_batch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.predict_proba_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make predictions on batch of data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/support_classifier.html#SupportGraphClassifier.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save all models</p>
+<p>TODO(rbharath): Saving is not yet supported for this model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.support_classifier.SupportGraphClassifier.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.tf_new_models.vina_model">
+<span id="deepchem-models-tf-new-models-vina-model-module"></span><h2>deepchem.models.tf_new_models.vina_model module<a class="headerlink" href="#module-deepchem.models.tf_new_models.vina_model" title="Permalink to this headline">¶</a></h2>
+<p>Implements Autodock Vina&#8217;s pose-generation in tensorflow.</p>
+<dl class="class">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel">
+<em class="property">class </em><code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">VinaModel</code><span class="sig-paren">(</span><em>max_local_steps=10</em>, <em>max_mutations=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#VinaModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="deepchem.models.html#deepchem.models.models.Model" title="deepchem.models.models.Model"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.models.Model</span></code></a></p>
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.construct_graph">
+<code class="descname">construct_graph</code><span class="sig-paren">(</span><em>N_protein=1000</em>, <em>N_ligand=100</em>, <em>M=50</em>, <em>ndim=3</em>, <em>k=5</em>, <em>nbr_cutoff=6</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#VinaModel.construct_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.construct_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds the computational graph for Vina.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X_protein</em>, <em>Z_protein</em>, <em>X_ligand</em>, <em>Z_ligand</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#VinaModel.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit to actual data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.generate_conformation">
+<code class="descname">generate_conformation</code><span class="sig-paren">(</span><em>protein</em>, <em>ligand</em>, <em>max_steps=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#VinaModel.generate_conformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.generate_conformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the global search for conformations.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of tasks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.mutate_conformer">
+<code class="descname">mutate_conformer</code><span class="sig-paren">(</span><em>protein</em>, <em>ligand</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#VinaModel.mutate_conformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.mutate_conformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a mutation on the ligand position.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses self to make predictions on provided Dataset object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples,)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Do transformers even make sense here?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples, n_classes*n_tasks)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions of class probabilities on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispatcher function for saving.</p>
+<p>Each subclass is responsible for overriding this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.tf_new_models.vina_model.VinaModel.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.VinaModel.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.compute_closest_neighbors">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">compute_closest_neighbors</code><span class="sig-paren">(</span><em>coords</em>, <em>cells</em>, <em>atoms_in_cells</em>, <em>neighbor_cells</em>, <em>N</em>, <em>n_cells</em>, <em>ndim=3</em>, <em>k=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#compute_closest_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.compute_closest_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes nearest neighbors from neighboring cells.</p>
+<p>TODO(rbharath): Make this pass test</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atoms_in_cells</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; Of length n_cells. Each entry tensor of shape (k, ndim)</li>
+<li><strong>neighbor_cells</strong> (<em>tf.Tensor</em>) &#8211; Of shape (n_cells, 26).</li>
+<li><strong>N</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Number atoms</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.compute_neighbor_cells">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">compute_neighbor_cells</code><span class="sig-paren">(</span><em>cells</em>, <em>ndim</em>, <em>n_cells</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#compute_neighbor_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.compute_neighbor_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute neighbors of cells in grid.</p>
+<p># TODO(rbharath): Do we need to handle periodic boundary conditions
+properly here?
+# TODO(rbharath): This doesn&#8217;t handle boundaries well. We hard-code
+# looking for 26 neighbors, which isn&#8217;t right for boundary cells in
+# the cube.</p>
+<p>Note n_cells is box_size**ndim. 26 is the number of neighbors of a cube in
+a grid (including diagonals).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cells</strong> (<em>tf.Tensor</em>) &#8211; (n_cells, 26) shape.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.compute_neighbor_list">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">compute_neighbor_list</code><span class="sig-paren">(</span><em>coords</em>, <em>nbr_cutoff</em>, <em>N</em>, <em>M</em>, <em>n_cells</em>, <em>ndim=3</em>, <em>k=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#compute_neighbor_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.compute_neighbor_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes a neighbor list from atom coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>coords</strong> (<em>tf.Tensor</em>) &#8211; Shape (N, ndim)</li>
+<li><strong>N</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Max number atoms</li>
+<li><strong>M</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Max number neighbors</li>
+<li><strong>ndim</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Dimensionality of space.</li>
+<li><strong>k</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Number of nearest neighbors to pull down.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nbr_list</strong> &#8211;
+Shape (N, M) of atom indices</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tf.Tensor</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.cutoff">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">cutoff</code><span class="sig-paren">(</span><em>d</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#cutoff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.cutoff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Truncates interactions that are too far away.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.g">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">g</code><span class="sig-paren">(</span><em>c</em>, <em>Nrot</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#g"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nonlinear function mapping interactions to free energy.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.gauss_1">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">gauss_1</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#gauss_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.gauss_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes first Gaussian interaction term.</p>
+<p>Note that d must be in Angstrom</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.gauss_2">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">gauss_2</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#gauss_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.gauss_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes second Gaussian interaction term.</p>
+<p>Note that d must be in Angstrom.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.get_cells">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">get_cells</code><span class="sig-paren">(</span><em>start</em>, <em>stop</em>, <em>nbr_cutoff</em>, <em>ndim=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#get_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.get_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the locations of all grid points in box.</p>
+<p>Suppose start is -10 Angstrom, stop is 10 Angstrom, nbr_cutoff is 1.
+Then would return a list of length 20^3 whose entries would be
+[(-10, -10, -10), (-10, -10, -9), ..., (9, 9, 9)]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>cells</strong> &#8211;
+(box_size**ndim, ndim) shape.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tf.Tensor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.get_cells_for_atoms">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">get_cells_for_atoms</code><span class="sig-paren">(</span><em>coords</em>, <em>cells</em>, <em>N</em>, <em>n_cells</em>, <em>ndim=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#get_cells_for_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.get_cells_for_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the cells each atom belongs to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>coords</strong> (<em>tf.Tensor</em>) &#8211; Shape (N, ndim)</li>
+<li><strong>cells</strong> (<em>tf.Tensor</em>) &#8211; (box_size**ndim, ndim) shape.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cells_for_atoms</strong> &#8211;
+Shape (N, 1)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tf.Tensor</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.h">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">h</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#h"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum of energy terms used in Autodock Vina.</p>
+<div class="math">
+\[h_{t_i,t_j}(d) = w_1        extrm{gauss}_1(d) + w_2 extrm{gauss}_2(d) + w_3 extrm{repulsion}(d) + w_4       extrm{hydrophobic}(d) + w_5     extrm{hbond}(d)\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.hbond">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">hbond</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#hbond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.hbond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes hydrogen bond term.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.hydrophobic">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">hydrophobic</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#hydrophobic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.hydrophobic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute hydrophobic interaction term.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.put_atoms_in_cells">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">put_atoms_in_cells</code><span class="sig-paren">(</span><em>coords</em>, <em>cells</em>, <em>N</em>, <em>n_cells</em>, <em>ndim</em>, <em>k=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#put_atoms_in_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.put_atoms_in_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Place each atom into cells. O(N) runtime.</p>
+<p>Let N be the number of atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>coords</strong> (<em>tf.Tensor</em>) &#8211; (N, 3) shape.</li>
+<li><strong>cells</strong> (<em>tf.Tensor</em>) &#8211; (n_cells, ndim) shape.</li>
+<li><strong>N</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Number atoms</li>
+<li><strong>ndim</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Dimensionality of input space</li>
+<li><strong>k</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Number of nearest neighbors.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>closest_atoms</strong> &#8211;
+Of shape (n_cells, k, ndim)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tf.Tensor</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="deepchem.models.tf_new_models.vina_model.repulsion">
+<code class="descclassname">deepchem.models.tf_new_models.vina_model.</code><code class="descname">repulsion</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/tf_new_models/vina_model.html#repulsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.tf_new_models.vina_model.repulsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes repulsion interaction term.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.tf_new_models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.models.tf_new_models" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.models.tf_new_models.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

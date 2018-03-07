@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tensorgraph.sequential &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tensorgraph.sequential</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Convenience class for building sequential deep networks.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.tensor_graph</span> <span class="kn">import</span> <span class="n">TensorGraph</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Feature</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Label</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">SoftMaxCrossEntropy</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReduceMean</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">ReduceSquareDifference</span>
+
+
+<div class="viewcode-block" id="Sequential"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.sequential.Sequential">[docs]</a><span class="k">class</span> <span class="nc">Sequential</span><span class="p">(</span><span class="n">TensorGraph</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Sequential models are linear stacks of layers.</span>
+
+<span class="sd">  Analogous to the Sequential model from Keras and allows for less</span>
+<span class="sd">  verbose construction of simple deep learning model.</span>
+
+<span class="sd">  Example</span>
+<span class="sd">  -------</span>
+
+<span class="sd">  &gt;&gt;&gt; import deepchem as dc</span>
+<span class="sd">  &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">  &gt;&gt;&gt; from deepchem.models.tensorgraph import layers</span>
+<span class="sd">  &gt;&gt;&gt; # Define Data</span>
+<span class="sd">  &gt;&gt;&gt; X = np.random.rand(20, 2)                     </span>
+<span class="sd">  &gt;&gt;&gt; y = [[0, 1] for x in range(20)]</span>
+<span class="sd">  &gt;&gt;&gt; dataset = dc.data.NumpyDataset(X, y)                              </span>
+<span class="sd">  &gt;&gt;&gt; model = dc.models.Sequential(learning_rate=0.01)                  </span>
+<span class="sd">  &gt;&gt;&gt; model.add(layers.Dense(out_channels=2))                                  </span>
+<span class="sd">  &gt;&gt;&gt; model.add(layers.SoftMax())</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initializes a sequential model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_prev_layer</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="s2">&quot;use_queue&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;use_queue&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sequential doesn&#39;t support queues.&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;use_queue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_built</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">Sequential</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Sequential.add"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.sequential.Sequential.add">[docs]</a>  <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds a new layer to model.</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ---------</span>
+<span class="sd">    layer: Layer</span>
+<span class="sd">      Adds layer to this graph.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Sequential.fit"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.sequential.Sequential.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fits on the specified dataset.</span>
+
+<span class="sd">    If called for the first time, constructs the TensorFlow graph for this</span>
+<span class="sd">    model. Fits this graph on the specified dataset according to the specified</span>
+<span class="sd">    loss.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: dc.data.Dataset</span>
+<span class="sd">      Dataset with data</span>
+<span class="sd">    loss: string</span>
+<span class="sd">      Only &quot;binary_crossentropy&quot; or &quot;mse&quot; for now.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X_shape</span><span class="p">,</span> <span class="n">y_shape</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+    <span class="c1"># Calling fit() for first time</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">built</span><span class="p">:</span>
+      <span class="n">feature_shape</span> <span class="o">=</span> <span class="n">X_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+      <span class="n">label_shape</span> <span class="o">=</span> <span class="n">y_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+      <span class="c1"># Add in features</span>
+      <span class="n">features</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,)</span> <span class="o">+</span> <span class="n">feature_shape</span><span class="p">)</span>
+      <span class="c1"># Add in labels</span>
+      <span class="n">labels</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,)</span> <span class="o">+</span> <span class="n">label_shape</span><span class="p">)</span>
+
+      <span class="c1"># Add in all layers</span>
+      <span class="n">prev_layer</span> <span class="o">=</span> <span class="n">features</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No layers have been added to model.&quot;</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">in_layers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot specify more than one &quot;</span>
+                           <span class="s2">&quot;in_layer for Sequential.&quot;</span><span class="p">)</span>
+        <span class="n">layer</span><span class="o">.</span><span class="n">in_layers</span> <span class="o">+=</span> <span class="p">[</span><span class="n">prev_layer</span><span class="p">]</span>
+        <span class="n">prev_layer</span> <span class="o">=</span> <span class="n">layer</span>
+      <span class="c1"># The last layer is the output of the model</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prev_layer</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="n">loss</span> <span class="o">==</span> <span class="s2">&quot;binary_crossentropy&quot;</span><span class="p">:</span>
+        <span class="n">smce</span> <span class="o">=</span> <span class="n">SoftMaxCrossEntropy</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">labels</span><span class="p">,</span> <span class="n">prev_layer</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">ReduceMean</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">smce</span><span class="p">]))</span>
+      <span class="k">elif</span> <span class="n">loss</span> <span class="o">==</span> <span class="s2">&quot;mse&quot;</span><span class="p">:</span>
+        <span class="n">mse</span> <span class="o">=</span> <span class="n">ReduceSquareDifference</span><span class="p">(</span><span class="n">in_layers</span><span class="o">=</span><span class="p">[</span><span class="n">prev_layer</span><span class="p">,</span> <span class="n">labels</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_loss</span><span class="p">(</span><span class="n">mse</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># TODO(rbharath): Add in support for additional</span>
+        <span class="c1"># losses.</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported loss.&quot;</span><span class="p">)</span>
+
+    <span class="nb">super</span><span class="p">(</span><span class="n">Sequential</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Sequential.restore"><a class="viewcode-back" href="../../../../deepchem.models.tensorgraph.html#deepchem.models.tensorgraph.sequential.Sequential.restore">[docs]</a>  <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Not currently supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO(rbharath): The TensorGraph can&#39;t be built until</span>
+    <span class="c1"># fit is called since the shapes of features/labels</span>
+    <span class="c1"># not specified. Need to figure out a good restoration</span>
+    <span class="c1"># method for this use case.</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Restore is not yet supported &quot;</span> <span class="s2">&quot;for sequential models.&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

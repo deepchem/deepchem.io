@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.hyper.gaussian_process &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.hyper.gaussian_process</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains class for gaussian process hyperparameter optimizations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">deepchem.hyper.grid_search</span> <span class="kn">import</span> <span class="n">HyperparamOpt</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils.evaluate</span> <span class="kn">import</span> <span class="n">Evaluator</span>
+<span class="kn">from</span> <span class="nn">deepchem.molnet.run_benchmark_models</span> <span class="kn">import</span> <span class="n">benchmark_classification</span><span class="p">,</span> <span class="n">benchmark_regression</span>
+
+
+<div class="viewcode-block" id="GaussianProcessHyperparamOpt"><a class="viewcode-back" href="../../../deepchem.hyper.html#deepchem.hyper.gaussian_process.GaussianProcessHyperparamOpt">[docs]</a><span class="k">class</span> <span class="nc">GaussianProcessHyperparamOpt</span><span class="p">(</span><span class="n">HyperparamOpt</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Gaussian Process Global Optimization(GPGO)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GaussianProcessHyperparamOpt.hyperparam_search"><a class="viewcode-back" href="../../../deepchem.hyper.html#deepchem.hyper.gaussian_process.GaussianProcessHyperparamOpt.hyperparam_search">[docs]</a>  <span class="k">def</span> <span class="nf">hyperparam_search</span><span class="p">(</span>
+      <span class="bp">self</span><span class="p">,</span>
+      <span class="n">params_dict</span><span class="p">,</span>
+      <span class="n">train_dataset</span><span class="p">,</span>
+      <span class="n">valid_dataset</span><span class="p">,</span>
+      <span class="n">output_transformers</span><span class="p">,</span>
+      <span class="n">metric</span><span class="p">,</span>
+      <span class="n">direction</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+      <span class="n">n_features</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+      <span class="n">n_tasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+      <span class="n">search_range</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+      <span class="n">hp_invalid_list</span><span class="o">=</span><span class="p">[</span>
+          <span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="s1">&#39;nb_epoch&#39;</span><span class="p">,</span> <span class="s1">&#39;penalty_type&#39;</span><span class="p">,</span> <span class="s1">&#39;dropouts&#39;</span><span class="p">,</span> <span class="s1">&#39;bypass_dropouts&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;n_pair_feat&#39;</span><span class="p">,</span> <span class="s1">&#39;fit_transformers&#39;</span><span class="p">,</span> <span class="s1">&#39;min_child_weight&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;max_delta_step&#39;</span><span class="p">,</span> <span class="s1">&#39;subsample&#39;</span><span class="p">,</span> <span class="s1">&#39;colsample_bylevel&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;colsample_bytree&#39;</span><span class="p">,</span> <span class="s1">&#39;reg_alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;reg_lambda&#39;</span><span class="p">,</span> <span class="s1">&#39;scale_pos_weight&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;base_score&#39;</span>
+      <span class="p">],</span>
+      <span class="n">log_file</span><span class="o">=</span><span class="s1">&#39;GPhypersearch.log&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform hyperparams search using a gaussian process assumption</span>
+
+<span class="sd">    params_dict include single-valued parameters being optimized,</span>
+<span class="sd">    which should only contain int, float and list of int(float)</span>
+
+<span class="sd">    parameters with names in hp_invalid_list will not be changed.</span>
+
+<span class="sd">    For Molnet models, self.model_class is model name in string,</span>
+<span class="sd">    params_dict = dc.molnet.preset_hyper_parameters.hps[self.model_class]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params_dict: dict</span>
+<span class="sd">      dict including parameters and their initial values</span>
+<span class="sd">      parameters not suitable for optimization can be added to hp_invalid_list</span>
+<span class="sd">    train_dataset: dc.data.Dataset struct</span>
+<span class="sd">      dataset used for training</span>
+<span class="sd">    valid_dataset: dc.data.Dataset struct</span>
+<span class="sd">      dataset used for validation(optimization on valid scores)</span>
+<span class="sd">    output_transformers: list of dc.trans.Transformer</span>
+<span class="sd">      transformers for evaluation</span>
+<span class="sd">    metric: list of dc.metrics.Metric</span>
+<span class="sd">      metric used for evaluation</span>
+<span class="sd">    direction: bool</span>
+<span class="sd">      maximization(True) or minimization(False)</span>
+<span class="sd">    n_features: int</span>
+<span class="sd">      number of input features</span>
+<span class="sd">    n_tasks: int</span>
+<span class="sd">      number of tasks</span>
+<span class="sd">    max_iter: int</span>
+<span class="sd">      number of optimization trials</span>
+<span class="sd">    search_range: int(float)</span>
+<span class="sd">      optimization on [initial values / search_range,</span>
+<span class="sd">                       initial values * search_range]</span>
+<span class="sd">    hp_invalid_list: list</span>
+<span class="sd">      names of parameters that should not be optimized</span>
+<span class="sd">    logfile: string</span>
+<span class="sd">      name of log file, hyperparameters and results for each trial will be recorded</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hyper_parameters: dict</span>
+<span class="sd">      params_dict with all optimized values</span>
+<span class="sd">    valid_performance_opt: float</span>
+<span class="sd">      best performance on valid dataset</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Only use one metric&#39;</span>
+    <span class="n">hyper_parameters</span> <span class="o">=</span> <span class="n">params_dict</span>
+    <span class="n">hp_list</span> <span class="o">=</span> <span class="n">hyper_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_invalid_list</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list</span><span class="p">:</span>
+        <span class="n">hp_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">hp</span><span class="p">)</span>
+
+    <span class="n">hp_list_class</span> <span class="o">=</span> <span class="p">[</span><span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span> <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">hp_list_class</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">([</span><span class="nb">list</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span>
+    <span class="c1"># Float or int hyper parameters(ex. batch_size, learning_rate)</span>
+    <span class="n">hp_list_single</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">hp_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hp_list</span><span class="p">))</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">hp_list_class</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="nb">list</span>
+    <span class="p">]</span>
+    <span class="c1"># List of float or int hyper parameters(ex. layer_sizes)</span>
+    <span class="n">hp_list_multiple</span> <span class="o">=</span> <span class="p">[(</span><span class="n">hp_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp_list</span><span class="p">[</span><span class="n">i</span><span class="p">]]))</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hp_list</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">hp_list_class</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">]</span>
+
+    <span class="c1"># Number of parameters</span>
+    <span class="n">n_param</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hp_list_single</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hp_list_multiple</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">n_param</span> <span class="o">=</span> <span class="n">n_param</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">([</span><span class="n">hp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list_multiple</span><span class="p">])</span>
+    <span class="c1"># Range of optimization</span>
+    <span class="n">param_range</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list_single</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">param_range</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="s1">&#39;int&#39;</span><span class="p">),</span> <span class="p">[</span>
+            <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span> <span class="o">//</span> <span class="n">search_range</span><span class="p">,</span>
+            <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span> <span class="o">*</span> <span class="n">search_range</span>
+        <span class="p">]))</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">param_range</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="s1">&#39;cont&#39;</span><span class="p">),</span> <span class="p">[</span>
+            <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span> <span class="o">/</span> <span class="n">search_range</span><span class="p">,</span>
+            <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span> <span class="o">*</span> <span class="n">search_range</span>
+        <span class="p">]))</span>
+    <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list_multiple</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">param_range</span><span class="o">.</span><span class="n">extend</span><span class="p">([((</span><span class="s1">&#39;int&#39;</span><span class="p">),</span> <span class="p">[</span>
+            <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">i</span><span class="p">]</span> <span class="o">//</span> <span class="n">search_range</span><span class="p">,</span>
+            <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">search_range</span>
+        <span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hp</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">param_range</span><span class="o">.</span><span class="n">extend</span><span class="p">([((</span><span class="s1">&#39;cont&#39;</span><span class="p">),</span> <span class="p">[</span>
+            <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">search_range</span><span class="p">,</span>
+            <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">search_range</span>
+        <span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hp</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+
+    <span class="c1"># Dummy names</span>
+    <span class="n">param_name</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;l&#39;</span> <span class="o">+</span> <span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;02d&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)]</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">param_name</span><span class="p">[:</span><span class="n">n_param</span><span class="p">],</span> <span class="n">param_range</span><span class="p">))</span>
+
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DEEPCHEM_DATA_DIR&#39;</span><span class="p">]</span>
+    <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">log_file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">l00</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l01</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l02</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l03</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l04</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l05</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l06</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l07</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l08</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l09</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l10</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l11</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l12</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l13</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l14</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l15</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l16</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l17</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l18</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">l19</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot; Optimizing function</span>
+<span class="sd">      Take in hyper parameter values and return valid set performances</span>
+
+<span class="sd">      Parameters</span>
+<span class="sd">      ----------</span>
+<span class="sd">      l00~l19: int or float</span>
+<span class="sd">        placeholders for hyperparameters being optimized,</span>
+<span class="sd">        hyper_parameters dict is rebuilt based on input values of placeholders</span>
+
+<span class="sd">      Returns:</span>
+<span class="sd">      --------</span>
+<span class="sd">      valid_scores: float</span>
+<span class="sd">        valid set performances</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">args</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+      <span class="c1"># Input hyper parameters</span>
+      <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list_single</span><span class="p">:</span>
+        <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">param_name</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="n">param_range</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+          <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list_multiple</span><span class="p">:</span>
+        <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">param_name</span><span class="p">[</span><span class="n">j</span><span class="p">]])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">hp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">param_range</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+          <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">hp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+      <span class="k">print</span><span class="p">(</span><span class="n">hyper_parameters</span><span class="p">)</span>
+      <span class="c1"># Run benchmark</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># Record hyperparameters</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">hyper_parameters</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+          <span class="n">train_scores</span><span class="p">,</span> <span class="n">valid_scores</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">benchmark_classification</span><span class="p">(</span>
+              <span class="n">train_dataset</span><span class="p">,</span>
+              <span class="n">valid_dataset</span><span class="p">,</span>
+              <span class="n">valid_dataset</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;task_placeholder&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_tasks</span><span class="p">,</span>
+              <span class="n">output_transformers</span><span class="p">,</span>
+              <span class="n">n_features</span><span class="p">,</span>
+              <span class="n">metric</span><span class="p">,</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">,</span>
+              <span class="n">hyper_parameters</span><span class="o">=</span><span class="n">hyper_parameters</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+          <span class="n">train_scores</span><span class="p">,</span> <span class="n">valid_scores</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">benchmark_regression</span><span class="p">(</span>
+              <span class="n">train_dataset</span><span class="p">,</span>
+              <span class="n">valid_dataset</span><span class="p">,</span>
+              <span class="n">valid_dataset</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;task_placeholder&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_tasks</span><span class="p">,</span>
+              <span class="n">output_transformers</span><span class="p">,</span>
+              <span class="n">n_features</span><span class="p">,</span>
+              <span class="n">metric</span><span class="p">,</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">,</span>
+              <span class="n">hyper_parameters</span><span class="o">=</span><span class="n">hyper_parameters</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">valid_scores</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">][</span><span class="n">metric</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">model_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">(</span><span class="n">hyper_parameters</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">hyper_parameters</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">evaluator</span> <span class="o">=</span> <span class="n">Evaluator</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">output_transformers</span><span class="p">)</span>
+        <span class="n">multitask_scores</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">compute_model_performance</span><span class="p">([</span><span class="n">metric</span><span class="p">])</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">multitask_scores</span><span class="p">[</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># Record performances</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">score</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+      <span class="c1"># GPGO maximize performance by default, set performance to its negative value for minimization</span>
+      <span class="k">if</span> <span class="n">direction</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">score</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">score</span>
+
+    <span class="kn">import</span> <span class="nn">pyGPGO</span>
+    <span class="kn">from</span> <span class="nn">pyGPGO.covfunc</span> <span class="kn">import</span> <span class="n">matern32</span>
+    <span class="kn">from</span> <span class="nn">pyGPGO.acquisition</span> <span class="kn">import</span> <span class="n">Acquisition</span>
+    <span class="kn">from</span> <span class="nn">pyGPGO.surrogates.GaussianProcess</span> <span class="kn">import</span> <span class="n">GaussianProcess</span>
+    <span class="kn">from</span> <span class="nn">pyGPGO.GPGO</span> <span class="kn">import</span> <span class="n">GPGO</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">matern32</span><span class="p">()</span>
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">GaussianProcess</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
+    <span class="n">acq</span> <span class="o">=</span> <span class="n">Acquisition</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;ExpectedImprovement&#39;</span><span class="p">)</span>
+    <span class="n">gpgo</span> <span class="o">=</span> <span class="n">GPGO</span><span class="p">(</span><span class="n">gp</span><span class="p">,</span> <span class="n">acq</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Max number of iteration: </span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">max_iter</span><span class="p">)</span>
+    <span class="n">gpgo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">)</span>
+
+    <span class="n">hp_opt</span><span class="p">,</span> <span class="n">valid_performance_opt</span> <span class="o">=</span> <span class="n">gpgo</span><span class="o">.</span><span class="n">getResult</span><span class="p">()</span>
+    <span class="c1"># Readout best hyper parameters</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list_single</span><span class="p">:</span>
+      <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">hp_opt</span><span class="p">[</span><span class="n">param_name</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+      <span class="k">if</span> <span class="n">param_range</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+        <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">])</span>
+      <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hp_list_multiple</span><span class="p">:</span>
+      <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
+          <span class="nb">float</span><span class="p">(</span><span class="n">hp_opt</span><span class="p">[</span><span class="n">param_name</span><span class="p">[</span><span class="n">j</span><span class="p">]])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">hp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+      <span class="p">]</span>
+      <span class="k">if</span> <span class="n">param_range</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+        <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">hyper_parameters</span><span class="p">[</span><span class="n">hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+      <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">hp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Compare best model to default hyperparameters</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="c1"># Record hyperparameters</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">params_dict</span><span class="p">))</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">,</span>
+                                                       <span class="nb">unicode</span><span class="p">):</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">train_scores</span><span class="p">,</span> <span class="n">valid_scores</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">benchmark_classification</span><span class="p">(</span>
+            <span class="n">train_dataset</span><span class="p">,</span>
+            <span class="n">valid_dataset</span><span class="p">,</span>
+            <span class="n">valid_dataset</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;task_placeholder&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_tasks</span><span class="p">,</span>
+            <span class="n">output_transformers</span><span class="p">,</span>
+            <span class="n">n_features</span><span class="p">,</span>
+            <span class="n">metric</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">,</span>
+            <span class="n">hyper_parameters</span><span class="o">=</span><span class="n">params_dict</span><span class="p">)</span>
+      <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+        <span class="n">train_scores</span><span class="p">,</span> <span class="n">valid_scores</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">benchmark_regression</span><span class="p">(</span>
+            <span class="n">train_dataset</span><span class="p">,</span>
+            <span class="n">valid_dataset</span><span class="p">,</span>
+            <span class="n">valid_dataset</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;task_placeholder&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_tasks</span><span class="p">,</span>
+            <span class="n">output_transformers</span><span class="p">,</span>
+            <span class="n">n_features</span><span class="p">,</span>
+            <span class="n">metric</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">,</span>
+            <span class="n">hyper_parameters</span><span class="o">=</span><span class="n">params_dict</span><span class="p">)</span>
+      <span class="n">score</span> <span class="o">=</span> <span class="n">valid_scores</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_class</span><span class="p">][</span><span class="n">metric</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># Record performances</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">score</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">direction</span><span class="p">:</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="o">-</span><span class="n">score</span>
+      <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">valid_performance_opt</span><span class="p">:</span>
+        <span class="c1"># Optimized model is better, return hyperparameters</span>
+        <span class="k">return</span> <span class="n">params_dict</span><span class="p">,</span> <span class="n">score</span>
+
+    <span class="c1"># Return default hyperparameters</span>
+    <span class="k">return</span> <span class="n">hyper_parameters</span><span class="p">,</span> <span class="n">valid_performance_opt</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
