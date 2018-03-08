@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tensorflow_models.utils &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="deepchem.models.tensorflow_models" href="../tensorflow_models.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tensorflow_models.utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2015 Google Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Utils for graph convolution models.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.ops</span> <span class="kn">import</span> <span class="n">math_ops</span>
+
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">text_format</span>
+
+<span class="kn">from</span> <span class="nn">tensorflow.python.platform</span> <span class="kn">import</span> <span class="n">gfile</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.training</span> <span class="kn">import</span> <span class="n">checkpoint_state_pb2</span>
+
+
+<div class="viewcode-block" id="ParseCheckpoint"><a class="viewcode-back" href="../../../../deepchem.models.tensorflow_models.html#deepchem.models.tensorflow_models.utils.ParseCheckpoint">[docs]</a><span class="k">def</span> <span class="nf">ParseCheckpoint</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Parse a checkpoint file.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    checkpoint: Path to checkpoint. The checkpoint is either a serialized</span>
+<span class="sd">      CheckpointState proto or an actual checkpoint file.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    The path to an actual checkpoint file.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;ParseCheckpoint is deprecated. &quot;</span>
+                <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">cp</span> <span class="o">=</span> <span class="n">checkpoint_state_pb2</span><span class="o">.</span><span class="n">CheckpointState</span><span class="p">()</span>
+      <span class="n">text_format</span><span class="o">.</span><span class="n">Merge</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">cp</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">cp</span><span class="o">.</span><span class="n">model_checkpoint_path</span>
+    <span class="k">except</span> <span class="n">text_format</span><span class="o">.</span><span class="n">ParseError</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">checkpoint</span></div>
+
+
+<div class="viewcode-block" id="Mask"><a class="viewcode-back" href="../../../../deepchem.models.tensorflow_models.html#deepchem.models.tensorflow_models.utils.Mask">[docs]</a><span class="k">def</span> <span class="nf">Mask</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Apply a mask to a tensor.</span>
+
+<span class="sd">  If not None, mask should be a t.shape[:-1] tensor of 0,1 values.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    t: Input tensor.</span>
+<span class="sd">    mask: Boolean mask with shape == t.shape[:-1]. If None, nothing happens.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A tensor with the same shape as the input tensor.</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    ValueError: If shapes do not match.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Mask is deprecated. &quot;</span>
+                <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">t</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_compatible_with</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()):</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Shapes do not match: </span><span class="si">%s</span><span class="s1"> vs. </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">get_shape</span><span class="p">(),</span>
+                                                         <span class="n">mask</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()))</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Mean"><a class="viewcode-back" href="../../../../deepchem.models.tensorflow_models.html#deepchem.models.tensorflow_models.utils.Mean">[docs]</a><span class="k">def</span> <span class="nf">Mean</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute mean using Sum and Mul for better GPU performance.</span>
+
+<span class="sd">  See tf.nn.moments for additional notes on this approach.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    tensor: Input tensor.</span>
+<span class="sd">    reduction_indices: Axes to reduce across. If None, reduce to a scalar.</span>
+<span class="sd">    mask: Mask to apply to tensor.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A tensor with the same type as the input tensor.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Mean is deprecated. &quot;</span>
+                <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">Moment</span><span class="p">(</span>
+      <span class="mi">1</span><span class="p">,</span>
+      <span class="n">tensor</span><span class="p">,</span>
+      <span class="n">standardize</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+      <span class="n">reduction_indices</span><span class="o">=</span><span class="n">reduction_indices</span><span class="p">,</span>
+      <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Variance"><a class="viewcode-back" href="../../../../deepchem.models.tensorflow_models.html#deepchem.models.tensorflow_models.utils.Variance">[docs]</a><span class="k">def</span> <span class="nf">Variance</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute variance.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    tensor: Input tensor.</span>
+<span class="sd">    reduction_indices: Axes to reduce across. If None, reduce to a scalar.</span>
+<span class="sd">    mask: Mask to apply to tensor.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A tensor with the same type as the input tensor.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Variance is deprecated. &quot;</span>
+                <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">Moment</span><span class="p">(</span>
+      <span class="mi">2</span><span class="p">,</span>
+      <span class="n">tensor</span><span class="p">,</span>
+      <span class="n">standardize</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+      <span class="n">reduction_indices</span><span class="o">=</span><span class="n">reduction_indices</span><span class="p">,</span>
+      <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Skewness"><a class="viewcode-back" href="../../../../deepchem.models.tensorflow_models.html#deepchem.models.tensorflow_models.utils.Skewness">[docs]</a><span class="k">def</span> <span class="nf">Skewness</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute skewness, the third standardized moment.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    tensor: Input tensor.</span>
+<span class="sd">    reduction_indices: Axes to reduce across. If None, reduce to a scalar.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A tensor with the same type as the input tensor.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Skewness is deprecated. &quot;</span>
+                <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">Moment</span><span class="p">(</span>
+      <span class="mi">3</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="o">=</span><span class="n">reduction_indices</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Kurtosis"><a class="viewcode-back" href="../../../../deepchem.models.tensorflow_models.html#deepchem.models.tensorflow_models.utils.Kurtosis">[docs]</a><span class="k">def</span> <span class="nf">Kurtosis</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute kurtosis, the fourth standardized moment minus three.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    tensor: Input tensor.</span>
+<span class="sd">    reduction_indices: Axes to reduce across. If None, reduce to a scalar.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A tensor with the same type as the input tensor.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Kurtosis is deprecated. &quot;</span>
+                <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">Moment</span><span class="p">(</span>
+      <span class="mi">4</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="o">=</span><span class="n">reduction_indices</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="Moment"><a class="viewcode-back" href="../../../../deepchem.models.tensorflow_models.html#deepchem.models.tensorflow_models.utils.Moment">[docs]</a><span class="k">def</span> <span class="nf">Moment</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute the k-th central moment of a tensor, possibly standardized.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    k: Which moment to compute. 1 = mean, 2 = variance, etc.</span>
+<span class="sd">    tensor: Input tensor.</span>
+<span class="sd">    standardize: If True, returns the standardized moment, i.e. the central</span>
+<span class="sd">      moment divided by the n-th power of the standard deviation.</span>
+<span class="sd">    reduction_indices: Axes to reduce across. If None, reduce to a scalar.</span>
+<span class="sd">    mask: Mask to apply to tensor.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    The mean and the requested moment.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Moment is deprecated. &quot;</span>
+                <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">reduction_indices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">reduction_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">reduction_indices</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+  <span class="c1"># get the divisor</span>
+  <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">Mask</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+    <span class="n">ones</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">tensor</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+    <span class="n">divisor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span>
+        <span class="n">Mask</span><span class="p">(</span><span class="n">ones</span><span class="p">,</span> <span class="n">mask</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">reduction_indices</span><span class="p">,</span> <span class="n">keep_dims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">reduction_indices</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">divisor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">()),</span> <span class="n">tensor</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">divisor</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())):</span>
+      <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">reduction_indices</span><span class="p">:</span>
+        <span class="n">divisor</span> <span class="o">*=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">divisor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">divisor</span><span class="p">,</span> <span class="n">tensor</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+  <span class="c1"># compute the requested central moment</span>
+  <span class="c1"># note that mean is a raw moment, not a central moment</span>
+  <span class="n">mean</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">reduction_indices</span><span class="p">,</span> <span class="n">keep_dims</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span> <span class="n">divisor</span><span class="p">)</span>
+  <span class="n">delta</span> <span class="o">=</span> <span class="n">tensor</span> <span class="o">-</span> <span class="n">mean</span>
+  <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">Mask</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+  <span class="n">moment</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span>
+          <span class="n">math_ops</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">reduction_indices</span><span class="p">,</span> <span class="n">keep_dims</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+      <span class="n">divisor</span><span class="p">)</span>
+  <span class="n">moment</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">moment</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">standardize</span><span class="p">:</span>
+    <span class="n">moment</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
+        <span class="n">moment</span><span class="p">,</span>
+        <span class="n">math_ops</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">rsqrt</span><span class="p">(</span><span class="n">Moment</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="o">=</span><span class="n">reduction_indices</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="n">k</span><span class="p">))</span>
+
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">reduction_indices</span><span class="p">),</span> <span class="n">moment</span></div>
+
+
+<div class="viewcode-block" id="StringToOp"><a class="viewcode-back" href="../../../../deepchem.models.tensorflow_models.html#deepchem.models.tensorflow_models.utils.StringToOp">[docs]</a><span class="k">def</span> <span class="nf">StringToOp</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Get a TensorFlow op from a string.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    string: String description of an op, such as &#39;sum&#39; or &#39;mean&#39;.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A TensorFlow op.</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    NotImplementedError: If string does not match a supported operation.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;StringToOp is deprecated. &quot;</span>
+                <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+  <span class="c1"># TODO(user): median is not implemented yet in TensorFlow</span>
+  <span class="n">op_map</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">,</span>
+      <span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="n">Mean</span><span class="p">,</span>
+      <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">,</span>
+      <span class="s1">&#39;sum&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">,</span>
+      <span class="s1">&#39;variance&#39;</span><span class="p">:</span> <span class="n">Variance</span><span class="p">,</span>
+      <span class="s1">&#39;skewness&#39;</span><span class="p">:</span> <span class="n">Skewness</span><span class="p">,</span>
+      <span class="s1">&#39;kurtosis&#39;</span><span class="p">:</span> <span class="n">Kurtosis</span><span class="p">,</span>
+  <span class="p">}</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">op_map</span><span class="p">[</span><span class="n">string</span><span class="p">]</span>
+  <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Unrecognized op: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">string</span><span class="p">)</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.nn.layers &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.nn.layers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Custom Keras Layers.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Han Altae-Tran and Bharath Ramsundar&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn</span> <span class="kn">import</span> <span class="n">activations</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn</span> <span class="kn">import</span> <span class="n">initializations</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn</span> <span class="kn">import</span> <span class="n">model_ops</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn.copy</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn.copy</span> <span class="kn">import</span> <span class="n">Input</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn.copy</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn.copy</span> <span class="kn">import</span> <span class="n">Dropout</span>
+
+
+<div class="viewcode-block" id="affine"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.affine">[docs]</a><span class="k">def</span> <span class="nf">affine</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span></div>
+
+
+<div class="viewcode-block" id="tf_affine"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.tf_affine">[docs]</a><span class="k">def</span> <span class="nf">tf_affine</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">vm</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
+  <span class="n">W</span> <span class="o">=</span> <span class="n">vm</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="s1">&#39;W&#39;</span><span class="p">)</span>
+  <span class="n">b</span> <span class="o">=</span> <span class="n">vm</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span></div>
+
+
+<div class="viewcode-block" id="sum_neigh"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.sum_neigh">[docs]</a><span class="k">def</span> <span class="nf">sum_neigh</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">deg_adj_lists</span><span class="p">,</span> <span class="n">max_deg</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Store the summed atoms by degree&quot;&quot;&quot;</span>
+  <span class="n">deg_summed</span> <span class="o">=</span> <span class="n">max_deg</span> <span class="o">*</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span>
+
+  <span class="c1"># Tensorflow correctly processes empty lists when using concat</span>
+  <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_deg</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">gathered_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">deg_adj_lists</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># Sum along neighbors as well as self, and store</span>
+    <span class="n">summed_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">gathered_atoms</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">deg_summed</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">summed_atoms</span>
+
+  <span class="k">return</span> <span class="n">deg_summed</span></div>
+
+
+<div class="viewcode-block" id="graph_conv"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.graph_conv">[docs]</a><span class="k">def</span> <span class="nf">graph_conv</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">deg_adj_lists</span><span class="p">,</span> <span class="n">deg_slice</span><span class="p">,</span> <span class="n">max_deg</span><span class="p">,</span> <span class="n">min_deg</span><span class="p">,</span> <span class="n">W_list</span><span class="p">,</span>
+               <span class="n">b_list</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Core tensorflow function implementing graph convolution</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  atoms: tf.Tensor</span>
+<span class="sd">    Should be of shape (n_atoms, n_feat)</span>
+<span class="sd">  deg_adj_lists: list</span>
+<span class="sd">    Of length (max_deg+1-min_deg). The deg-th element is a list of</span>
+<span class="sd">    adjacency lists for atoms of degree deg.</span>
+<span class="sd">  deg_slice: tf.Tensor</span>
+<span class="sd">    Of shape (max_deg+1-min_deg,2). Explained in GraphTopology.</span>
+<span class="sd">  max_deg: int</span>
+<span class="sd">    Maximum degree of atoms in molecules.</span>
+<span class="sd">  min_deg: int</span>
+<span class="sd">    Minimum degree of atoms in molecules</span>
+<span class="sd">  W_list: list</span>
+<span class="sd">    List of learnable weights for convolution.</span>
+<span class="sd">  b_list: list</span>
+<span class="sd">    List of learnable biases for convolution.</span>
+
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  tf.Tensor</span>
+<span class="sd">    Of shape (n_atoms, n_feat)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">W</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">W_list</span><span class="p">)</span>
+  <span class="n">b</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">b_list</span><span class="p">)</span>
+
+  <span class="c1">#Sum all neighbors using adjacency matrix</span>
+  <span class="n">deg_summed</span> <span class="o">=</span> <span class="n">sum_neigh</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">deg_adj_lists</span><span class="p">,</span> <span class="n">max_deg</span><span class="p">)</span>
+
+  <span class="c1"># Get collection of modified atom features</span>
+  <span class="n">new_rel_atoms_collection</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_deg</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">)</span> <span class="o">*</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span>
+
+  <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_deg</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># Obtain relevant atoms for this degree</span>
+    <span class="n">rel_atoms</span> <span class="o">=</span> <span class="n">deg_summed</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Get self atoms</span>
+    <span class="n">begin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">deg_slice</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">deg_slice</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">self_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="c1"># Apply hidden affine to relevant atoms and append</span>
+    <span class="n">rel_out</span> <span class="o">=</span> <span class="n">affine</span><span class="p">(</span><span class="n">rel_atoms</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">W</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+    <span class="n">self_out</span> <span class="o">=</span> <span class="n">affine</span><span class="p">(</span><span class="n">self_atoms</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">W</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">rel_out</span> <span class="o">+</span> <span class="n">self_out</span>
+
+    <span class="n">new_rel_atoms_collection</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
+
+  <span class="c1"># Determine the min_deg=0 case</span>
+  <span class="k">if</span> <span class="n">min_deg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">deg</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">begin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">deg_slice</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">deg_slice</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">self_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="c1"># Only use the self layer</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">affine</span><span class="p">(</span><span class="n">self_atoms</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">W</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+
+    <span class="n">new_rel_atoms_collection</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
+
+  <span class="c1"># Combine all atoms back into the list</span>
+  <span class="n">activated_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">new_rel_atoms_collection</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">activated_atoms</span></div>
+
+
+<div class="viewcode-block" id="graph_gather"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.graph_gather">[docs]</a><span class="k">def</span> <span class="nf">graph_gather</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">membership_placeholder</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  atoms: tf.Tensor</span>
+<span class="sd">    Of shape (n_atoms, n_feat)</span>
+<span class="sd">  membership_placeholder: tf.Placeholder</span>
+<span class="sd">    Of shape (n_atoms,). Molecule each atom belongs to.</span>
+<span class="sd">  batch_size: int</span>
+<span class="sd">    Batch size for deep model.</span>
+
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  tf.Tensor</span>
+<span class="sd">    Of shape (batch_size, n_feat)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="c1"># WARNING: Does not work for Batch Size 1! If batch_size = 1, then use reduce_sum!</span>
+  <span class="k">assert</span> <span class="n">batch_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;graph_gather requires batches larger than 1&quot;</span>
+
+  <span class="c1"># Obtain the partitions for each of the molecules</span>
+  <span class="n">activated_par</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">dynamic_partition</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">membership_placeholder</span><span class="p">,</span>
+                                       <span class="n">batch_size</span><span class="p">)</span>
+
+  <span class="c1"># Sum over atoms for each molecule</span>
+  <span class="n">sparse_reps</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">activated</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">keep_dims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">activated</span> <span class="ow">in</span> <span class="n">activated_par</span>
+  <span class="p">]</span>
+
+  <span class="c1"># Get the final sparse representations</span>
+  <span class="n">sparse_reps</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">sparse_reps</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">sparse_reps</span></div>
+
+
+<div class="viewcode-block" id="graph_pool"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.graph_pool">[docs]</a><span class="k">def</span> <span class="nf">graph_pool</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">deg_adj_lists</span><span class="p">,</span> <span class="n">deg_slice</span><span class="p">,</span> <span class="n">max_deg</span><span class="p">,</span> <span class="n">min_deg</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  atoms: tf.Tensor</span>
+<span class="sd">    Of shape (n_atoms, n_feat)</span>
+<span class="sd">  deg_adj_lists: list</span>
+<span class="sd">    Of length (max_deg+1-min_deg). The deg-th element is a list of</span>
+<span class="sd">    adjacency lists for atoms of degree deg.</span>
+<span class="sd">  deg_slice: tf.Tensor</span>
+<span class="sd">    Of shape (max_deg+1-min_deg,2). Explained in GraphTopology.</span>
+<span class="sd">  max_deg: int</span>
+<span class="sd">    Maximum degree of atoms in molecules.</span>
+<span class="sd">  min_deg: int</span>
+<span class="sd">    Minimum degree of atoms in molecules</span>
+
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  tf.Tensor</span>
+<span class="sd">    Of shape (batch_size, n_feat)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1"># Store the summed atoms by degree</span>
+  <span class="n">deg_maxed</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_deg</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">)</span> <span class="o">*</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span>
+
+  <span class="c1"># Tensorflow correctly processes empty lists when using concat</span>
+
+  <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_deg</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># Get self atoms</span>
+    <span class="n">begin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">deg_slice</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">deg_slice</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">self_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="c1"># Expand dims</span>
+    <span class="n">self_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">self_atoms</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># always deg-1 for deg_adj_lists</span>
+    <span class="n">gathered_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">deg_adj_lists</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">gathered_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="n">self_atoms</span><span class="p">,</span> <span class="n">gathered_atoms</span><span class="p">])</span>
+
+    <span class="n">maxed_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">(</span><span class="n">gathered_atoms</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">deg_maxed</span><span class="p">[</span><span class="n">deg</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxed_atoms</span>
+
+  <span class="k">if</span> <span class="n">min_deg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">begin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">deg_slice</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">deg_slice</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">self_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+    <span class="n">deg_maxed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">self_atoms</span>
+
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">deg_maxed</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GraphConv"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphConv">[docs]</a><span class="k">class</span> <span class="nc">GraphConv</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;&quot;Performs a graph convolution.</span>
+
+<span class="sd">  Note this layer expects the presence of placeholders defined by GraphTopology</span>
+<span class="sd">  and expects that they follow the ordering provided by</span>
+<span class="sd">  GraphTopology.get_input_placeholders().</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">nb_filter</span><span class="p">,</span>
+               <span class="n">n_atom_features</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+               <span class="n">dropout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">max_deg</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+               <span class="n">min_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nb_filter: int</span>
+<span class="sd">      Number of convolutional filters.</span>
+<span class="sd">    n_atom_features: int</span>
+<span class="sd">      Number of features listed per atom.</span>
+<span class="sd">    init: str, optional</span>
+<span class="sd">      Weight initialization for filters.</span>
+<span class="sd">    activation: str, optional</span>
+<span class="sd">      Activation function applied after convolution.</span>
+<span class="sd">    dropout: float, optional</span>
+<span class="sd">      Dropout probability.</span>
+<span class="sd">    max_deg: int, optional</span>
+<span class="sd">      Maximum degree of atoms in molecules.</span>
+<span class="sd">    min_deg: int, optional</span>
+<span class="sd">      Minimum degree of atoms in molecules.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.GraphConv is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by dc.models.tensorgraph.layers.GraphConv&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">GraphConv</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>  <span class="c1"># Set weight initialization</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>  <span class="c1"># Get activations</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nb_filter</span> <span class="o">=</span> <span class="n">nb_filter</span>  <span class="c1"># Save number of filters</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">dropout</span>  <span class="c1"># Save dropout params</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_deg</span> <span class="o">=</span> <span class="n">max_deg</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">min_deg</span> <span class="o">=</span> <span class="n">min_deg</span>
+    <span class="c1"># TODO(rbharath): It&#39;s not clear where nb_affine comes from.</span>
+    <span class="c1"># Is there a solid explanation here?</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nb_affine</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">max_deg</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">min_deg</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_atom_features</span> <span class="o">=</span> <span class="n">n_atom_features</span>
+
+<div class="viewcode-block" id="GraphConv.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphConv.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot;Construct internal trainable weights.</span>
+
+<span class="sd">    n_atom_features should provide the number of features per atom.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_atom_features: int</span>
+<span class="sd">      Number of features provied per atom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_atom_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atom_features</span>
+
+    <span class="c1"># Generate the nb_affine weights and biases</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="n">n_atom_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_filter</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_affine</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nb_filter</span><span class="p">,</span>
+        <span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_affine</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span></div>
+
+<div class="viewcode-block" id="GraphConv.get_output_shape_for"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphConv.get_output_shape_for">[docs]</a>  <span class="k">def</span> <span class="nf">get_output_shape_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Output tensor shape produced by this layer.&quot;&quot;&quot;</span>
+    <span class="n">atom_features_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom_features_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+            <span class="s2">&quot;MolConv only takes 2 dimensional tensors for x&quot;</span>
+    <span class="n">n_atoms</span> <span class="o">=</span> <span class="n">atom_features_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_filter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GraphConv.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphConv.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    This layer is meant to be executed on a Graph. So x is expected to</span>
+<span class="sd">    be a list of placeholders, with the first placeholder the list of</span>
+<span class="sd">    atom_features (learned or input) at this level, the second the deg_slice,</span>
+<span class="sd">    the third the membership, and the remaining the deg_adj_lists.</span>
+
+<span class="sd">    Visually</span>
+
+<span class="sd">    x = [atom_features, deg_slice, membership, deg_adj_list placeholders...]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: list</span>
+<span class="sd">      list of Tensors of form described above.</span>
+<span class="sd">    mask: bool, optional</span>
+<span class="sd">      Ignored. Present only to shadow superclass call() method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    atom_features: tf.Tensor</span>
+<span class="sd">      Of shape (n_atoms, nb_filter)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Add trainable weights</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+
+    <span class="c1"># Extract atom_features</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Extract graph topology</span>
+    <span class="n">deg_slice</span><span class="p">,</span> <span class="n">membership</span><span class="p">,</span> <span class="n">deg_adj_lists</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+
+    <span class="c1"># Perform the mol conv</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">graph_conv</span><span class="p">(</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">deg_adj_lists</span><span class="p">,</span> <span class="n">deg_slice</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">max_deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="p">)</span>
+
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">atom_features</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">atom_features</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">)(</span><span class="n">atom_features</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">atom_features</span></div></div>
+
+
+<div class="viewcode-block" id="GraphGather"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphGather">[docs]</a><span class="k">class</span> <span class="nc">GraphGather</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Gathers information for each molecule.</span>
+
+<span class="sd">  The various graph convolution operations expect as input a tensor</span>
+<span class="sd">  atom_features of shape (n_atoms, n_feat). However, we train on batches of</span>
+<span class="sd">  molecules at a time. The GraphTopology object groups a list of molecules</span>
+<span class="sd">  into the atom_features tensor. The tensorial operations are done on this tensor,</span>
+<span class="sd">  but at the end, the atoms need to be grouped back into molecules. This</span>
+<span class="sd">  layer takes care of that operation.</span>
+
+<span class="sd">  Note this layer expects the presence of placeholders defined by GraphTopology</span>
+<span class="sd">  and expects that they follow the ordering provided by</span>
+<span class="sd">  GraphTopology.get_input_placeholders().</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    batch_size: int</span>
+<span class="sd">      Number of elements in batch of data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;The dc.nn.GraphGather is &quot;</span>
+        <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+        <span class="s2">&quot;Will be replaced by dc.models.tensorgraph.layers.GraphGather&quot;</span><span class="p">,</span>
+        <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">GraphGather</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>  <span class="c1"># Get activations</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+
+<div class="viewcode-block" id="GraphGather.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphGather.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Nothing needed (no learnable weights).&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GraphGather.get_output_shape_for"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphGather.get_output_shape_for">[docs]</a>  <span class="k">def</span> <span class="nf">get_output_shape_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Output tensor shape produced by this layer.&quot;&quot;&quot;</span>
+    <span class="c1"># Extract nodes and membership</span>
+    <span class="n">atom_features_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">membership_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom_features_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+            <span class="s2">&quot;GraphGather only takes 2 dimensional tensors&quot;</span>
+    <span class="n">n_feat</span> <span class="o">=</span> <span class="n">atom_features_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GraphGather.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphGather.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    This layer is meant to be executed on a Graph. So x is expected to</span>
+<span class="sd">    be a list of placeholders, with the first placeholder the list of</span>
+<span class="sd">    atom_features (learned or input) at this level, the second the deg_slice,</span>
+<span class="sd">    the third the membership, and the remaining the deg_adj_lists.</span>
+
+<span class="sd">    Visually</span>
+
+<span class="sd">    x = [atom_features, deg_slice, membership, deg_adj_list placeholders...]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: list</span>
+<span class="sd">      list of Tensors of form described above.</span>
+<span class="sd">    mask: bool, optional</span>
+<span class="sd">      Ignored. Present only to shadow superclass call() method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tf.Tensor</span>
+<span class="sd">      Of shape (batch_size, n_feat), where n_feat is number of atom_features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract atom_features</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Extract graph topology</span>
+    <span class="n">membership</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Perform the mol gather</span>
+    <span class="n">mol_features</span> <span class="o">=</span> <span class="n">graph_gather</span><span class="p">(</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">membership</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">mol_features</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GraphPool"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphPool">[docs]</a><span class="k">class</span> <span class="nc">GraphPool</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Performs a pooling operation over an arbitrary graph.</span>
+
+<span class="sd">  Performs a max pool over the feature vectors for an atom and its neighbors</span>
+<span class="sd">  in bond-graph. Returns a tensor of the same size as the input.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_deg</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">min_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_deg: int, optional</span>
+<span class="sd">      Maximum degree of atoms in molecules.</span>
+<span class="sd">    min_deg: int, optional</span>
+<span class="sd">      Minimum degree of atoms in molecules.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.GraphPool is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by dc.models.tensorgraph.layers.GraphPool&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_deg</span> <span class="o">=</span> <span class="n">max_deg</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">min_deg</span> <span class="o">=</span> <span class="n">min_deg</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">GraphPool</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GraphPool.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphPool.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Nothing needed (no learnable weights).&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GraphPool.get_output_shape_for"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphPool.get_output_shape_for">[docs]</a>  <span class="k">def</span> <span class="nf">get_output_shape_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Output tensor shape produced by this layer.&quot;&quot;&quot;</span>
+    <span class="c1"># Extract nodes</span>
+    <span class="n">atom_features_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom_features_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+            <span class="s2">&quot;GraphPool only takes 2 dimensional tensors&quot;</span>
+    <span class="k">return</span> <span class="n">atom_features_shape</span></div>
+
+<div class="viewcode-block" id="GraphPool.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.GraphPool.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    This layer is meant to be executed on a Graph. So x is expected to</span>
+<span class="sd">    be a list of placeholders, with the first placeholder the list of</span>
+<span class="sd">    atom_features (learned or input) at this level, the second the deg_slice,</span>
+<span class="sd">    the third the membership, and the remaining the deg_adj_lists.</span>
+
+<span class="sd">    Visually</span>
+
+<span class="sd">    x = [atom_features, deg_slice, membership, deg_adj_list placeholders...]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: list</span>
+<span class="sd">      list of Tensors of form described above.</span>
+<span class="sd">    mask: bool, optional</span>
+<span class="sd">      Ignored. Present only to shadow superclass call() method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tf.Tensor</span>
+<span class="sd">      Of shape (n_atoms, n_feat), where n_feat is number of atom_features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract atom_features</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Extract graph topology</span>
+    <span class="n">deg_slice</span><span class="p">,</span> <span class="n">membership</span><span class="p">,</span> <span class="n">deg_adj_lists</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+
+    <span class="c1"># Perform the mol gather</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">graph_pool</span><span class="p">(</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">deg_adj_lists</span><span class="p">,</span> <span class="n">deg_slice</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">max_deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_deg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">atom_features</span></div></div>
+
+
+<div class="viewcode-block" id="AttnLSTMEmbedding"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.AttnLSTMEmbedding">[docs]</a><span class="k">class</span> <span class="nc">AttnLSTMEmbedding</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Implements AttnLSTM as in matching networks paper.</span>
+
+<span class="sd">  References:</span>
+<span class="sd">  Matching Networks for One Shot Learning</span>
+<span class="sd">  https://arxiv.org/pdf/1606.04080v1.pdf</span>
+
+<span class="sd">  Order Matters: Sequence to sequence for sets</span>
+<span class="sd">  https://arxiv.org/abs/1511.06391</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_test</span><span class="p">,</span>
+               <span class="n">n_support</span><span class="p">,</span>
+               <span class="n">n_feat</span><span class="p">,</span>
+               <span class="n">max_depth</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+               <span class="n">dropout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_support: int</span>
+<span class="sd">      Size of support set.</span>
+<span class="sd">    n_test: int</span>
+<span class="sd">      Size of test set.</span>
+<span class="sd">    n_feat: int</span>
+<span class="sd">      Number of features per atom</span>
+<span class="sd">    max_depth: int</span>
+<span class="sd">      Number of &quot;processing steps&quot; used by sequence-to-sequence for sets model.</span>
+<span class="sd">    init: str, optional</span>
+<span class="sd">      Type of initialization of weights</span>
+<span class="sd">    activation: str, optional</span>
+<span class="sd">      Activation for layers.</span>
+<span class="sd">    dropout: float, optional</span>
+<span class="sd">      Dropout probability</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">AttnLSTMEmbedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>  <span class="c1"># Set weight initialization</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>  <span class="c1"># Get activations</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_test</span> <span class="o">=</span> <span class="n">n_test</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_support</span> <span class="o">=</span> <span class="n">n_support</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_feat</span> <span class="o">=</span> <span class="n">n_feat</span>
+
+<div class="viewcode-block" id="AttnLSTMEmbedding.get_output_shape_for"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.AttnLSTMEmbedding.get_output_shape_for">[docs]</a>  <span class="k">def</span> <span class="nf">get_output_shape_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the output shape. Same as input_shape.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_shape: list</span>
+<span class="sd">      Will be of form [(n_test, n_feat), (n_support, n_feat)]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">      Of same shape as input [(n_test, n_feat), (n_support, n_feat)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_input_shape</span><span class="p">,</span> <span class="n">xp_input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>  <span class="c1">#Unpack</span>
+
+    <span class="k">return</span> <span class="n">input_shape</span></div>
+
+<div class="viewcode-block" id="AttnLSTMEmbedding.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.AttnLSTMEmbedding.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_xp</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x_xp: list</span>
+<span class="sd">      List of two tensors (X, Xp). X should be of shape (n_test, n_feat) and</span>
+<span class="sd">      Xp should be of shape (n_support, n_feat) where n_test is the size of</span>
+<span class="sd">      the test set, n_support that of the support set, and n_feat is the number</span>
+<span class="sd">      of per-atom features.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">      Returns two tensors of same shape as input. Namely the output shape will</span>
+<span class="sd">      be [(n_test, n_feat), (n_support, n_feat)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># x is test set, xp is support set.</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">xp</span> <span class="o">=</span> <span class="n">x_xp</span>
+
+    <span class="c1">## Initializes trainable weights.</span>
+    <span class="n">n_feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_feat</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span> <span class="o">=</span> <span class="n">LSTMStep</span><span class="p">(</span><span class="n">n_feat</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">q_init</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">r_init</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">states_init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="o">.</span><span class="n">get_initial_states</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">q_init</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_init</span><span class="p">]</span>
+
+    <span class="c1">### Performs computations</span>
+
+    <span class="c1"># Get initializations</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_init</span>
+    <span class="c1">#r = self.r_init</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states_init</span>
+
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span><span class="p">):</span>
+      <span class="c1"># Process using attention</span>
+      <span class="c1"># Eqn (4), appendix A.1 of Matching Networks paper</span>
+      <span class="n">e</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">q</span><span class="p">,</span> <span class="n">xp</span><span class="p">)</span>
+      <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+      <span class="n">r</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">xp</span><span class="p">)</span>
+
+      <span class="c1"># Generate new aattention states</span>
+      <span class="n">y</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">q</span><span class="p">,</span> <span class="n">r</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">q</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">([</span><span class="n">y</span><span class="p">]</span> <span class="o">+</span> <span class="n">states</span><span class="p">)</span>  <span class="c1">#+ self.lstm.get_constants(x)</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="n">q</span><span class="p">,</span> <span class="n">xp</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AttnLSTMEmbedding.compute_mask"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.AttnLSTMEmbedding.compute_mask">[docs]</a>  <span class="k">def</span> <span class="nf">compute_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">mask</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">mask</span>
+    <span class="k">return</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="ResiLSTMEmbedding"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.ResiLSTMEmbedding">[docs]</a><span class="k">class</span> <span class="nc">ResiLSTMEmbedding</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Embeds its inputs using an LSTM layer.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_test</span><span class="p">,</span>
+               <span class="n">n_support</span><span class="p">,</span>
+               <span class="n">n_feat</span><span class="p">,</span>
+               <span class="n">max_depth</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Unlike the AttnLSTM model which only modifies the test vectors additively,</span>
+<span class="sd">    this model allows for an additive update to be performed to both test and</span>
+<span class="sd">    support using information from each other.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_support: int</span>
+<span class="sd">      Size of support set.</span>
+<span class="sd">    n_test: int</span>
+<span class="sd">      Size of test set.</span>
+<span class="sd">    n_feat: int</span>
+<span class="sd">      Number of input atom features</span>
+<span class="sd">    max_depth: int</span>
+<span class="sd">      Number of LSTM Embedding layers.</span>
+<span class="sd">    init: string</span>
+<span class="sd">      Type of weight initialization (from Keras)</span>
+<span class="sd">    activation: string</span>
+<span class="sd">      Activation type (ReLu/Linear/etc.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.ResiLSTMEmbedding is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by &quot;</span>
+                  <span class="s2">&quot;dc.models.tensorgraph.layers.IterRefLSTM&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">ResiLSTMEmbedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>  <span class="c1"># Set weight initialization</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>  <span class="c1"># Get activations</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_test</span> <span class="o">=</span> <span class="n">n_test</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_support</span> <span class="o">=</span> <span class="n">n_support</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_feat</span> <span class="o">=</span> <span class="n">n_feat</span>
+
+  <span class="c1">#def build(self, input_shape):</span>
+<div class="viewcode-block" id="ResiLSTMEmbedding.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.ResiLSTMEmbedding.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds this layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#_, support_input_shape = input_shape  #Unpack</span>
+    <span class="c1">#n_feat = support_input_shape[1]</span>
+    <span class="n">n_feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_feat</span>
+
+    <span class="c1"># Support set lstm</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">support_lstm</span> <span class="o">=</span> <span class="n">LSTMStep</span><span class="p">(</span><span class="n">n_feat</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">q_init</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n_support</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">support_states_init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">support_lstm</span><span class="o">.</span><span class="n">get_initial_states</span><span class="p">(</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_support</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+
+    <span class="c1"># Test lstm</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">test_lstm</span> <span class="o">=</span> <span class="n">LSTMStep</span><span class="p">(</span><span class="n">n_feat</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_feat</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">p_init</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">test_states_init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_lstm</span><span class="o">.</span><span class="n">get_initial_states</span><span class="p">(</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="ResiLSTMEmbedding.get_output_shape_for"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.ResiLSTMEmbedding.get_output_shape_for">[docs]</a>  <span class="k">def</span> <span class="nf">get_output_shape_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the output shape. Same as input_shape.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_shape: list</span>
+<span class="sd">      Will be of form [(n_test, n_feat), (n_support, n_feat)]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">      Of same shape as input [(n_test, n_feat), (n_support, n_feat)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">input_shape</span></div>
+
+<div class="viewcode-block" id="ResiLSTMEmbedding.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.ResiLSTMEmbedding.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argument</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    argument: list</span>
+<span class="sd">      List of two tensors (X, Xp). X should be of shape (n_test, n_feat) and</span>
+<span class="sd">      Xp should be of shape (n_support, n_feat) where n_test is the size of</span>
+<span class="sd">      the test set, n_support that of the support set, and n_feat is the number</span>
+<span class="sd">      of per-atom features.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">      Returns two tensors of same shape as input. Namely the output shape will</span>
+<span class="sd">      be [(n_test, n_feat), (n_support, n_feat)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">xp</span> <span class="o">=</span> <span class="n">argument</span>
+
+    <span class="c1"># Get initializations</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_init</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_init</span>
+    <span class="c1"># Rename support</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">xp</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">support_states_init</span>
+    <span class="n">x_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_states_init</span>
+
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span><span class="p">):</span>
+      <span class="c1"># Process support xp using attention</span>
+      <span class="n">e</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="n">q</span><span class="p">,</span> <span class="n">xp</span><span class="p">)</span>
+      <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+      <span class="c1"># Get linear combination of support set</span>
+      <span class="n">r</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">xp</span><span class="p">)</span>
+
+      <span class="c1"># Not sure if it helps to place the update here or later yet.  Will</span>
+      <span class="c1"># decide</span>
+      <span class="c1">#z = r</span>
+
+      <span class="c1"># Process test x using attention</span>
+      <span class="n">x_e</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">p</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+      <span class="n">x_a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">x_e</span><span class="p">)</span>
+      <span class="n">s</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x_a</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+      <span class="c1"># Generate new support attention states</span>
+      <span class="n">qr</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">q</span><span class="p">,</span> <span class="n">r</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">q</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">support_lstm</span><span class="p">([</span><span class="n">qr</span><span class="p">]</span> <span class="o">+</span> <span class="n">states</span><span class="p">)</span>
+
+      <span class="c1"># Generate new test attention states</span>
+      <span class="n">ps</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">p</span><span class="p">,</span> <span class="n">x_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_lstm</span><span class="p">([</span><span class="n">ps</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_states</span><span class="p">)</span>
+
+      <span class="c1"># Redefine</span>
+      <span class="n">z</span> <span class="o">=</span> <span class="n">r</span>
+
+    <span class="c1">#return [x+p, z+q]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="n">p</span><span class="p">,</span> <span class="n">xp</span> <span class="o">+</span> <span class="n">q</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ResiLSTMEmbedding.compute_mask"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.ResiLSTMEmbedding.compute_mask">[docs]</a>  <span class="k">def</span> <span class="nf">compute_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">mask</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">mask</span>
+    <span class="k">return</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="cos"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.cos">[docs]</a><span class="k">def</span> <span class="nf">cos</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+  <span class="n">denom</span> <span class="o">=</span> <span class="p">(</span>
+      <span class="n">model_ops</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">model_ops</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">*</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
+      <span class="o">+</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">epsilon</span><span class="p">())</span>
+  <span class="k">return</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">/</span> <span class="n">denom</span></div>
+
+
+<div class="viewcode-block" id="LSTMStep"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.LSTMStep">[docs]</a><span class="k">class</span> <span class="nc">LSTMStep</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot; LSTM whose call is a single step in the LSTM.</span>
+
+<span class="sd">  This layer exists because the Keras LSTM layer is intrinsically linked to an</span>
+<span class="sd">  RNN with sequence inputs, and here, we will not be using sequence inputs, but</span>
+<span class="sd">  rather we generate a sequence of inputs using the intermediate outputs of the</span>
+<span class="sd">  LSTM, and so will require step by step operation of the lstm</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">output_dim</span><span class="p">,</span>
+               <span class="n">input_dim</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="n">inner_init</span><span class="o">=</span><span class="s1">&#39;orthogonal&#39;</span><span class="p">,</span>
+               <span class="n">forget_bias_init</span><span class="o">=</span><span class="s1">&#39;one&#39;</span><span class="p">,</span>
+               <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;tanh&#39;</span><span class="p">,</span>
+               <span class="n">inner_activation</span><span class="o">=</span><span class="s1">&#39;hard_sigmoid&#39;</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.LSTMStep is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by dc.models.tensorgraph.layers.LSTMStep&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+
+    <span class="nb">super</span><span class="p">(</span><span class="n">LSTMStep</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span> <span class="o">=</span> <span class="n">output_dim</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">inner_init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">inner_init</span><span class="p">)</span>
+    <span class="c1"># No other forget biases supported right now.</span>
+    <span class="k">assert</span> <span class="n">forget_bias_init</span> <span class="o">==</span> <span class="s2">&quot;one&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">forget_bias_init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">forget_bias_init</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">inner_activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">inner_activation</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span> <span class="o">=</span> <span class="n">input_dim</span>
+
+<div class="viewcode-block" id="LSTMStep.get_initial_states"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.LSTMStep.get_initial_states">[docs]</a>  <span class="k">def</span> <span class="nf">get_initial_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">input_shape</span><span class="p">),</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)]</span></div>
+
+  <span class="c1">#def build(self, input_shape):</span>
+<div class="viewcode-block" id="LSTMStep.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.LSTMStep.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_init</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">))),</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LSTMStep.get_output_shape_for"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.LSTMStep.get_output_shape_for">[docs]</a>  <span class="k">def</span> <span class="nf">get_output_shape_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">h_tm1</span><span class="p">,</span> <span class="n">c_tm1</span> <span class="o">=</span> <span class="n">input_shape</span>  <span class="c1"># Unpack</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">),</span> <span class="n">h_tm1</span><span class="p">,</span> <span class="n">c_tm1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LSTMStep.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.LSTMStep.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_states</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">h_tm1</span><span class="p">,</span> <span class="n">c_tm1</span> <span class="o">=</span> <span class="n">x_states</span>  <span class="c1"># Unpack</span>
+
+    <span class="c1"># Taken from Keras code [citation needed]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">)</span> <span class="o">+</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">h_tm1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+
+    <span class="n">z0</span> <span class="o">=</span> <span class="n">z</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">]</span>
+    <span class="n">z1</span> <span class="o">=</span> <span class="n">z</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">]</span>
+    <span class="n">z2</span> <span class="o">=</span> <span class="n">z</span><span class="p">[:,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">:</span><span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">]</span>
+    <span class="n">z3</span> <span class="o">=</span> <span class="n">z</span><span class="p">[:,</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">:]</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_activation</span><span class="p">(</span><span class="n">z0</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_activation</span><span class="p">(</span><span class="n">z1</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">f</span> <span class="o">*</span> <span class="n">c_tm1</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_activation</span><span class="p">(</span><span class="n">z3</span><span class="p">)</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="n">o</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="c1">####################################################### DEBUG</span>
+    <span class="c1">#return o, [h, c]</span>
+    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="p">[</span><span class="n">h</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span></div></div>
+    <span class="c1">####################################################### DEBUG</span>
+
+
+<div class="viewcode-block" id="DTNNEmbedding"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNEmbedding">[docs]</a><span class="k">class</span> <span class="nc">DTNNEmbedding</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Generate embeddings for all atoms in the batch</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_embedding</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+               <span class="n">periodic_table_length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_embedding: int, optional</span>
+<span class="sd">      Number of features for each atom</span>
+<span class="sd">    periodic_table_length: int, optional</span>
+<span class="sd">      Length of embedding, 83=Bi</span>
+<span class="sd">    init: str, optional</span>
+<span class="sd">      Weight initialization for filters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.DTNNEmbedding is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by &quot;</span>
+                  <span class="s2">&quot;dc.models.tensorgraph.graph_layers.DTNNEmbedding&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span> <span class="o">=</span> <span class="n">n_embedding</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">periodic_table_length</span> <span class="o">=</span> <span class="n">periodic_table_length</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>  <span class="c1"># Set weight initialization</span>
+
+    <span class="nb">super</span><span class="p">(</span><span class="n">DTNNEmbedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DTNNEmbedding.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNEmbedding.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">embedding_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">periodic_table_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_list</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DTNNEmbedding.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNEmbedding.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: Tensor</span>
+<span class="sd">      1D tensor of length n_atoms (atomic number)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tf.Tensor</span>
+<span class="sd">      Of shape (n_atoms, n_embedding), where n_embedding is number of atom features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">embedding_lookup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_list</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">atom_features</span></div></div>
+
+
+<div class="viewcode-block" id="DTNNStep"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNStep">[docs]</a><span class="k">class</span> <span class="nc">DTNNStep</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;A convolution step that merge in distance and atom info of</span>
+<span class="sd">     all other atoms into current atom.</span>
+
+<span class="sd">     model based on https://arxiv.org/abs/1609.08259</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_embedding</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+               <span class="n">n_distance</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+               <span class="n">n_hidden</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;tanh&#39;</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_embedding: int, optional</span>
+<span class="sd">      Number of features for each atom</span>
+<span class="sd">    n_distance: int, optional</span>
+<span class="sd">      granularity of distance matrix</span>
+<span class="sd">    n_hidden: int, optional</span>
+<span class="sd">      Number of nodes in hidden layer</span>
+<span class="sd">    init: str, optional</span>
+<span class="sd">      Weight initialization for filters.</span>
+<span class="sd">    activation: str, optional</span>
+<span class="sd">      Activation function applied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.DTNNStep is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by &quot;</span>
+                  <span class="s2">&quot;dc.models.tensorgraph.graph_layers.DTNNStep&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span> <span class="o">=</span> <span class="n">n_embedding</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_distance</span> <span class="o">=</span> <span class="n">n_distance</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span> <span class="o">=</span> <span class="n">n_hidden</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>  <span class="c1"># Set weight initialization</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>  <span class="c1"># Get activations</span>
+
+    <span class="nb">super</span><span class="p">(</span><span class="n">DTNNStep</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DTNNStep.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNStep.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_cf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n_distance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_fc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_cf</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">,</span>
+    <span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_df</span> <span class="o">=</span> <span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">,</span>
+    <span class="p">])</span>
+    <span class="c1">#self.b_fc = model_ops.zeros(shape=[self.n_embedding,])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W_cf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_fc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_cf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_df</span>
+    <span class="p">]</span></div>
+
+<div class="viewcode-block" id="DTNNStep.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNStep.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: list of Tensor</span>
+<span class="sd">      should be [atom_features: n_atoms*n_embedding,</span>
+<span class="sd">                 distance_matrix: n_pairs*n_distance,</span>
+<span class="sd">                 atom_membership: n_atoms</span>
+<span class="sd">                 distance_membership_i: n_pairs,</span>
+<span class="sd">                 distance_membership_j: n_pairs,</span>
+<span class="sd">                 ]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tf.Tensor</span>
+<span class="sd">      new embeddings for atoms, same shape as x[0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">distance_membership_i</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">distance_membership_j</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">distance_hidden</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_df</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_df</span>
+    <span class="c1">#distance_hidden = self.activation(distance_hidden)</span>
+    <span class="n">atom_features_hidden</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">atom_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_cf</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_cf</span>
+    <span class="c1">#atom_features_hidden = self.activation(atom_features_hidden)</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">distance_hidden</span><span class="p">,</span>
+                          <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">atom_features_hidden</span><span class="p">,</span>
+                                    <span class="n">distance_membership_j</span><span class="p">))</span>
+
+    <span class="c1"># for atom i in a molecule m, this step multiplies together distance info of atom pair(i,j)</span>
+    <span class="c1"># and embeddings of atom j(both gone through a hidden layer)</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_fc</span><span class="p">)</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+
+    <span class="n">output_ii</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b_df</span><span class="p">,</span> <span class="n">atom_features_hidden</span><span class="p">)</span>
+    <span class="n">output_ii</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">output_ii</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_fc</span><span class="p">)</span>
+    <span class="n">output_ii</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">output_ii</span><span class="p">)</span>
+
+    <span class="c1"># for atom i, sum the influence from all other atom j in the molecule</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">segment_sum</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span>
+                             <span class="n">distance_membership_i</span><span class="p">)</span> <span class="o">-</span> <span class="n">output_ii</span> <span class="o">+</span> <span class="n">atom_features</span>
+
+    <span class="k">return</span> <span class="n">outputs</span></div></div>
+
+
+<div class="viewcode-block" id="DTNNGather"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNGather">[docs]</a><span class="k">class</span> <span class="nc">DTNNGather</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Map the atomic features into molecular properties and sum</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_embedding</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+               <span class="n">n_outputs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+               <span class="n">layer_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
+               <span class="n">output_activation</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;tanh&#39;</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_embedding: int, optional</span>
+<span class="sd">      Number of features for each atom</span>
+<span class="sd">    layer_sizes: list of int, optional(default=[1000])</span>
+<span class="sd">      Structure of hidden layer(s)</span>
+<span class="sd">    n_tasks: int, optional</span>
+<span class="sd">      Number of final summed outputs</span>
+<span class="sd">    init: str, optional</span>
+<span class="sd">      Weight initialization for filters.</span>
+<span class="sd">    activation: str, optional</span>
+<span class="sd">      Activation function applied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.DTNNGather is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by &quot;</span>
+                  <span class="s2">&quot;dc.models.tensorgraph.graph_layers.DTNNGather&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span> <span class="o">=</span> <span class="n">n_embedding</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_sizes</span> <span class="o">=</span> <span class="n">layer_sizes</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span> <span class="o">=</span> <span class="n">n_outputs</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">output_activation</span> <span class="o">=</span> <span class="n">output_activation</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>  <span class="c1"># Set weight initialization</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>  <span class="c1"># Get activations</span>
+
+    <span class="nb">super</span><span class="p">(</span><span class="n">DTNNGather</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DTNNGather.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNGather.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prev_layer_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_embedding</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer_size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_sizes</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="n">prev_layer_size</span><span class="p">,</span> <span class="n">layer_size</span><span class="p">]))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+          <span class="n">layer_size</span><span class="p">,</span>
+      <span class="p">]))</span>
+      <span class="n">prev_layer_size</span> <span class="o">=</span> <span class="n">layer_size</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="n">prev_layer_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span><span class="p">,</span>
+    <span class="p">]))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span></div>
+
+<div class="viewcode-block" id="DTNNGather.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DTNNGather.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: list of Tensor</span>
+<span class="sd">      should be [embedding tensor of molecules, of shape (batch_size*max_n_atoms*n_embedding),</span>
+<span class="sd">                 mask tensor of molecules, of shape (batch_size*max_n_atoms)]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of tf.Tensor</span>
+<span class="sd">      Of shape (batch_size)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">atom_membership</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">W</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_activation</span><span class="p">:</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">segment_sum</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">atom_membership</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span></div></div>
+
+
+<div class="viewcode-block" id="DAGLayer"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DAGLayer">[docs]</a><span class="k">class</span> <span class="nc">DAGLayer</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;&quot; Main layer of DAG model</span>
+<span class="sd">  For a molecule with n atoms, n different graphs are generated and run through</span>
+<span class="sd">  The final outputs of each graph become the graph features of corresponding</span>
+<span class="sd">  atom, which will be summed and put into another network in DAGGather Layer</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_graph_feat</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+               <span class="n">n_atom_feat</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span>
+               <span class="n">max_atoms</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+               <span class="n">layer_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span>
+               <span class="n">dropout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_graph_feat: int, optional</span>
+<span class="sd">      Number of features for each node(and the whole grah).</span>
+<span class="sd">    n_atom_feat: int, optional</span>
+<span class="sd">      Number of features listed per atom.</span>
+<span class="sd">    max_atoms: int, optional</span>
+<span class="sd">      Maximum number of atoms in molecules.</span>
+<span class="sd">    layer_sizes: list of int, optional(default=[1000])</span>
+<span class="sd">      Structure of hidden layer(s)</span>
+<span class="sd">    init: str, optional</span>
+<span class="sd">      Weight initialization for filters.</span>
+<span class="sd">    activation: str, optional</span>
+<span class="sd">      Activation function applied</span>
+<span class="sd">    dropout: float, optional</span>
+<span class="sd">      Dropout probability, not supported here</span>
+<span class="sd">    batch_size: int, optional</span>
+<span class="sd">      number of molecules in a batch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.DAGLayer is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by &quot;</span>
+                  <span class="s2">&quot;dc.models.tensorgraph.graph_layers.DAGLayer&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DAGLayer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>  <span class="c1"># Set weight initialization</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>  <span class="c1"># Get activations</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_sizes</span> <span class="o">=</span> <span class="n">layer_sizes</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">dropout</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_inputs</span> <span class="o">=</span> <span class="n">n_atom_feat</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_graph_feat</span>
+    <span class="c1"># number of inputs each step</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_graph_feat</span> <span class="o">=</span> <span class="n">n_graph_feat</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span> <span class="o">=</span> <span class="n">n_graph_feat</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_atom_feat</span> <span class="o">=</span> <span class="n">n_atom_feat</span>
+
+<div class="viewcode-block" id="DAGLayer.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DAGLayer.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot;Construct internal trainable weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prev_layer_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_inputs</span>
+    <span class="k">for</span> <span class="n">layer_size</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_sizes</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="n">prev_layer_size</span><span class="p">,</span> <span class="n">layer_size</span><span class="p">]))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+          <span class="n">layer_size</span><span class="p">,</span>
+      <span class="p">]))</span>
+      <span class="n">prev_layer_size</span> <span class="o">=</span> <span class="n">layer_size</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="n">prev_layer_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span><span class="p">,</span>
+    <span class="p">]))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span></div>
+
+<div class="viewcode-block" id="DAGLayer.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DAGLayer.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    x = [atom_features, parents, calculation_orders, calculation_masks, membership, n_atoms]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: list</span>
+<span class="sd">      list of Tensors of form described above.</span>
+<span class="sd">    mask: bool, optional</span>
+<span class="sd">      Ignored. Present only to shadow superclass call() method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    outputs: tf.Tensor</span>
+<span class="sd">      Tensor of atom features, of shape (n_atoms, n_graph_feat)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Add trainable weights</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="c1"># Extract atom_features</span>
+    <span class="c1"># Basic features of every atom: (batch_size*max_atoms) * n_atom_features</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># calculation orders of graph: (batch_size*max_atoms) * max_atoms * max_atoms</span>
+    <span class="c1"># each atom corresponds to a graph, which is represented by the `max_atoms*max_atoms` int32 matrix of index</span>
+    <span class="c1"># each gragh include `max_atoms` of steps(corresponding to rows) of calculating graph features</span>
+    <span class="c1"># step i calculates the graph features for atoms of index `parents[:,i,0]`</span>
+    <span class="n">parents</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># target atoms for each step: (batch_size*max_atoms) * max_atoms</span>
+    <span class="c1"># represent the same atoms of `parents[:, :, 0]`,</span>
+    <span class="c1"># different in that these index are positions in `atom_features`</span>
+    <span class="n">calculation_orders</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">calculation_masks</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="c1"># number of atoms in total, should equal `batch_size*max_atoms`</span>
+    <span class="n">n_atoms</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+
+    <span class="n">graph_features_initial</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_graph_feat</span><span class="p">))</span>
+    <span class="c1"># initialize graph features for each graph</span>
+    <span class="c1"># another row of zeros is generated for padded dummy atoms</span>
+    <span class="n">graph_features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">graph_features_initial</span><span class="p">,</span> <span class="n">trainable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span><span class="p">):</span>
+      <span class="c1"># `count`-th step</span>
+      <span class="c1"># extracting atom features of target atoms: (batch_size*max_atoms) * n_atom_features</span>
+      <span class="n">mask</span> <span class="o">=</span> <span class="n">calculation_masks</span><span class="p">[:,</span> <span class="n">count</span><span class="p">]</span>
+      <span class="n">current_round</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">boolean_mask</span><span class="p">(</span><span class="n">calculation_orders</span><span class="p">[:,</span> <span class="n">count</span><span class="p">],</span> <span class="n">mask</span><span class="p">)</span>
+      <span class="n">batch_atom_features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">current_round</span><span class="p">)</span>
+
+      <span class="c1"># generating index for graph features used in the inputs</span>
+      <span class="n">index</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+          <span class="p">[</span>
+              <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                  <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+                      <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">boolean_mask</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">),</span> <span class="n">mask</span><span class="p">)]</span> <span class="o">*</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+                      <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+              <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">boolean_mask</span><span class="p">(</span><span class="n">parents</span><span class="p">[:,</span> <span class="n">count</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">mask</span><span class="p">),</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+          <span class="p">],</span>
+          <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="c1"># extracting graph features for parents of the target atoms, then flatten</span>
+      <span class="c1"># shape: (batch_size*max_atoms) * [(max_atoms-1)*n_graph_features]</span>
+      <span class="n">batch_graph_features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">graph_features</span><span class="p">,</span> <span class="n">index</span><span class="p">),</span>
+          <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_graph_feat</span><span class="p">])</span>
+
+      <span class="c1"># concat into the input tensor: (batch_size*max_atoms) * n_inputs</span>
+      <span class="n">batch_inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+          <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="n">batch_atom_features</span><span class="p">,</span> <span class="n">batch_graph_features</span><span class="p">])</span>
+      <span class="c1"># DAGgraph_step maps from batch_inputs to a batch of graph_features</span>
+      <span class="c1"># of shape: (batch_size*max_atoms) * n_graph_features</span>
+      <span class="c1"># representing the graph features of target atoms in each graph</span>
+      <span class="n">batch_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DAGgraph_step</span><span class="p">(</span><span class="n">batch_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="p">)</span>
+
+      <span class="c1"># index for targe atoms</span>
+      <span class="n">target_index</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">),</span> <span class="n">parents</span><span class="p">[:,</span> <span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">target_index</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">boolean_mask</span><span class="p">(</span><span class="n">target_index</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+      <span class="c1"># update the graph features for target atoms</span>
+      <span class="n">graph_features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">scatter_nd_update</span><span class="p">(</span><span class="n">graph_features</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span>
+                                            <span class="n">batch_outputs</span><span class="p">)</span>
+
+    <span class="c1"># last step generates graph features for all target atom</span>
+    <span class="k">return</span> <span class="n">batch_outputs</span></div>
+
+<div class="viewcode-block" id="DAGLayer.DAGgraph_step"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DAGLayer.DAGgraph_step">[docs]</a>  <span class="k">def</span> <span class="nf">DAGgraph_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_inputs</span><span class="p">,</span> <span class="n">W_list</span><span class="p">,</span> <span class="n">b_list</span><span class="p">):</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">batch_inputs</span>
+    <span class="k">for</span> <span class="n">idw</span><span class="p">,</span> <span class="n">W</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">W_list</span><span class="p">):</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">xw_plus_b</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">b_list</span><span class="p">[</span><span class="n">idw</span><span class="p">])</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outputs</span></div></div>
+
+
+<div class="viewcode-block" id="DAGGather"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DAGGather">[docs]</a><span class="k">class</span> <span class="nc">DAGGather</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot; Gather layer of DAG model</span>
+<span class="sd">  for each molecule, graph outputs are summed and input into another NN</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">n_graph_feat</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+               <span class="n">n_outputs</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+               <span class="n">max_atoms</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+               <span class="n">layer_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span>
+               <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span>
+               <span class="n">dropout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_graph_feat: int, optional</span>
+<span class="sd">      Number of features for each atom</span>
+<span class="sd">    n_outputs: int, optional</span>
+<span class="sd">      Number of features for each molecule.</span>
+<span class="sd">    max_atoms: int, optional</span>
+<span class="sd">      Maximum number of atoms in molecules.</span>
+<span class="sd">    layer_sizes: list of int, optional</span>
+<span class="sd">      Structure of hidden layer(s)</span>
+<span class="sd">    init: str, optional</span>
+<span class="sd">      Weight initialization for filters.</span>
+<span class="sd">    activation: str, optional</span>
+<span class="sd">      Activation function applied</span>
+<span class="sd">    dropout: float, optional</span>
+<span class="sd">      Dropout probability, not supported</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The dc.nn.DAGGather is &quot;</span>
+                  <span class="s2">&quot;deprecated. Will be removed in DeepChem 1.4. &quot;</span>
+                  <span class="s2">&quot;Will be replaced by &quot;</span>
+                  <span class="s2">&quot;dc.models.tensorgraph.graph_layers.DAGGather&quot;</span><span class="p">,</span>
+                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DAGGather</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">initializations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>  <span class="c1"># Set weight initialization</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>  <span class="c1"># Get activations</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_sizes</span> <span class="o">=</span> <span class="n">layer_sizes</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">dropout</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_graph_feat</span> <span class="o">=</span> <span class="n">n_graph_feat</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span> <span class="o">=</span> <span class="n">n_outputs</span>
+
+<div class="viewcode-block" id="DAGGather.build"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DAGGather.build">[docs]</a>  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot;Construct internal trainable weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prev_layer_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_graph_feat</span>
+    <span class="k">for</span> <span class="n">layer_size</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_sizes</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="n">prev_layer_size</span><span class="p">,</span> <span class="n">layer_size</span><span class="p">]))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+          <span class="n">layer_size</span><span class="p">,</span>
+      <span class="p">]))</span>
+      <span class="n">prev_layer_size</span> <span class="o">=</span> <span class="n">layer_size</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">([</span><span class="n">prev_layer_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_ops</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs</span><span class="p">,</span>
+    <span class="p">]))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainable_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span></div>
+
+<div class="viewcode-block" id="DAGGather.call"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DAGGather.call">[docs]</a>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute this layer on input tensors.</span>
+
+<span class="sd">    x = [graph_features, membership]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: tf.Tensor</span>
+<span class="sd">      Tensor of each atom&#39;s graph features</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    outputs: tf.Tensor</span>
+<span class="sd">      Tensor of each molecule&#39;s features</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Add trainable weights</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="n">atom_features</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">membership</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Extract atom_features</span>
+    <span class="n">graph_features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">segment_sum</span><span class="p">(</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">membership</span><span class="p">)</span>
+    <span class="c1"># sum all graph outputs</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DAGgraph_step</span><span class="p">(</span><span class="n">graph_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outputs</span></div>
+
+<div class="viewcode-block" id="DAGGather.DAGgraph_step"><a class="viewcode-back" href="../../../deepchem.nn.html#deepchem.nn.layers.DAGGather.DAGgraph_step">[docs]</a>  <span class="k">def</span> <span class="nf">DAGgraph_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_inputs</span><span class="p">,</span> <span class="n">W_list</span><span class="p">,</span> <span class="n">b_list</span><span class="p">):</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">batch_inputs</span>
+    <span class="k">for</span> <span class="n">idw</span><span class="p">,</span> <span class="n">W</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">W_list</span><span class="p">):</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">xw_plus_b</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">b_list</span><span class="p">[</span><span class="n">idw</span><span class="p">])</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outputs</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

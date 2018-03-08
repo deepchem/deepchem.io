@@ -1,0 +1,30 @@
+deepchem.utils.test package
+===========================
+
+Submodules
+----------
+
+deepchem.utils.test.test_generator_evaluator module
+---------------------------------------------------
+
+.. automodule:: deepchem.utils.test.test_generator_evaluator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.utils.test.test_rdkit_util module
+------------------------------------------
+
+.. automodule:: deepchem.utils.test.test_rdkit_util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.utils.test
+    :members:
+    :undoc-members:
+    :show-inheritance:

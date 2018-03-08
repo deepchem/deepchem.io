@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.models.tf_new_models.vina_model &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.models.tf_new_models.vina_model</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implements Autodock Vina&#39;s pose-generation in tensorflow.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Bharath Ramsundar&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">deepchem.models</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">deepchem.nn</span> <span class="kn">import</span> <span class="n">model_ops</span>
+<span class="kn">import</span> <span class="nn">deepchem.utils.rdkit_util</span> <span class="kn">as</span> <span class="nn">rdkit_util</span>
+
+
+<div class="viewcode-block" id="compute_neighbor_list"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.compute_neighbor_list">[docs]</a><span class="k">def</span> <span class="nf">compute_neighbor_list</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes a neighbor list from atom coordinates.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  coords: tf.Tensor</span>
+<span class="sd">    Shape (N, ndim)</span>
+<span class="sd">  N: int</span>
+<span class="sd">    Max number atoms</span>
+<span class="sd">  M: int</span>
+<span class="sd">    Max number neighbors</span>
+<span class="sd">  ndim: int</span>
+<span class="sd">    Dimensionality of space.</span>
+<span class="sd">  k: int</span>
+<span class="sd">    Number of nearest neighbors to pull down.</span>
+
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  nbr_list: tf.Tensor</span>
+<span class="sd">    Shape (N, M) of atom indices</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">start</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_int32</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">coords</span><span class="p">))</span>
+  <span class="n">stop</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_int32</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">(</span><span class="n">coords</span><span class="p">))</span>
+  <span class="n">cells</span> <span class="o">=</span> <span class="n">get_cells</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="n">ndim</span><span class="p">)</span>
+  <span class="c1"># Associate each atom with cell it belongs to. O(N*n_cells)</span>
+  <span class="c1"># Shape (n_cells, k)</span>
+  <span class="n">atoms_in_cells</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">put_atoms_in_cells</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+  <span class="c1"># Shape (N, 1)</span>
+  <span class="n">cells_for_atoms</span> <span class="o">=</span> <span class="n">get_cells_for_atoms</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span>
+
+  <span class="c1"># Associate each cell with its neighbor cells. Assumes periodic boundary</span>
+  <span class="c1"># conditions, so does wrapround. O(constant)</span>
+  <span class="c1"># Shape (n_cells, 26)</span>
+  <span class="n">neighbor_cells</span> <span class="o">=</span> <span class="n">compute_neighbor_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">)</span>
+
+  <span class="c1"># Shape (N, 26)</span>
+  <span class="n">neighbor_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">neighbor_cells</span><span class="p">,</span> <span class="n">cells_for_atoms</span><span class="p">))</span>
+
+  <span class="c1"># coords of shape (N, ndim)</span>
+  <span class="c1"># Shape (N, 26, k, ndim)</span>
+  <span class="n">tiled_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+  <span class="c1"># Shape (N, 26, k)</span>
+  <span class="n">nbr_inds</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">atoms_in_cells</span><span class="p">,</span> <span class="n">neighbor_cells</span><span class="p">)</span>
+
+  <span class="c1"># Shape (N, 26, k)</span>
+  <span class="n">atoms_in_nbr_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">atoms_in_cells</span><span class="p">,</span> <span class="n">neighbor_cells</span><span class="p">)</span>
+
+  <span class="c1"># Shape (N, 26, k, ndim)</span>
+  <span class="n">nbr_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">atoms_in_nbr_cells</span><span class="p">)</span>
+
+  <span class="c1"># For smaller systems especially, the periodic boundary conditions can</span>
+  <span class="c1"># result in neighboring cells being seen multiple times. Maybe use tf.unique to</span>
+  <span class="c1"># make sure duplicate neighbors are ignored?</span>
+
+  <span class="c1"># TODO(rbharath): How does distance need to be modified here to</span>
+  <span class="c1"># account for periodic boundary conditions?</span>
+  <span class="c1"># Shape (N, 26, k)</span>
+  <span class="n">dists</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">((</span><span class="n">tiled_coords</span> <span class="o">-</span> <span class="n">nbr_coords</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+  <span class="c1"># Shape (N, 26*k)</span>
+  <span class="n">dists</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="p">[</span><span class="n">N</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+  <span class="c1"># TODO(rbharath): This will cause an issue with duplicates!</span>
+  <span class="c1"># Shape (N, M)</span>
+  <span class="n">closest_nbr_locs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">M</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+  <span class="c1"># N elts of size (M,) each</span>
+  <span class="n">split_closest_nbr_locs</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">locs</span><span class="p">)</span> <span class="k">for</span> <span class="n">locs</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">closest_nbr_locs</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+  <span class="p">]</span>
+
+  <span class="c1"># Shape (N, 26*k)</span>
+  <span class="n">nbr_inds</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nbr_inds</span><span class="p">,</span> <span class="p">[</span><span class="n">N</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+  <span class="c1"># N elts of size (26*k,) each</span>
+  <span class="n">split_nbr_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">nbr_inds</span><span class="p">,</span> <span class="n">N</span><span class="p">)]</span>
+
+  <span class="c1"># N elts of size (M,) each</span>
+  <span class="n">neighbor_list</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">nbr_inds</span><span class="p">,</span> <span class="n">closest_nbr_locs</span><span class="p">)</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">nbr_inds</span><span class="p">,</span>
+           <span class="n">closest_nbr_locs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">split_nbr_inds</span><span class="p">,</span> <span class="n">split_closest_nbr_locs</span><span class="p">)</span>
+  <span class="p">]</span>
+
+  <span class="c1"># Shape (N, M)</span>
+  <span class="n">neighbor_list</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">neighbor_list</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">neighbor_list</span></div>
+
+
+<div class="viewcode-block" id="get_cells_for_atoms"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.get_cells_for_atoms">[docs]</a><span class="k">def</span> <span class="nf">get_cells_for_atoms</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute the cells each atom belongs to.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  coords: tf.Tensor</span>
+<span class="sd">    Shape (N, ndim)</span>
+<span class="sd">  cells: tf.Tensor</span>
+<span class="sd">    (box_size**ndim, ndim) shape.</span>
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  cells_for_atoms: tf.Tensor</span>
+<span class="sd">    Shape (N, 1)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">n_cells</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_cells</span><span class="p">)</span>
+  <span class="c1"># Tile both cells and coords to form arrays of size (n_cells*N, ndim)</span>
+  <span class="n">tiled_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+  <span class="c1"># N tensors of shape (n_cells, 1)</span>
+  <span class="n">tiled_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tiled_cells</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+  <span class="c1"># Shape (N*n_cells, 1) after tile</span>
+  <span class="n">tiled_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">)),</span> <span class="p">(</span><span class="n">n_cells</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+  <span class="c1"># List of N tensors of shape (n_cells, 1)</span>
+  <span class="n">tiled_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tiled_coords</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+  <span class="c1"># Lists of length N</span>
+  <span class="n">coords_rel</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tiled_coords</span><span class="p">,</span> <span class="n">tiled_cells</span><span class="p">)</span>
+  <span class="p">]</span>
+  <span class="n">coords_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">rel</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">coords_rel</span><span class="p">]</span>
+
+  <span class="c1"># Lists of length n_cells</span>
+  <span class="c1"># Get indices of k atoms closest to each cell point</span>
+  <span class="n">closest_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span><span class="o">-</span><span class="n">norm</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">norm</span> <span class="ow">in</span> <span class="n">coords_norm</span><span class="p">]</span>
+
+  <span class="c1"># TODO(rbharath): tf.stack for tf 1.0</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">closest_inds</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="compute_closest_neighbors"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.compute_closest_neighbors">[docs]</a><span class="k">def</span> <span class="nf">compute_closest_neighbors</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span>
+                              <span class="n">cells</span><span class="p">,</span>
+                              <span class="n">atoms_in_cells</span><span class="p">,</span>
+                              <span class="n">neighbor_cells</span><span class="p">,</span>
+                              <span class="n">N</span><span class="p">,</span>
+                              <span class="n">n_cells</span><span class="p">,</span>
+                              <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                              <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes nearest neighbors from neighboring cells.</span>
+
+<span class="sd">  TODO(rbharath): Make this pass test</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ---------</span>
+<span class="sd">  atoms_in_cells: list</span>
+<span class="sd">    Of length n_cells. Each entry tensor of shape (k, ndim)</span>
+<span class="sd">  neighbor_cells: tf.Tensor </span>
+<span class="sd">    Of shape (n_cells, 26).</span>
+<span class="sd">  N: int</span>
+<span class="sd">    Number atoms</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">n_cells</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_cells</span><span class="p">)</span>
+  <span class="c1"># Tensor of shape (n_cells, k, ndim)</span>
+  <span class="c1">#atoms_in_cells = tf.stack(atoms_in_cells)</span>
+
+  <span class="n">cells_for_atoms</span> <span class="o">=</span> <span class="n">get_cells_for_atoms</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span>
+  <span class="n">all_closest</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">atom_vec</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span>
+    <span class="n">cell</span> <span class="o">=</span> <span class="n">cells_for_atoms</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span>
+    <span class="n">nbr_inds</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">neighbor_cells</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_int32</span><span class="p">(</span><span class="n">cell</span><span class="p">))</span>
+    <span class="c1"># Tensor of shape (26, k, ndim)</span>
+    <span class="n">nbr_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">atoms_in_cells</span><span class="p">,</span> <span class="n">nbr_inds</span><span class="p">)</span>
+    <span class="c1"># Reshape to (26*k, ndim)</span>
+    <span class="n">nbr_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nbr_atoms</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="c1"># Subtract out atom vector. Still of shape (26*k, ndim) due to broadcast.</span>
+    <span class="n">nbr_atoms</span> <span class="o">=</span> <span class="n">nbr_atoms</span> <span class="o">-</span> <span class="n">atom_vec</span>
+    <span class="c1"># Dists of shape (26*k, 1)</span>
+    <span class="n">nbr_dists</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">nbr_atoms</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Of shape (k, ndim)</span>
+    <span class="n">closest_inds</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span><span class="n">nbr_dists</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">all_closest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_inds</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">all_closest</span></div>
+
+
+<div class="viewcode-block" id="get_cells"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.get_cells">[docs]</a><span class="k">def</span> <span class="nf">get_cells</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns the locations of all grid points in box.</span>
+
+<span class="sd">  Suppose start is -10 Angstrom, stop is 10 Angstrom, nbr_cutoff is 1.</span>
+<span class="sd">  Then would return a list of length 20^3 whose entries would be</span>
+<span class="sd">  [(-10, -10, -10), (-10, -10, -9), ..., (9, 9, 9)]</span>
+
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  cells: tf.Tensor</span>
+<span class="sd">    (box_size**ndim, ndim) shape.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+              <span class="n">tf</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
+                  <span class="o">*</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">)]))),</span>
+      <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="put_atoms_in_cells"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.put_atoms_in_cells">[docs]</a><span class="k">def</span> <span class="nf">put_atoms_in_cells</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Place each atom into cells. O(N) runtime.    </span>
+<span class="sd">  </span>
+<span class="sd">  Let N be the number of atoms.</span>
+<span class="sd">      </span>
+<span class="sd">  Parameters    </span>
+<span class="sd">  ----------    </span>
+<span class="sd">  coords: tf.Tensor </span>
+<span class="sd">    (N, 3) shape.</span>
+<span class="sd">  cells: tf.Tensor</span>
+<span class="sd">    (n_cells, ndim) shape.</span>
+<span class="sd">  N: int</span>
+<span class="sd">    Number atoms</span>
+<span class="sd">  ndim: int</span>
+<span class="sd">    Dimensionality of input space</span>
+<span class="sd">  k: int</span>
+<span class="sd">    Number of nearest neighbors.</span>
+
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  closest_atoms: tf.Tensor </span>
+<span class="sd">    Of shape (n_cells, k, ndim)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">n_cells</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_cells</span><span class="p">)</span>
+  <span class="c1"># Tile both cells and coords to form arrays of size (n_cells*N, ndim)</span>
+  <span class="n">tiled_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)),</span> <span class="p">(</span><span class="n">n_cells</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+  <span class="c1"># TODO(rbharath): Change this for tf 1.0</span>
+  <span class="c1"># n_cells tensors of shape (N, 1)</span>
+  <span class="n">tiled_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tiled_cells</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">)</span>
+
+  <span class="c1"># Shape (N*n_cells, 1) after tile</span>
+  <span class="n">tiled_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">n_cells</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+  <span class="c1"># List of n_cells tensors of shape (N, 1)</span>
+  <span class="n">tiled_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tiled_coords</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">)</span>
+
+  <span class="c1"># Lists of length n_cells</span>
+  <span class="n">coords_rel</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tiled_coords</span><span class="p">,</span> <span class="n">tiled_cells</span><span class="p">)</span>
+  <span class="p">]</span>
+  <span class="n">coords_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">rel</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">coords_rel</span><span class="p">]</span>
+
+  <span class="c1"># Lists of length n_cells</span>
+  <span class="c1"># Get indices of k atoms closest to each cell point</span>
+  <span class="n">closest_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">norm</span> <span class="ow">in</span> <span class="n">coords_norm</span><span class="p">]</span>
+  <span class="c1"># n_cells tensors of shape (k, ndim)</span>
+  <span class="n">closest_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">inds</span><span class="p">)</span> <span class="k">for</span> <span class="n">inds</span> <span class="ow">in</span> <span class="n">closest_inds</span><span class="p">])</span>
+  <span class="c1"># Tensor of shape (n_cells, k)</span>
+  <span class="n">closest_inds</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">closest_inds</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">closest_inds</span><span class="p">,</span> <span class="n">closest_atoms</span></div>
+
+  <span class="c1"># TODO(rbharath):</span>
+  <span class="c1">#   - Need to find neighbors of the cells (+/- 1 in every dimension).</span>
+  <span class="c1">#   - Need to group closest atoms amongst cell neighbors</span>
+  <span class="c1">#   - Need to do another top_k to find indices of closest neighbors.</span>
+  <span class="c1">#   - Return N lists corresponding to neighbors for every atom.</span>
+
+
+<div class="viewcode-block" id="compute_neighbor_cells"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.compute_neighbor_cells">[docs]</a><span class="k">def</span> <span class="nf">compute_neighbor_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute neighbors of cells in grid.    </span>
+
+<span class="sd">  # TODO(rbharath): Do we need to handle periodic boundary conditions</span>
+<span class="sd">  properly here?</span>
+<span class="sd">  # TODO(rbharath): This doesn&#39;t handle boundaries well. We hard-code</span>
+<span class="sd">  # looking for 26 neighbors, which isn&#39;t right for boundary cells in</span>
+<span class="sd">  # the cube.</span>
+<span class="sd">      </span>
+<span class="sd">  Note n_cells is box_size**ndim. 26 is the number of neighbors of a cube in</span>
+<span class="sd">  a grid (including diagonals).</span>
+
+<span class="sd">  Parameters    </span>
+<span class="sd">  ----------    </span>
+<span class="sd">  cells: tf.Tensor</span>
+<span class="sd">    (n_cells, 26) shape.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">n_cells</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_cells</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not defined for dimensions besides 3&quot;</span><span class="p">)</span>
+  <span class="c1"># Number of neighbors of central cube in 3-space is</span>
+  <span class="c1"># 3^2 (top-face) + 3^2 (bottom-face) + (3^2-1) (middle-band)</span>
+  <span class="c1"># TODO(rbharath)</span>
+  <span class="n">k</span> <span class="o">=</span> <span class="mi">9</span> <span class="o">+</span> <span class="mi">9</span> <span class="o">+</span> <span class="mi">8</span>  <span class="c1"># (26 faces on Rubik&#39;s cube for example)</span>
+  <span class="c1">#n_cells = int(cells.get_shape()[0])</span>
+  <span class="c1"># Tile cells to form arrays of size (n_cells*n_cells, ndim)</span>
+  <span class="c1"># Two tilings (a, b, c, a, b, c, ...) vs. (a, a, a, b, b, b, etc.)</span>
+  <span class="c1"># Tile (a, a, a, b, b, b, etc.)</span>
+  <span class="n">tiled_centers</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">)),</span> <span class="p">(</span><span class="n">n_cells</span> <span class="o">*</span> <span class="n">n_cells</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
+  <span class="c1"># Tile (a, b, c, a, b, c, ...)</span>
+  <span class="n">tiled_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="p">(</span><span class="n">n_cells</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+  <span class="c1"># Lists of n_cells tensors of shape (N, 1)</span>
+  <span class="n">tiled_centers</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tiled_centers</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">)</span>
+  <span class="n">tiled_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tiled_cells</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">)</span>
+
+  <span class="c1"># Lists of length n_cells</span>
+  <span class="n">coords_rel</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">to_float</span><span class="p">(</span><span class="n">centers</span><span class="p">)</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">centers</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tiled_centers</span><span class="p">,</span> <span class="n">tiled_cells</span><span class="p">)</span>
+  <span class="p">]</span>
+  <span class="n">coords_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">rel</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">coords_rel</span><span class="p">]</span>
+
+  <span class="c1"># Lists of length n_cells</span>
+  <span class="c1"># Get indices of k atoms closest to each cell point</span>
+  <span class="c1"># n_cells tensors of shape (26,)</span>
+  <span class="n">closest_inds</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">norm</span> <span class="ow">in</span> <span class="n">coords_norm</span><span class="p">])</span>
+
+  <span class="k">return</span> <span class="n">closest_inds</span></div>
+
+
+<div class="viewcode-block" id="cutoff"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.cutoff">[docs]</a><span class="k">def</span> <span class="nf">cutoff</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Truncates interactions that are too far away.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="gauss_1"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.gauss_1">[docs]</a><span class="k">def</span> <span class="nf">gauss_1</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes first Gaussian interaction term.</span>
+
+<span class="sd">  Note that d must be in Angstrom</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="gauss_2"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.gauss_2">[docs]</a><span class="k">def</span> <span class="nf">gauss_2</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes second Gaussian interaction term.</span>
+
+<span class="sd">  Note that d must be in Angstrom.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">d</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="repulsion"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.repulsion">[docs]</a><span class="k">def</span> <span class="nf">repulsion</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes repulsion interaction term.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">d</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">d</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="hydrophobic"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.hydrophobic">[docs]</a><span class="k">def</span> <span class="nf">hydrophobic</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute hydrophobic interaction term.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">,</span>
+                  <span class="n">tf</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span> <span class="o">-</span> <span class="n">d</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">d</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="hbond"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.hbond">[docs]</a><span class="k">def</span> <span class="nf">hbond</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes hydrogen bond term.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">,</span>
+                  <span class="n">tf</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">d</span><span class="p">),</span>
+                  <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">0.7</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">d</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">d</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="g"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.g">[docs]</a><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">Nrot</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Nonlinear function mapping interactions to free energy.&quot;&quot;&quot;</span>
+  <span class="n">w</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">([</span>
+      <span class="mi">1</span><span class="p">,</span>
+  <span class="p">],</span> <span class="n">stddev</span><span class="o">=.</span><span class="mi">3</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">c</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">w</span> <span class="o">*</span> <span class="n">Nrot</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="h"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.h">[docs]</a><span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Sum of energy terms used in Autodock Vina.</span>
+
+<span class="sd">  .. math:: h_{t_i,t_j}(d) = w_1\textrm{gauss}_1(d) + w_2\textrm{gauss}_2(d) + w_3\textrm{repulsion}(d) + w_4\textrm{hydrophobic}(d) + w_5\textrm{hbond}(d)</span>
+
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">w_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">([</span>
+      <span class="mi">1</span><span class="p">,</span>
+  <span class="p">],</span> <span class="n">stddev</span><span class="o">=.</span><span class="mi">3</span><span class="p">))</span>
+  <span class="n">w_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">([</span>
+      <span class="mi">1</span><span class="p">,</span>
+  <span class="p">],</span> <span class="n">stddev</span><span class="o">=.</span><span class="mi">3</span><span class="p">))</span>
+  <span class="n">w_3</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">([</span>
+      <span class="mi">1</span><span class="p">,</span>
+  <span class="p">],</span> <span class="n">stddev</span><span class="o">=.</span><span class="mi">3</span><span class="p">))</span>
+  <span class="n">w_4</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">([</span>
+      <span class="mi">1</span><span class="p">,</span>
+  <span class="p">],</span> <span class="n">stddev</span><span class="o">=.</span><span class="mi">3</span><span class="p">))</span>
+  <span class="n">w_5</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">([</span>
+      <span class="mi">1</span><span class="p">,</span>
+  <span class="p">],</span> <span class="n">stddev</span><span class="o">=.</span><span class="mi">3</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">w_1</span> <span class="o">*</span> <span class="n">gauss_1</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="n">w_2</span> <span class="o">*</span> <span class="n">gauss_2</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="n">w_3</span> <span class="o">*</span> <span class="n">repulsion</span><span class="p">(</span>
+      <span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="n">w_4</span> <span class="o">*</span> <span class="n">hydrophobic</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="n">w_5</span> <span class="o">*</span> <span class="n">hbond</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="VinaModel"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.VinaModel">[docs]</a><span class="k">class</span> <span class="nc">VinaModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logdir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Vina models.</span>
+
+<span class="sd">    .. math:: c = \sum_{i &lt; j} f_{t_i,t_j}(r_{ij})</span>
+
+<span class="sd">    Over all pairs of atoms that can move relative to one-another. :math:`t_i` is the</span>
+<span class="sd">    atomtype of atom :math:`i`.</span>
+
+<span class="sd">    Can view as</span>
+
+<span class="sd">    .. math:: c = c_\textrm{inter} + c_\textrm{intra}</span>
+
+<span class="sd">    depending on whether atoms can move relative to one another. Free energy is</span>
+<span class="sd">    predicted only from :math:`c_\textrm{inter}`. Let :math:`R_t` be the Van der Waal&#39;s radius of</span>
+<span class="sd">    atom of type t. Then define surface distance</span>
+
+<span class="sd">    .. math:: d_{ij} = r_{ij} - R_{t_i} - R_{t_j}</span>
+
+<span class="sd">    Then the energy term is</span>
+
+<span class="sd">    .. math:: f_{t_i,t_j}(r_{ij}) = \textrm{cutoff}(d_{ij}, h_{t_i,t_j}(d_{ij}))</span>
+
+<span class="sd">    where</span>
+<span class="sd">  </span>
+<span class="sd">    .. math:: \textrm{cutoff}(d, x) = \begin{cases} x &amp; d &lt; 8 \textrm{ Angstrom} \\ 0 &amp; \textrm{otherwise} \end{cases}</span>
+
+<span class="sd">    The inner function can be further broken down into a sum of terms</span>
+
+<span class="sd">    .. math:: h_{t_i,t_j}(d) = w_1\textrm{gauss}_1(d) + w_2\textrm{gauss}_2(d) + w_3\textrm{repulsion}(d) + w_4\textrm{hydrophobic}(d) + w_5\textrm{hbond}(d)</span>
+
+<span class="sd">    these terms are defined as follows (all constants are in Angstroms):</span>
+
+<span class="sd">    .. math:: </span>
+<span class="sd">         \textrm{gauss}_1(d) = \exp(-(d/(0.5))^2)</span>
+<span class="sd">         \textrm{gauss}_2(d) = \exp(-((d-3)/(2))^2)</span>
+<span class="sd">         \textrm{repulsion}(d) = \begin{cases} d^2 &amp; d &lt; 0 \\ 0 &amp; d \geq 0 \end{cases}</span>
+<span class="sd">         \textrm{hydrophobic}(d) = \begin{cases} 1 &amp; d &lt; 0.5 \\ 1.5 - d &amp; \textrm{otherwise} \\ 0 &amp; d &gt; 1.5 \end{cases}</span>
+<span class="sd">         \textrm{hbond}(d) = \begin{cases} 1 &amp; d &lt; -0.7 \\ (1.0/.7)(0 - d) &amp; \textrm{otherwise} \\ 0 &amp; d &gt; 0 \end{cases}</span>
+
+<span class="sd">    The free energy of binding is computed as a function of the intermolecular interactions</span>
+
+<span class="sd">    ..math:: s = g(c_\textrm{inter})</span>
+
+<span class="sd">    This function is defined as</span>
+
+<span class="sd">    ..math:: g(c) = \frac{c}{1 + wN_\textrm{rot}}</span>
+
+<span class="sd">    Where :math:`w` is a weight parameter and :math:`N_\textrm{rot}` is the number of</span>
+<span class="sd">    rotatable bonds between heavy atoms in the ligand.</span>
+
+<span class="sd">    Gradients are taken backwards through the binding-free energy function with</span>
+<span class="sd">    respect to the position of the ligand and with respect to the torsions of</span>
+<span class="sd">    rotatable bonds and flexible ligands.</span>
+
+<span class="sd">    TODO(rbharath): It&#39;s not clear to me how the effect of the torsions on the :math:`d_{ij}` is</span>
+<span class="sd">    computed. Is there a way to get distances from torsions?</span>
+
+<span class="sd">    The idea is that mutations are applied to the ligand, and then gradient descent is</span>
+<span class="sd">    used to optimize starting from the initial structure. The code to compute the mutations</span>
+<span class="sd">    is specified</span>
+
+<span class="sd">    https://github.com/mwojcikowski/smina/blob/master/src/lib/mutate.cpp</span>
+
+<span class="sd">    Seems to do random quaternion rotations of the ligand. It&#39;s not clear to me yet</span>
+<span class="sd">    how the flexible and rotatable bonds are handled for the system.</span>
+
+<span class="sd">    Need to know an initial search space for the compound. Typically a cubic</span>
+<span class="sd">    binding box.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Autodock Vina Paper:</span>
+<span class="sd">    https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3041641/</span>
+<span class="sd">    Smina Paper:</span>
+<span class="sd">    http://pubs.acs.org/doi/pdf/10.1021/ci300604z</span>
+<span class="sd">    Omega Paper (ligand conformation generation):</span>
+<span class="sd">    http://www.sciencedirect.com/science/article/pii/S1093326302002048</span>
+<span class="sd">    QuickVina:</span>
+<span class="sd">    http://www.cil.ntu.edu.sg/Courses/papers/journal/QuickVina.pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_local_steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_mutations</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;VinaModel is deprecated. &quot;</span>
+                  <span class="s2">&quot;Will be removed in DeepChem 1.4.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_local_steps</span> <span class="o">=</span> <span class="n">max_local_steps</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_mutations</span> <span class="o">=</span> <span class="n">max_mutations</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_placeholders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_placeholder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">construct_graph</span><span class="p">(</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VinaModel.construct_graph"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.VinaModel.construct_graph">[docs]</a>  <span class="k">def</span> <span class="nf">construct_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                      <span class="n">N_protein</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                      <span class="n">N_ligand</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                      <span class="n">M</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                      <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                      <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                      <span class="n">nbr_cutoff</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds the computational graph for Vina.&quot;&quot;&quot;</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">n_cells</span> <span class="o">=</span> <span class="mi">64</span>
+      <span class="c1"># TODO(rbharath): Make this handle minibatches</span>
+      <span class="n">protein_coords_placeholder</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_protein</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+      <span class="n">ligand_coords_placeholder</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_ligand</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+      <span class="n">protein_Z_placeholder</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_protein</span><span class="p">,))</span>
+      <span class="n">ligand_Z_placeholder</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_ligand</span><span class="p">,))</span>
+
+      <span class="n">label_placeholder</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+
+      <span class="c1"># Shape (N_protein+N_ligand, 3)</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+          <span class="p">[</span><span class="n">protein_coords_placeholder</span><span class="p">,</span> <span class="n">ligand_coords_placeholder</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="c1"># Shape (N_protein+N_ligand,)</span>
+      <span class="n">Z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">protein_Z_placeholder</span><span class="p">,</span> <span class="n">ligand_Z_placeholder</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+      <span class="c1"># Shape (N_protein+N_ligand, M)</span>
+      <span class="n">nbr_list</span> <span class="o">=</span> <span class="n">compute_neighbor_list</span><span class="p">(</span>
+          <span class="n">coords</span><span class="p">,</span> <span class="n">nbr_cutoff</span><span class="p">,</span> <span class="n">N_protein</span> <span class="o">+</span> <span class="n">N_ligand</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="n">ndim</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+      <span class="n">all_interactions</span> <span class="o">=</span> <span class="p">[]</span>
+
+      <span class="c1"># Shape (N_protein+N_ligand,)</span>
+      <span class="n">all_atoms</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">N_protein</span> <span class="o">+</span> <span class="n">N_ligand</span><span class="p">)</span>
+      <span class="c1"># Shape (N_protein+N_ligand, 3)</span>
+      <span class="n">atom_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">all_atoms</span><span class="p">)</span>
+      <span class="c1"># Shape (N_protein+N_ligand,)</span>
+      <span class="n">atom_Z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">all_atoms</span><span class="p">)</span>
+      <span class="c1"># Shape (N_protein+N_ligand, M)</span>
+      <span class="n">nbrs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">nbr_list</span><span class="p">,</span> <span class="n">all_atoms</span><span class="p">))</span>
+      <span class="c1"># Shape (N_protein+N_ligand, M, 3)</span>
+      <span class="n">nbr_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">nbrs</span><span class="p">)</span>
+
+      <span class="c1"># Shape (N_protein+N_ligand, M)</span>
+      <span class="n">nbr_Z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">nbrs</span><span class="p">)</span>
+      <span class="c1"># Shape (N_protein+N_ligand, M, 3)</span>
+      <span class="n">tiled_atom_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">atom_coords</span><span class="p">,</span> <span class="p">(</span><span class="n">N_protein</span> <span class="o">+</span> <span class="n">N_ligand</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+      <span class="c1"># Shape (N_protein+N_ligand, M)</span>
+      <span class="n">dists</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">((</span><span class="n">tiled_atom_coords</span> <span class="o">-</span> <span class="n">nbr_coords</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+      <span class="c1"># TODO(rbharath): Need to subtract out Van-der-Waals radii from dists</span>
+
+      <span class="c1"># Shape (N_protein+N_ligand, M)</span>
+      <span class="n">atom_interactions</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">dists</span><span class="p">)</span>
+      <span class="c1"># Shape (N_protein+N_ligand, M)</span>
+      <span class="n">cutoff_interactions</span> <span class="o">=</span> <span class="n">cutoff</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">atom_interactions</span><span class="p">)</span>
+
+      <span class="c1"># TODO(rbharath): Use RDKit to compute number of rotatable bonds in ligand.</span>
+      <span class="n">Nrot</span> <span class="o">=</span> <span class="mi">1</span>
+
+      <span class="c1"># TODO(rbharath): Autodock Vina only uses protein-ligand interactions in</span>
+      <span class="c1"># computing free-energy. This implementation currently uses all interaction</span>
+      <span class="c1"># terms. Not sure if this makes a difference.</span>
+
+      <span class="c1"># Shape (N_protein+N_ligand, M)</span>
+      <span class="n">free_energy</span> <span class="o">=</span> <span class="n">g</span><span class="p">(</span><span class="n">cutoff_interactions</span><span class="p">,</span> <span class="n">Nrot</span><span class="p">)</span>
+      <span class="c1"># Shape () -- scalar</span>
+      <span class="n">energy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">atom_interactions</span><span class="p">)</span>
+
+      <span class="n">loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">energy</span> <span class="o">-</span> <span class="n">label_placeholder</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="p">(</span><span class="n">protein_coords_placeholder</span><span class="p">,</span> <span class="n">protein_Z_placeholder</span><span class="p">,</span>
+                    <span class="n">ligand_coords_placeholder</span><span class="p">,</span> <span class="n">ligand_Z_placeholder</span><span class="p">),</span>
+            <span class="n">label_placeholder</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VinaModel.fit"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.VinaModel.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_protein</span><span class="p">,</span> <span class="n">Z_protein</span><span class="p">,</span> <span class="n">X_ligand</span><span class="p">,</span> <span class="n">Z_ligand</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fit to actual data.&quot;&quot;&quot;</span>
+    <span class="k">return</span></div>
+
+<div class="viewcode-block" id="VinaModel.mutate_conformer"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.VinaModel.mutate_conformer">[docs]</a>  <span class="k">def</span> <span class="nf">mutate_conformer</span><span class="p">(</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs a mutation on the ligand position.&quot;&quot;&quot;</span>
+    <span class="k">return</span></div>
+
+<div class="viewcode-block" id="VinaModel.generate_conformation"><a class="viewcode-back" href="../../../../deepchem.models.tf_new_models.html#deepchem.models.tf_new_models.vina_model.VinaModel.generate_conformation">[docs]</a>  <span class="k">def</span> <span class="nf">generate_conformation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs the global search for conformations.&quot;&quot;&quot;</span>
+    <span class="n">best_conf</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">best_score</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_random_conformation</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_steps</span><span class="p">):</span>
+      <span class="n">mut_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutate_conformer</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+      <span class="n">loc_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient_minimize</span><span class="p">(</span><span class="n">mut_conf</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">best_conf</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">best_conf</span> <span class="o">=</span> <span class="n">loc_conf</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">loc_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">loc_conf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">loc_score</span> <span class="o">&lt;</span> <span class="n">best_score</span><span class="p">:</span>
+          <span class="n">best_conf</span> <span class="o">=</span> <span class="n">loc_conf</span>
+    <span class="k">return</span> <span class="n">best_conf</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

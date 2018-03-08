@@ -1,0 +1,22 @@
+deepchem.metalearning package
+=============================
+
+Submodules
+----------
+
+deepchem.metalearning.maml module
+---------------------------------
+
+.. automodule:: deepchem.metalearning.maml
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.metalearning
+    :members:
+    :undoc-members:
+    :show-inheritance:

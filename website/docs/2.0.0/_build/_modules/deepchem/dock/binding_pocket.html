@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.dock.binding_pocket &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.dock.binding_pocket</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Computes putative binding pockets on protein.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Bharath Ramsundar&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2017, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">call</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">ConvexHull</span>
+<span class="kn">from</span> <span class="nn">deepchem.feat.binding_pocket_features</span> <span class="kn">import</span> <span class="n">BindingPocketFeaturizer</span>
+<span class="kn">from</span> <span class="nn">deepchem.feat.fingerprints</span> <span class="kn">import</span> <span class="n">CircularFingerprint</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.sklearn_models</span> <span class="kn">import</span> <span class="n">SklearnModel</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils</span> <span class="kn">import</span> <span class="n">rdkit_util</span>
+
+
+<div class="viewcode-block" id="extract_active_site"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.extract_active_site">[docs]</a><span class="k">def</span> <span class="nf">extract_active_site</span><span class="p">(</span><span class="n">protein_file</span><span class="p">,</span> <span class="n">ligand_file</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Extracts a box for the active site.&quot;&quot;&quot;</span>
+  <span class="n">protein_coords</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span>
+      <span class="n">protein_file</span><span class="p">,</span> <span class="n">add_hydrogens</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">ligand_coords</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span>
+      <span class="n">ligand_file</span><span class="p">,</span> <span class="n">add_hydrogens</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">calc_charges</span><span class="o">=</span><span class="bp">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">num_ligand_atoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ligand_coords</span><span class="p">)</span>
+  <span class="n">num_protein_atoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">protein_coords</span><span class="p">)</span>
+  <span class="n">pocket_inds</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">pocket_atoms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+  <span class="k">for</span> <span class="n">lig_atom_ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_ligand_atoms</span><span class="p">):</span>
+    <span class="n">lig_atom</span> <span class="o">=</span> <span class="n">ligand_coords</span><span class="p">[</span><span class="n">lig_atom_ind</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">protein_atom_ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_protein_atoms</span><span class="p">):</span>
+      <span class="n">protein_atom</span> <span class="o">=</span> <span class="n">protein_coords</span><span class="p">[</span><span class="n">protein_atom_ind</span><span class="p">]</span>
+      <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">lig_atom</span> <span class="o">-</span> <span class="n">protein_atom</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">cutoff</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">protein_atom_ind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pocket_atoms</span><span class="p">:</span>
+          <span class="n">pocket_atoms</span> <span class="o">=</span> <span class="n">pocket_atoms</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">protein_atom_ind</span><span class="p">]))</span>
+  <span class="c1"># Should be an array of size (n_pocket_atoms, 3)</span>
+  <span class="n">pocket_atoms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pocket_atoms</span><span class="p">)</span>
+  <span class="n">n_pocket_atoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pocket_atoms</span><span class="p">)</span>
+  <span class="n">pocket_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_pocket_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+  <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">pocket_ind</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pocket_atoms</span><span class="p">):</span>
+    <span class="n">pocket_coords</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">protein_coords</span><span class="p">[</span><span class="n">pocket_ind</span><span class="p">]</span>
+
+  <span class="n">x_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">pocket_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])))</span>
+  <span class="n">x_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">pocket_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])))</span>
+  <span class="n">y_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">pocket_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])))</span>
+  <span class="n">y_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">pocket_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])))</span>
+  <span class="n">z_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">pocket_coords</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])))</span>
+  <span class="n">z_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">pocket_coords</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])))</span>
+  <span class="k">return</span> <span class="p">(((</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">),</span> <span class="p">(</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">),</span> <span class="p">(</span><span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span><span class="p">)),</span> <span class="n">pocket_atoms</span><span class="p">,</span>
+          <span class="n">pocket_coords</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="compute_overlap"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.compute_overlap">[docs]</a><span class="k">def</span> <span class="nf">compute_overlap</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">box1</span><span class="p">,</span> <span class="n">box2</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes overlap between the two boxes.</span>
+
+<span class="sd">  Overlap is defined as % atoms of box1 in box2. Note that</span>
+<span class="sd">  overlap is not a symmetric measurement.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">atom1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">box1</span><span class="p">])</span>
+  <span class="n">atom2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">box2</span><span class="p">])</span>
+  <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">atom2</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atom1</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_all_boxes"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.get_all_boxes">[docs]</a><span class="k">def</span> <span class="nf">get_all_boxes</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Get all pocket boxes for protein coords.</span>
+
+<span class="sd">  We pad all boxes the prescribed number of angstroms.</span>
+
+<span class="sd">  TODO(rbharath): It looks like this may perhaps be non-deterministic?</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">hull</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+  <span class="n">boxes</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">triangle</span> <span class="ow">in</span> <span class="n">hull</span><span class="o">.</span><span class="n">simplices</span><span class="p">:</span>
+    <span class="c1"># coords[triangle, 0] gives the x-dimension of all triangle points</span>
+    <span class="c1"># Take transpose to make sure rows correspond to atoms.</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">coords</span><span class="p">[</span><span class="n">triangle</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">triangle</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">triangle</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+    <span class="c1"># We voxelize so all grids have integral coordinates (convenience)</span>
+    <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">x_min</span><span class="p">))</span> <span class="o">-</span> <span class="n">pad</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">x_max</span><span class="p">))</span> <span class="o">+</span> <span class="n">pad</span>
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">y_min</span><span class="p">))</span> <span class="o">-</span> <span class="n">pad</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">y_max</span><span class="p">))</span> <span class="o">+</span> <span class="n">pad</span>
+    <span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">z_min</span><span class="p">))</span> <span class="o">-</span> <span class="n">pad</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">z_max</span><span class="p">))</span> <span class="o">+</span> <span class="n">pad</span>
+    <span class="n">boxes</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">),</span> <span class="p">(</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">),</span> <span class="p">(</span><span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span><span class="p">)))</span>
+  <span class="k">return</span> <span class="n">boxes</span></div>
+
+
+<div class="viewcode-block" id="boxes_to_atoms"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.boxes_to_atoms">[docs]</a><span class="k">def</span> <span class="nf">boxes_to_atoms</span><span class="p">(</span><span class="n">atom_coords</span><span class="p">,</span> <span class="n">boxes</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Maps each box to a list of atoms in that box.</span>
+
+<span class="sd">  TODO(rbharath): This does a num_atoms x num_boxes computations. Is</span>
+<span class="sd">  there a reasonable heuristic we can use to speed this up?</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">box_ind</span><span class="p">,</span> <span class="n">box</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">boxes</span><span class="p">):</span>
+    <span class="n">box_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">),</span> <span class="p">(</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">),</span> <span class="p">(</span><span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span><span class="p">)</span> <span class="o">=</span> <span class="n">box</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Handing box </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">box_ind</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">boxes</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">atom_ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atom_coords</span><span class="p">)):</span>
+      <span class="n">atom</span> <span class="o">=</span> <span class="n">atom_coords</span><span class="p">[</span><span class="n">atom_ind</span><span class="p">]</span>
+      <span class="n">x_cont</span> <span class="o">=</span> <span class="n">x_min</span> <span class="o">&lt;=</span> <span class="n">atom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">atom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x_max</span>
+      <span class="n">y_cont</span> <span class="o">=</span> <span class="n">y_min</span> <span class="o">&lt;=</span> <span class="n">atom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">atom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">y_max</span>
+      <span class="n">z_cont</span> <span class="o">=</span> <span class="n">z_min</span> <span class="o">&lt;=</span> <span class="n">atom</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">atom</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">z_max</span>
+      <span class="k">if</span> <span class="n">x_cont</span> <span class="ow">and</span> <span class="n">y_cont</span> <span class="ow">and</span> <span class="n">z_cont</span><span class="p">:</span>
+        <span class="n">box_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom_ind</span><span class="p">)</span>
+    <span class="n">mapping</span><span class="p">[</span><span class="n">box</span><span class="p">]</span> <span class="o">=</span> <span class="n">box_atoms</span>
+  <span class="k">return</span> <span class="n">mapping</span></div>
+
+
+<div class="viewcode-block" id="merge_boxes"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.merge_boxes">[docs]</a><span class="k">def</span> <span class="nf">merge_boxes</span><span class="p">(</span><span class="n">box1</span><span class="p">,</span> <span class="n">box2</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Merges two boxes.&quot;&quot;&quot;</span>
+  <span class="p">(</span><span class="n">x_min1</span><span class="p">,</span> <span class="n">x_max1</span><span class="p">),</span> <span class="p">(</span><span class="n">y_min1</span><span class="p">,</span> <span class="n">y_max1</span><span class="p">),</span> <span class="p">(</span><span class="n">z_min1</span><span class="p">,</span> <span class="n">z_max1</span><span class="p">)</span> <span class="o">=</span> <span class="n">box1</span>
+  <span class="p">(</span><span class="n">x_min2</span><span class="p">,</span> <span class="n">x_max2</span><span class="p">),</span> <span class="p">(</span><span class="n">y_min2</span><span class="p">,</span> <span class="n">y_max2</span><span class="p">),</span> <span class="p">(</span><span class="n">z_min2</span><span class="p">,</span> <span class="n">z_max2</span><span class="p">)</span> <span class="o">=</span> <span class="n">box2</span>
+  <span class="n">x_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x_min1</span><span class="p">,</span> <span class="n">x_min2</span><span class="p">)</span>
+  <span class="n">y_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">y_min1</span><span class="p">,</span> <span class="n">y_min2</span><span class="p">)</span>
+  <span class="n">z_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">z_min1</span><span class="p">,</span> <span class="n">z_min2</span><span class="p">)</span>
+  <span class="n">x_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x_max1</span><span class="p">,</span> <span class="n">x_max2</span><span class="p">)</span>
+  <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">y_max1</span><span class="p">,</span> <span class="n">y_max2</span><span class="p">)</span>
+  <span class="n">z_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">z_max1</span><span class="p">,</span> <span class="n">z_max2</span><span class="p">)</span>
+  <span class="k">return</span> <span class="p">((</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">),</span> <span class="p">(</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">),</span> <span class="p">(</span><span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="merge_overlapping_boxes"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.merge_overlapping_boxes">[docs]</a><span class="k">def</span> <span class="nf">merge_overlapping_boxes</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=.</span><span class="mi">8</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Merge boxes which have an overlap greater than threshold.</span>
+
+<span class="sd">  TODO(rbharath): This merge code is terribly inelegant. It&#39;s also quadratic</span>
+<span class="sd">  in number of boxes. It feels like there ought to be an elegant divide and</span>
+<span class="sd">  conquer approach here. Figure out later...</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">num_boxes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
+  <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_boxes</span><span class="p">):</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">new_boxes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">new_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># If overlap of box with previously generated output boxes, return</span>
+    <span class="n">contained</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">for</span> <span class="n">output_box</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+      <span class="c1"># Carry forward mappings</span>
+      <span class="n">new_mapping</span><span class="p">[</span><span class="n">output_box</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">output_box</span><span class="p">]</span>
+      <span class="k">if</span> <span class="n">compute_overlap</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">output_box</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">contained</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="n">contained</span><span class="p">:</span>
+      <span class="k">continue</span>
+    <span class="c1"># We know that box has at least one atom not in outputs</span>
+    <span class="n">unique_box</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">for</span> <span class="n">merge_box</span> <span class="ow">in</span> <span class="n">boxes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+      <span class="n">overlap</span> <span class="o">=</span> <span class="n">compute_overlap</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">merge_box</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">overlap</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">:</span>
+        <span class="n">new_boxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merge_box</span><span class="p">)</span>
+        <span class="n">new_mapping</span><span class="p">[</span><span class="n">merge_box</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">merge_box</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Current box has been merged into box further down list.</span>
+        <span class="c1"># No need to output current box</span>
+        <span class="n">unique_box</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">merged</span> <span class="o">=</span> <span class="n">merge_boxes</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">merge_box</span><span class="p">)</span>
+        <span class="n">new_boxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+        <span class="n">new_mapping</span><span class="p">[</span><span class="n">merged</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">box</span><span class="p">])</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">merge_box</span><span class="p">])))</span>
+    <span class="k">if</span> <span class="n">unique_box</span><span class="p">:</span>
+      <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
+      <span class="n">new_mapping</span><span class="p">[</span><span class="n">box</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">box</span><span class="p">]</span>
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">new_boxes</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">new_mapping</span>
+  <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">mapping</span></div>
+
+
+<div class="viewcode-block" id="BindingPocketFinder"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.BindingPocketFinder">[docs]</a><span class="k">class</span> <span class="nc">BindingPocketFinder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Abstract superclass for binding pocket detectors&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BindingPocketFinder.find_pockets"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.BindingPocketFinder.find_pockets">[docs]</a>  <span class="k">def</span> <span class="nf">find_pockets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein_file</span><span class="p">,</span> <span class="n">ligand_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds potential binding pockets in proteins.&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+
+<div class="viewcode-block" id="ConvexHullPocketFinder"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.ConvexHullPocketFinder">[docs]</a><span class="k">class</span> <span class="nc">ConvexHullPocketFinder</span><span class="p">(</span><span class="n">BindingPocketFinder</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Implementation that uses convex hull of protein to find pockets.</span>
+
+<span class="sd">  Based on https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4112621/pdf/1472-6807-14-18.pdf</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">pad</span>
+
+<div class="viewcode-block" id="ConvexHullPocketFinder.find_all_pockets"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.ConvexHullPocketFinder.find_all_pockets">[docs]</a>  <span class="k">def</span> <span class="nf">find_all_pockets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find list of binding pockets on protein.&quot;&quot;&quot;</span>
+    <span class="c1"># protein_coords is (N, 3) tensor</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span><span class="n">protein_file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">get_all_boxes</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvexHullPocketFinder.find_pockets"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.ConvexHullPocketFinder.find_pockets">[docs]</a>  <span class="k">def</span> <span class="nf">find_pockets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein_file</span><span class="p">,</span> <span class="n">ligand_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find list of suitable binding pockets on protein.&quot;&quot;&quot;</span>
+    <span class="n">protein_coords</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span>
+        <span class="n">protein_file</span><span class="p">,</span> <span class="n">add_hydrogens</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">calc_charges</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ligand_coords</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span>
+        <span class="n">ligand_file</span><span class="p">,</span> <span class="n">add_hydrogens</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">calc_charges</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">get_all_boxes</span><span class="p">(</span><span class="n">protein_coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">)</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">boxes_to_atoms</span><span class="p">(</span><span class="n">protein_coords</span><span class="p">,</span> <span class="n">boxes</span><span class="p">)</span>
+    <span class="n">pockets</span><span class="p">,</span> <span class="n">pocket_atoms_map</span> <span class="o">=</span> <span class="n">merge_overlapping_boxes</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">boxes</span><span class="p">)</span>
+    <span class="n">pocket_coords</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pocket</span> <span class="ow">in</span> <span class="n">pockets</span><span class="p">:</span>
+      <span class="n">atoms</span> <span class="o">=</span> <span class="n">pocket_atoms_map</span><span class="p">[</span><span class="n">pocket</span><span class="p">]</span>
+      <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+      <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="n">coords</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">protein_coords</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span>
+      <span class="n">pocket_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pockets</span><span class="p">,</span> <span class="n">pocket_atoms_map</span><span class="p">,</span> <span class="n">pocket_coords</span></div></div>
+
+
+<div class="viewcode-block" id="RFConvexHullPocketFinder"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.RFConvexHullPocketFinder">[docs]</a><span class="k">class</span> <span class="nc">RFConvexHullPocketFinder</span><span class="p">(</span><span class="n">BindingPocketFinder</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Uses pre-trained RF model + ConvexHulPocketFinder to select pockets.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">pad</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">convex_finder</span> <span class="o">=</span> <span class="n">ConvexHullPocketFinder</span><span class="p">(</span><span class="n">pad</span><span class="p">)</span>
+
+    <span class="c1"># Load binding pocket model</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;About to download trained model.&quot;</span><span class="p">)</span>
+    <span class="c1"># TODO(rbharath): Shift refined to full once trained.</span>
+    <span class="n">call</span><span class="p">((</span>
+        <span class="s2">&quot;wget -nv -c http://deepchem.io.s3-website-us-west-1.amazonaws.com/trained_models/pocket_random_refined_RF.tar.gz&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">call</span><span class="p">((</span><span class="s2">&quot;tar -zxvf pocket_random_refined_RF.tar.gz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">call</span><span class="p">((</span><span class="s2">&quot;mv pocket_random_refined_RF </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span><span class="p">,</span> <span class="s2">&quot;pocket_random_refined_RF&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Fit model on dataset</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">SklearnModel</span><span class="p">(</span><span class="n">model_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+
+    <span class="c1"># Create featurizers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pocket_featurizer</span> <span class="o">=</span> <span class="n">BindingPocketFeaturizer</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ligand_featurizer</span> <span class="o">=</span> <span class="n">CircularFingerprint</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RFConvexHullPocketFinder.find_pockets"><a class="viewcode-back" href="../../../deepchem.dock.html#deepchem.dock.binding_pocket.RFConvexHullPocketFinder.find_pockets">[docs]</a>  <span class="k">def</span> <span class="nf">find_pockets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein_file</span><span class="p">,</span> <span class="n">ligand_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute features for a given complex</span>
+
+<span class="sd">    TODO(rbharath): This has a log of code overlap with</span>
+<span class="sd">    compute_binding_pocket_features in</span>
+<span class="sd">    examples/binding_pockets/binding_pocket_datasets.py. Find way to refactor</span>
+<span class="sd">    to avoid code duplication.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if not ligand_file.endswith(&quot;.sdf&quot;):</span>
+    <span class="c1">#   raise ValueError(&quot;Only .sdf ligand files can be featurized.&quot;)</span>
+    <span class="c1"># ligand_basename = os.path.basename(ligand_file).split(&quot;.&quot;)[0]</span>
+    <span class="c1"># ligand_mol2 = os.path.join(</span>
+    <span class="c1">#     self.base_dir, ligand_basename + &quot;.mol2&quot;)</span>
+    <span class="c1">#</span>
+    <span class="c1"># # Write mol2 file for ligand</span>
+    <span class="c1"># obConversion = ob.OBConversion()</span>
+    <span class="c1"># conv_out = obConversion.SetInAndOutFormats(str(&quot;sdf&quot;), str(&quot;mol2&quot;))</span>
+    <span class="c1"># ob_mol = ob.OBMol()</span>
+    <span class="c1"># obConversion.ReadFile(ob_mol, str(ligand_file))</span>
+    <span class="c1"># obConversion.WriteFile(ob_mol, str(ligand_mol2))</span>
+    <span class="c1">#</span>
+    <span class="c1"># # Featurize ligand</span>
+    <span class="c1"># mol = Chem.MolFromMol2File(str(ligand_mol2), removeHs=False)</span>
+    <span class="c1"># if mol is None:</span>
+    <span class="c1">#   return None, None</span>
+    <span class="c1"># # Default for CircularFingerprint</span>
+    <span class="c1"># n_ligand_features = 1024</span>
+    <span class="c1"># ligand_features = self.ligand_featurizer.featurize([mol])</span>
+    <span class="c1">#</span>
+    <span class="c1"># # Featurize pocket</span>
+    <span class="c1"># pockets, pocket_atoms_map, pocket_coords = self.convex_finder.find_pockets(</span>
+    <span class="c1">#     protein_file, ligand_file)</span>
+    <span class="c1"># n_pockets = len(pockets)</span>
+    <span class="c1"># n_pocket_features = BindingPocketFeaturizer.n_features</span>
+    <span class="c1">#</span>
+    <span class="c1"># features = np.zeros((n_pockets, n_pocket_features+n_ligand_features))</span>
+    <span class="c1"># pocket_features = self.pocket_featurizer.featurize(</span>
+    <span class="c1">#     protein_file, pockets, pocket_atoms_map, pocket_coords)</span>
+    <span class="c1"># # Note broadcast operation</span>
+    <span class="c1"># features[:, :n_pocket_features] = pocket_features</span>
+    <span class="c1"># features[:, n_pocket_features:] = ligand_features</span>
+    <span class="c1"># dataset = NumpyDataset(X=features)</span>
+    <span class="c1"># pocket_preds = self.model.predict(dataset)</span>
+    <span class="c1"># pocket_pred_proba = np.squeeze(self.model.predict_proba(dataset))</span>
+    <span class="c1">#</span>
+    <span class="c1"># # Find pockets which are active</span>
+    <span class="c1"># active_pockets = []</span>
+    <span class="c1"># active_pocket_atoms_map = {}</span>
+    <span class="c1"># active_pocket_coords = []</span>
+    <span class="c1"># for pocket_ind in range(len(pockets)):</span>
+    <span class="c1">#   #################################################### DEBUG</span>
+    <span class="c1">#   # TODO(rbharath): For now, using a weak cutoff. Fix later.</span>
+    <span class="c1">#   #if pocket_preds[pocket_ind] == 1:</span>
+    <span class="c1">#   if pocket_pred_proba[pocket_ind][1] &gt; .15:</span>
+    <span class="c1">#   #################################################### DEBUG</span>
+    <span class="c1">#     pocket = pockets[pocket_ind]</span>
+    <span class="c1">#     active_pockets.append(pocket)</span>
+    <span class="c1">#     active_pocket_atoms_map[pocket] = pocket_atoms_map[pocket]</span>
+    <span class="c1">#     active_pocket_coords.append(pocket_coords[pocket_ind])</span>
+    <span class="c1"># return active_pockets, active_pocket_atoms_map, active_pocket_coords</span>
+    <span class="c1"># # TODO(LESWING)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Karl Implement&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

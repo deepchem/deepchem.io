@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.metalearning package &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="index.html" />
+    <link rel="up" title="deepchem package" href="deepchem.html" />
+    <link rel="next" title="deepchem.metrics package" href="deepchem.metrics.html" />
+    <link rel="prev" title="deepchem.hyper package" href="deepchem.hyper.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">deepchem.metalearning package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-deepchem.metalearning.maml">deepchem.metalearning.maml module</a></li>
+<li><a class="reference internal" href="#module-deepchem.metalearning">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-metalearning-package">
+<h1>deepchem.metalearning package<a class="headerlink" href="#deepchem-metalearning-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deepchem.metalearning.maml">
+<span id="deepchem-metalearning-maml-module"></span><h2>deepchem.metalearning.maml module<a class="headerlink" href="#module-deepchem.metalearning.maml" title="Permalink to this headline">¶</a></h2>
+<p>Model-Agnostic Meta-Learning (MAML) algorithm for low data learning.</p>
+<dl class="class">
+<dt id="deepchem.metalearning.maml.MAML">
+<em class="property">class </em><code class="descclassname">deepchem.metalearning.maml.</code><code class="descname">MAML</code><span class="sig-paren">(</span><em>learner</em>, <em>learning_rate=0.001</em>, <em>optimization_steps=1</em>, <em>meta_batch_size=10</em>, <em>optimizer=&lt;deepchem.models.tensorgraph.optimizers.Adam object&gt;</em>, <em>model_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metalearning/maml.html#MAML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metalearning.maml.MAML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Implements the Model-Agnostic Meta-Learning algorithm for low data learning.</p>
+<p>The algorithm is described in Finn et al., &#8220;Model-Agnostic Meta-Learning for Fast
+Adaptation of Deep Networks&#8221; (<a class="reference external" href="https://arxiv.org/abs/1703.03400">https://arxiv.org/abs/1703.03400</a>).  It is used for
+training models that can perform a variety of tasks, depending on what data they
+are trained on.  It assumes you have training data for many tasks, but only a small
+amount for each one.  It performs &#8220;meta-learning&#8221; by looping over tasks and trying
+to minimize the loss on each one <em>after</em> one or a few steps of gradient descent.
+That is, it does not try to create a model that can directly solve the tasks, but
+rather tries to create a model that is very easy to train.</p>
+<p>To use this class, create a subclass of MetaLearner that encapsulates the model
+and data for your learning problem.  Pass it to a MAML object and call fit().
+You can then use train_on_current_task() to fine tune the model for a particular
+task.</p>
+<dl class="method">
+<dt id="deepchem.metalearning.maml.MAML.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>steps</em>, <em>max_checkpoints_to_keep=5</em>, <em>checkpoint_interval=600</em>, <em>restore=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metalearning/maml.html#MAML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metalearning.maml.MAML.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform meta-learning to train the model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steps</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the number of steps of meta-learning to perform</li>
+<li><strong>max_checkpoints_to_keep</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the maximum number of checkpoint files to keep.  When this number is reached, older
+files are deleted.</li>
+<li><strong>checkpoint_interval</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; the time interval at which to save checkpoints, measured in seconds</li>
+<li><strong>restore</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; if True, restore the model from the most recent checkpoint and continue training
+from there.  If False, retrain the model from scratch.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.metalearning.maml.MAML.restore">
+<code class="descname">restore</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metalearning/maml.html#MAML.restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metalearning.maml.MAML.restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload the model parameters from the most recent checkpoint file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.metalearning.maml.MAML.train_on_current_task">
+<code class="descname">train_on_current_task</code><span class="sig-paren">(</span><em>optimization_steps=1</em>, <em>restore=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metalearning/maml.html#MAML.train_on_current_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metalearning.maml.MAML.train_on_current_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a few steps of gradient descent to fine tune the model on the current task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>optimization_steps</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the number of steps of gradient descent to perform</li>
+<li><strong>restore</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; if True, restore the model from the most recent checkpoint before optimizing</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.metalearning.maml.MetaLearner">
+<em class="property">class </em><code class="descclassname">deepchem.metalearning.maml.</code><code class="descname">MetaLearner</code><a class="reference internal" href="_modules/deepchem/metalearning/maml.html#MetaLearner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metalearning.maml.MetaLearner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Model and data to which the MAML algorithm can be applied.</p>
+<p>To use MAML, create a subclass of this defining the learning problem to solve.
+It consists of a model that can be trained to perform many different tasks, and
+data for training it on a large (possibly infinite) set of different tasks.</p>
+<dl class="method">
+<dt id="deepchem.metalearning.maml.MetaLearner.get_batch">
+<code class="descname">get_batch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metalearning/maml.html#MetaLearner.get_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metalearning.maml.MetaLearner.get_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a batch of data for training.</p>
+<p>This should return the data in the form of a Tensorflow feed dict, that is, a dict
+mapping tensors to values.  This will usually be called twice for each task, and should
+return a different batch on each call.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.metalearning.maml.MetaLearner.loss">
+<code class="descname">loss</code><a class="headerlink" href="#deepchem.metalearning.maml.MetaLearner.loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the model&#8217;s loss function, represented as a Layer or Tensor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.metalearning.maml.MetaLearner.select_task">
+<code class="descname">select_task</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/metalearning/maml.html#MetaLearner.select_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.metalearning.maml.MetaLearner.select_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a new task to train on.</p>
+<p>If there is a fixed set of training tasks, this will typically cycle through them.
+If there are infinitely many training tasks, this can simply select a new one each
+time it is called.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.metalearning.maml.MetaLearner.variables">
+<code class="descname">variables</code><a class="headerlink" href="#deepchem.metalearning.maml.MetaLearner.variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of Tensorflow variables to train.</p>
+<p>The default implementation returns all trainable variables in the graph.  This is usually
+what you want, but subclasses can customize it if needed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.metalearning">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.metalearning" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.metalearning.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

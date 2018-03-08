@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>deepchem package &mdash; deepchem 1.3.1 documentation</title>
+
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="index.html" />
+    <link rel="next" title="deepchem.data package" href="deepchem.data.html" />
+    <link rel="prev" title="DeepChem" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+
+                <li><a href="/docs/notebooks/index.html">Tutorials</a></li>
+
+
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/deepchem.html">master</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/2.0.0/deepchem.html">2.0.0</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/1.3.1/deepchem.html">1.3.1</a></li>
+</ul>
+</ul>
+</li>
+</ul>
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+
+        </div>
+    </div>
+  </div>    </div>
+  </div>  </div><div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem">
+<h1>deepchem<a class="headerlink" href="#deepchem" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deepchem.html">deepchem package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.data.html">deepchem.data package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.data.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.data.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.data.html#module-deepchem.data.data_loader">deepchem.data.data_loader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.data.html#module-deepchem.data.datasets">deepchem.data.datasets module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.data.html#module-deepchem.data.supports">deepchem.data.supports module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.data.html#module-deepchem.data.test_data_loader">deepchem.data.test_data_loader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.data.html#module-deepchem.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.dock.html">deepchem.dock package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.dock.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.dock.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.dock.html#module-deepchem.dock.binding_pocket">deepchem.dock.binding_pocket module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.dock.html#module-deepchem.dock.docking">deepchem.dock.docking module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.dock.html#module-deepchem.dock.pose_generation">deepchem.dock.pose_generation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.dock.html#module-deepchem.dock.pose_scoring">deepchem.dock.pose_scoring module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.dock.html#module-deepchem.dock">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.feat.html">deepchem.feat package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.adjacency_fingerprints">deepchem.feat.adjacency_fingerprints module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.atomic_coordinates">deepchem.feat.atomic_coordinates module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.base_classes">deepchem.feat.base_classes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.basic">deepchem.feat.basic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.binding_pocket_features">deepchem.feat.binding_pocket_features module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.coulomb_matrices">deepchem.feat.coulomb_matrices module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.fingerprints">deepchem.feat.fingerprints module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.graph_features">deepchem.feat.graph_features module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.mol_graphs">deepchem.feat.mol_graphs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.nnscore_utils">deepchem.feat.nnscore_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.one_hot">deepchem.feat.one_hot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.raw_featurizer">deepchem.feat.raw_featurizer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.rdkit_grid_featurizer">deepchem.feat.rdkit_grid_featurizer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat.test_one_hot">deepchem.feat.test_one_hot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.feat.html#module-deepchem.feat">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.hyper.html">deepchem.hyper package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.hyper.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.hyper.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.hyper.html#module-deepchem.hyper.gaussian_process">deepchem.hyper.gaussian_process module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.hyper.html#module-deepchem.hyper.grid_search">deepchem.hyper.grid_search module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.hyper.html#module-deepchem.hyper">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.metalearning.html">deepchem.metalearning package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.metalearning.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.metalearning.html#module-deepchem.metalearning.maml">deepchem.metalearning.maml module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.metalearning.html#module-deepchem.metalearning">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.metrics.html">deepchem.metrics package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.metrics.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.metrics.html#module-deepchem.metrics">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.models.html">deepchem.models package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.html#module-deepchem.models.models">deepchem.models.models module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.html#module-deepchem.models.multitask">deepchem.models.multitask module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.html#module-deepchem.models.sequential">deepchem.models.sequential module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.models.html#module-deepchem.models">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.molnet.html">deepchem.molnet package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.molnet.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.molnet.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.molnet.html#module-deepchem.molnet.check_availability">deepchem.molnet.check_availability module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.molnet.html#module-deepchem.molnet.preset_hyper_parameters">deepchem.molnet.preset_hyper_parameters module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.molnet.html#module-deepchem.molnet.run_benchmark">deepchem.molnet.run_benchmark module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.molnet.html#module-deepchem.molnet.run_benchmark_low_data">deepchem.molnet.run_benchmark_low_data module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.molnet.html#module-deepchem.molnet.run_benchmark_models">deepchem.molnet.run_benchmark_models module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.molnet.html#module-deepchem.molnet">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.nn.html">deepchem.nn package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.activations">deepchem.nn.activations module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.constraints">deepchem.nn.constraints module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.copy">deepchem.nn.copy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.initializations">deepchem.nn.initializations module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.layers">deepchem.nn.layers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.model_ops">deepchem.nn.model_ops module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.objectives">deepchem.nn.objectives module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.regularizers">deepchem.nn.regularizers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn.weave_layers">deepchem.nn.weave_layers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.nn.html#module-deepchem.nn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.rl.html">deepchem.rl package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.rl.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.rl.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.rl.html#module-deepchem.rl.a3c">deepchem.rl.a3c module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.rl.html#module-deepchem.rl.ppo">deepchem.rl.ppo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.rl.html#module-deepchem.rl">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.splits.html">deepchem.splits package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.splits.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.splits.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.splits.html#module-deepchem.splits.splitters">deepchem.splits.splitters module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.splits.html#module-deepchem.splits.task_splitter">deepchem.splits.task_splitter module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.splits.html#module-deepchem.splits">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.trans.html">deepchem.trans package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.trans.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.trans.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.trans.html#module-deepchem.trans.transformers">deepchem.trans.transformers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.trans.html#module-deepchem.trans">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deepchem.utils.html">deepchem.utils package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#module-deepchem.utils.conformers">deepchem.utils.conformers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#module-deepchem.utils.evaluate">deepchem.utils.evaluate module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#module-deepchem.utils.mol_xyz_util">deepchem.utils.mol_xyz_util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#module-deepchem.utils.rdkit_util">deepchem.utils.rdkit_util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#module-deepchem.utils.save">deepchem.utils.save module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#module-deepchem.utils.visualization">deepchem.utils.visualization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deepchem.utils.html#module-deepchem.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deepchem.html#module-deepchem">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/modules.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

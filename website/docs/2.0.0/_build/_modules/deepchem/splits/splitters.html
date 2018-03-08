@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.splits.splitters &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.splits.splitters</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains an abstract base class that supports chemically aware data splits.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Bharath Ramsundar, Aneesh Pappu &quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">DataStructs</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
+<span class="kn">from</span> <span class="nn">rdkit.ML.Cluster</span> <span class="kn">import</span> <span class="n">Butina</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">DataStructs</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem.Fingerprints</span> <span class="kn">import</span> <span class="n">FingerprintMols</span>
+<span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">from</span> <span class="nn">deepchem.data</span> <span class="kn">import</span> <span class="n">DiskDataset</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils</span> <span class="kn">import</span> <span class="n">ScaffoldGenerator</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils.save</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">deepchem.data</span> <span class="kn">import</span> <span class="n">NumpyDataset</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils.save</span> <span class="kn">import</span> <span class="n">load_data</span>
+
+
+<div class="viewcode-block" id="generate_scaffold"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.generate_scaffold">[docs]</a><span class="k">def</span> <span class="nf">generate_scaffold</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">include_chirality</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Compute the Bemis-Murcko scaffold for a SMILES string.&quot;&quot;&quot;</span>
+  <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+  <span class="n">engine</span> <span class="o">=</span> <span class="n">ScaffoldGenerator</span><span class="p">(</span><span class="n">include_chirality</span><span class="o">=</span><span class="n">include_chirality</span><span class="p">)</span>
+  <span class="n">scaffold</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">get_scaffold</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">scaffold</span></div>
+
+
+<div class="viewcode-block" id="randomize_arrays"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.randomize_arrays">[docs]</a><span class="k">def</span> <span class="nf">randomize_arrays</span><span class="p">(</span><span class="n">array_list</span><span class="p">):</span>
+  <span class="c1"># assumes that every array is of the same dimension</span>
+  <span class="n">num_rows</span> <span class="o">=</span> <span class="n">array_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">num_rows</span><span class="p">)</span>
+  <span class="n">permuted_arrays</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">array_list</span><span class="p">:</span>
+    <span class="n">permuted_arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">perm</span><span class="p">])</span>
+  <span class="k">return</span> <span class="n">permuted_arrays</span></div>
+
+
+<div class="viewcode-block" id="Splitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.Splitter">[docs]</a><span class="k">class</span> <span class="nc">Splitter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for chemically aware splits..</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates splitter object.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+<div class="viewcode-block" id="Splitter.k_fold_split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.Splitter.k_fold_split">[docs]</a>  <span class="k">def</span> <span class="nf">k_fold_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">directories</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: Dataset</span>
+<span class="sd">    Dataset to do a k-fold split</span>
+
+<span class="sd">    k: int</span>
+<span class="sd">    number of folds</span>
+
+<span class="sd">    directories: list of str</span>
+<span class="sd">    list of length 2*k filepaths to save the result disk-datasets</span>
+
+<span class="sd">    kwargs</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of length k tuples of (train, cv)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param dataset:</span>
+<span class="sd">    :param k:</span>
+<span class="sd">    :param directories:</span>
+<span class="sd">    :param kwargs:</span>
+<span class="sd">    :return: list of length k tuples of (train, cv)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Computing K-fold split&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">directories</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">directories</span> <span class="o">=</span> <span class="p">[</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">k</span>
+    <span class="n">cv_datasets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">train_ds_base</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">train_datasets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># rem_dataset is remaining portion of dataset</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">DiskDataset</span><span class="p">):</span>
+      <span class="n">rem_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">rem_dataset</span> <span class="o">=</span> <span class="n">DiskDataset</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span>
+                                           <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">fold</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+      <span class="c1"># Note starts as 1/k since fold starts at 0. Ends at 1 since fold goes up</span>
+      <span class="c1"># to k-1.</span>
+      <span class="n">frac_fold</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">fold</span><span class="p">)</span>
+      <span class="n">train_dir</span><span class="p">,</span> <span class="n">cv_dir</span> <span class="o">=</span> <span class="n">directories</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">fold</span><span class="p">],</span> <span class="n">directories</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">fold</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+      <span class="n">fold_inds</span><span class="p">,</span> <span class="n">rem_inds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+          <span class="n">rem_dataset</span><span class="p">,</span>
+          <span class="n">frac_train</span><span class="o">=</span><span class="n">frac_fold</span><span class="p">,</span>
+          <span class="n">frac_valid</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">frac_fold</span><span class="p">,</span>
+          <span class="n">frac_test</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">cv_dataset</span> <span class="o">=</span> <span class="n">rem_dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">fold_inds</span><span class="p">,</span> <span class="n">select_dir</span><span class="o">=</span><span class="n">cv_dir</span><span class="p">)</span>
+      <span class="n">cv_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cv_dataset</span><span class="p">)</span>
+      <span class="n">rem_dataset</span> <span class="o">=</span> <span class="n">rem_dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">rem_inds</span><span class="p">)</span>
+
+      <span class="n">train_ds_to_merge</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span>
+                                 <span class="p">[</span><span class="n">train_ds_base</span><span class="p">,</span> <span class="n">rem_dataset</span><span class="p">])</span>
+      <span class="n">train_ds_to_merge</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">train_ds_to_merge</span><span class="p">)</span>
+      <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">DiskDataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">train_ds_to_merge</span><span class="p">,</span> <span class="n">merge_dir</span><span class="o">=</span><span class="n">train_dir</span><span class="p">)</span>
+      <span class="n">train_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+
+      <span class="n">update_train_base_merge</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span>
+                                       <span class="p">[</span><span class="n">train_ds_base</span><span class="p">,</span> <span class="n">cv_dataset</span><span class="p">])</span>
+      <span class="n">train_ds_base</span> <span class="o">=</span> <span class="n">DiskDataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">update_train_base_merge</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">train_datasets</span><span class="p">,</span> <span class="n">cv_datasets</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Splitter.train_valid_test_split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.Splitter.train_valid_test_split">[docs]</a>  <span class="k">def</span> <span class="nf">train_valid_test_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                             <span class="n">dataset</span><span class="p">,</span>
+                             <span class="n">train_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">valid_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">test_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+                             <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">log_every_n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                             <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits self into train/validation/test sets.</span>
+
+<span class="sd">        Returns Dataset objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Computing train/valid/test indices&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">train_inds</span><span class="p">,</span> <span class="n">valid_inds</span><span class="p">,</span> <span class="n">test_inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">,</span>
+        <span class="n">frac_train</span><span class="o">=</span><span class="n">frac_train</span><span class="p">,</span>
+        <span class="n">frac_test</span><span class="o">=</span><span class="n">frac_test</span><span class="p">,</span>
+        <span class="n">frac_valid</span><span class="o">=</span><span class="n">frac_valid</span><span class="p">,</span>
+        <span class="n">log_every_n</span><span class="o">=</span><span class="n">log_every_n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">train_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">train_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">valid_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">valid_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">test_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">test_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">train_inds</span><span class="p">,</span> <span class="n">train_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">frac_valid</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">valid_inds</span><span class="p">,</span> <span class="n">valid_dir</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">valid_dataset</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">test_inds</span><span class="p">,</span> <span class="n">test_dir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span></div>
+
+<div class="viewcode-block" id="Splitter.train_test_split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.Splitter.train_test_split">[docs]</a>  <span class="k">def</span> <span class="nf">train_test_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">dataset</span><span class="p">,</span>
+                       <span class="n">train_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                       <span class="n">test_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                       <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                       <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+                       <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits self into train/test sets.</span>
+<span class="sd">        Returns Dataset objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">valid_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="n">train_dataset</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_valid_test_split</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">,</span>
+        <span class="n">train_dir</span><span class="p">,</span>
+        <span class="n">valid_dir</span><span class="p">,</span>
+        <span class="n">test_dir</span><span class="p">,</span>
+        <span class="n">frac_train</span><span class="o">=</span><span class="n">frac_train</span><span class="p">,</span>
+        <span class="n">frac_test</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">frac_train</span><span class="p">,</span>
+        <span class="n">frac_valid</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span></div>
+
+<div class="viewcode-block" id="Splitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.Splitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stub to be filled in by child classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+
+<div class="viewcode-block" id="RandomGroupSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomGroupSplitter">[docs]</a><span class="k">class</span> <span class="nc">RandomGroupSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A splitter class that splits on groupings. An example use case is when there</span>
+<span class="sd">    are multiple conformations of the same molecule that share the same topology.</span>
+<span class="sd">    This splitter subsequently guarantees that resulting splits preserve groupings.</span>
+
+<span class="sd">    Note that it doesn&#39;t do any dynamic programming or something fancy to try to</span>
+<span class="sd">    maximize the choice such that frac_train, frac_valid, or frac_test is maximized.</span>
+<span class="sd">    It simply permutes the groups themselves. As such, use with caution if the number</span>
+<span class="sd">    of elements per group varies significantly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    groups: array like list of hashables</span>
+<span class="sd">      An auxiliary array indicating the group of each item.</span>
+
+<span class="sd">    Eg:</span>
+<span class="sd">    g: 3 2 2 0 1 1 2 4 3</span>
+<span class="sd">    X: 0 1 2 3 4 5 6 7 8</span>
+
+<span class="sd">    Eg:</span>
+<span class="sd">    g: a b b e q x a a r</span>
+<span class="sd">    X: 0 1 2 3 4 5 6 7 8</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">RandomGroupSplitter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RandomGroupSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomGroupSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span> <span class="o">==</span> <span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">seed</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="c1"># dict is needed in case groups aren&#39;t strictly flattened or</span>
+    <span class="c1"># hashed by something non-integer like</span>
+    <span class="n">group_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">g</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_dict</span><span class="p">:</span>
+        <span class="n">group_dict</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">group_dict</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+    <span class="n">group_idxs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">group_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+      <span class="n">group_idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+    <span class="n">group_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">group_idxs</span><span class="p">)</span>
+
+    <span class="n">num_groups</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_idxs</span><span class="p">)</span>
+    <span class="n">train_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">*</span> <span class="n">num_groups</span><span class="p">)</span>
+    <span class="n">valid_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span><span class="p">)</span> <span class="o">*</span> <span class="n">num_groups</span><span class="p">)</span>
+    <span class="n">shuffled_group_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_groups</span><span class="p">))</span>
+
+    <span class="n">train_groups</span> <span class="o">=</span> <span class="n">shuffled_group_idxs</span><span class="p">[:</span><span class="n">train_cutoff</span><span class="p">]</span>
+    <span class="n">valid_groups</span> <span class="o">=</span> <span class="n">shuffled_group_idxs</span><span class="p">[</span><span class="n">train_cutoff</span><span class="p">:</span><span class="n">valid_cutoff</span><span class="p">]</span>
+    <span class="n">test_groups</span> <span class="o">=</span> <span class="n">shuffled_group_idxs</span><span class="p">[</span><span class="n">valid_cutoff</span><span class="p">:]</span>
+
+    <span class="n">train_idxs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">group_idxs</span><span class="p">[</span><span class="n">train_groups</span><span class="p">]))</span>
+    <span class="n">valid_idxs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">group_idxs</span><span class="p">[</span><span class="n">valid_groups</span><span class="p">]))</span>
+    <span class="n">test_idxs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">group_idxs</span><span class="p">[</span><span class="n">test_groups</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">train_idxs</span><span class="p">,</span> <span class="n">valid_idxs</span><span class="p">,</span> <span class="n">test_idxs</span></div></div>
+
+
+<div class="viewcode-block" id="RandomStratifiedSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomStratifiedSplitter">[docs]</a><span class="k">class</span> <span class="nc">RandomStratifiedSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RandomStratified Splitter class.</span>
+
+<span class="sd">    For sparse multitask datasets, a standard split offers no guarantees that the</span>
+<span class="sd">    splits will have any activate compounds. This class guarantees that each task</span>
+<span class="sd">    will have a proportional split of the activates in a split. TO do this, a</span>
+<span class="sd">    ragged split is performed with different numbers of compounds taken from each</span>
+<span class="sd">    task. Thus, the length of the split arrays may exceed the split of the</span>
+<span class="sd">    original array. That said, no datapoint is copied to more than one split, so</span>
+<span class="sd">    correctness is still ensured.</span>
+
+<span class="sd">    Note that this splitter is only valid for boolean label data.</span>
+
+<span class="sd">    TODO(rbharath): This splitter should be refactored to match style of other</span>
+<span class="sd">    splitter classes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__generate_required_hits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">frac_split</span><span class="p">):</span>
+    <span class="c1"># returns list of per column sum of non zero elements</span>
+    <span class="n">required_hits</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col_hits</span> <span class="ow">in</span> <span class="n">required_hits</span><span class="p">:</span>
+      <span class="n">col_hits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frac_split</span> <span class="o">*</span> <span class="n">col_hits</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">required_hits</span>
+
+<div class="viewcode-block" id="RandomStratifiedSplitter.get_task_split_indices"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomStratifiedSplitter.get_task_split_indices">[docs]</a>  <span class="k">def</span> <span class="nf">get_task_split_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">frac_split</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns num datapoints needed per task to split properly.&quot;&quot;&quot;</span>
+    <span class="n">w_present</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">y_present</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">w_present</span>
+
+    <span class="c1"># Compute number of actives needed per task.</span>
+    <span class="n">task_actives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_present</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">task_split_actives</span> <span class="o">=</span> <span class="p">(</span><span class="n">frac_split</span> <span class="o">*</span> <span class="n">task_actives</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># loop through each column and obtain index required to splice out for</span>
+    <span class="c1"># required fraction of hits</span>
+    <span class="n">split_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_tasks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">y</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_tasks</span><span class="p">):</span>
+      <span class="n">actives_count</span> <span class="o">=</span> <span class="n">task_split_actives</span><span class="p">[</span><span class="n">task</span><span class="p">]</span>
+      <span class="n">cum_task_actives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">y_present</span><span class="p">[:,</span> <span class="n">task</span><span class="p">])</span>
+      <span class="c1"># Find the first index where the cumulative number of actives equals</span>
+      <span class="c1"># the actives_count</span>
+      <span class="n">split_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cum_task_actives</span> <span class="o">&gt;=</span> <span class="n">actives_count</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="c1"># Note that np.where tells us last index required to exceed</span>
+      <span class="c1"># actives_count, so we actually want the following location</span>
+      <span class="n">split_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">split_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">split_indices</span></div>
+
+    <span class="c1"># TODO(rbharath): Refactor this split method to match API of other splits (or</span>
+
+  <span class="c1"># potentially refactor those to match this.</span>
+
+<div class="viewcode-block" id="RandomStratifiedSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomStratifiedSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">frac_split</span><span class="p">,</span> <span class="n">split_dirs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that does bulk of splitting dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">split_dirs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">split_dirs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">split_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()]</span>
+
+    <span class="c1"># Handle edge case where frac_split is 1</span>
+    <span class="k">if</span> <span class="n">frac_split</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="n">dataset_1</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span>
+      <span class="n">dataset_2</span> <span class="o">=</span> <span class="bp">None</span>
+      <span class="k">return</span> <span class="n">dataset_1</span><span class="p">,</span> <span class="n">dataset_2</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="n">randomize_arrays</span><span class="p">((</span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span>
+                                     <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">))</span>
+    <span class="n">split_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_task_split_indices</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">frac_split</span><span class="p">)</span>
+
+    <span class="c1"># Create weight matrices fpor two haves.</span>
+    <span class="n">w_1</span><span class="p">,</span> <span class="n">w_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">task</span><span class="p">,</span> <span class="n">split_index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">split_indices</span><span class="p">):</span>
+      <span class="c1"># copy over up to required index for weight first_split</span>
+      <span class="n">w_1</span><span class="p">[:</span><span class="n">split_index</span><span class="p">,</span> <span class="n">task</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="p">[:</span><span class="n">split_index</span><span class="p">,</span> <span class="n">task</span><span class="p">]</span>
+      <span class="n">w_2</span><span class="p">[</span><span class="n">split_index</span><span class="p">:,</span> <span class="n">task</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">split_index</span><span class="p">:,</span> <span class="n">task</span><span class="p">]</span>
+
+    <span class="c1"># check out if any rows in either w_1 or w_2 are just zeros</span>
+    <span class="n">rows_1</span> <span class="o">=</span> <span class="n">w_1</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">X_1</span><span class="p">,</span> <span class="n">y_1</span><span class="p">,</span> <span class="n">w_1</span><span class="p">,</span> <span class="n">ids_1</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">rows_1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">rows_1</span><span class="p">],</span> <span class="n">w_1</span><span class="p">[</span><span class="n">rows_1</span><span class="p">],</span> <span class="n">ids</span><span class="p">[</span><span class="n">rows_1</span><span class="p">]</span>
+    <span class="n">dataset_1</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X_1</span><span class="p">,</span> <span class="n">y_1</span><span class="p">,</span> <span class="n">w_1</span><span class="p">,</span> <span class="n">ids_1</span><span class="p">)</span>
+
+    <span class="n">rows_2</span> <span class="o">=</span> <span class="n">w_2</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">X_2</span><span class="p">,</span> <span class="n">y_2</span><span class="p">,</span> <span class="n">w_2</span><span class="p">,</span> <span class="n">ids_2</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">rows_2</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">rows_2</span><span class="p">],</span> <span class="n">w_2</span><span class="p">[</span><span class="n">rows_2</span><span class="p">],</span> <span class="n">ids</span><span class="p">[</span><span class="n">rows_2</span><span class="p">]</span>
+    <span class="n">dataset_2</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">X_2</span><span class="p">,</span> <span class="n">y_2</span><span class="p">,</span> <span class="n">w_2</span><span class="p">,</span> <span class="n">ids_2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset_1</span><span class="p">,</span> <span class="n">dataset_2</span></div>
+
+<div class="viewcode-block" id="RandomStratifiedSplitter.train_valid_test_split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomStratifiedSplitter.train_valid_test_split">[docs]</a>  <span class="k">def</span> <span class="nf">train_valid_test_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                             <span class="n">dataset</span><span class="p">,</span>
+                             <span class="n">train_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">valid_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">test_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+                             <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">log_every_n</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom split due to raggedness in original split.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">train_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">train_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">valid_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">valid_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">test_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">test_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="c1"># Obtain original x, y, and w arrays and shuffle</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="n">randomize_arrays</span><span class="p">((</span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">w</span><span class="p">,</span>
+                                     <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">))</span>
+    <span class="n">rem_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="n">train_dataset</span><span class="p">,</span> <span class="n">rem_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">frac_train</span><span class="p">,</span>
+                                            <span class="p">[</span><span class="n">train_dir</span><span class="p">,</span> <span class="n">rem_dir</span><span class="p">])</span>
+
+    <span class="c1"># calculate percent split for valid (out of test and valid)</span>
+    <span class="k">if</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">valid_percentage</span> <span class="o">=</span> <span class="n">frac_valid</span> <span class="o">/</span> <span class="p">(</span><span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+    <span class="c1"># split test data into valid and test, treating sub test set also as sparse</span>
+    <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">valid_percentage</span><span class="p">,</span>
+                                             <span class="p">[</span><span class="n">valid_dir</span><span class="p">,</span> <span class="n">test_dir</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span></div>
+
+<div class="viewcode-block" id="RandomStratifiedSplitter.k_fold_split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomStratifiedSplitter.k_fold_split">[docs]</a>  <span class="k">def</span> <span class="nf">k_fold_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">directories</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Needs custom implementation due to ragged splits for stratification.&quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Computing K-fold split&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">directories</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">directories</span> <span class="o">=</span> <span class="p">[</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="n">k</span>
+    <span class="n">fold_datasets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># rem_dataset is remaining portion of dataset</span>
+    <span class="n">rem_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+    <span class="k">for</span> <span class="n">fold</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+      <span class="c1"># Note starts as 1/k since fold starts at 0. Ends at 1 since fold goes up</span>
+      <span class="c1"># to k-1.</span>
+      <span class="n">frac_fold</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">fold</span><span class="p">)</span>
+      <span class="n">fold_dir</span> <span class="o">=</span> <span class="n">directories</span><span class="p">[</span><span class="n">fold</span><span class="p">]</span>
+      <span class="n">rem_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+      <span class="n">fold_dataset</span><span class="p">,</span> <span class="n">rem_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rem_dataset</span><span class="p">,</span> <span class="n">frac_fold</span><span class="p">,</span>
+                                             <span class="p">[</span><span class="n">fold_dir</span><span class="p">,</span> <span class="n">rem_dir</span><span class="p">])</span>
+      <span class="n">fold_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fold_dataset</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fold_datasets</span></div></div>
+
+
+<div class="viewcode-block" id="SingletaskStratifiedSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.SingletaskStratifiedSplitter">[docs]</a><span class="k">class</span> <span class="nc">SingletaskStratifiedSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for doing data splits by stratification on a single task.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    &gt;&gt;&gt; n_samples = 100</span>
+<span class="sd">    &gt;&gt;&gt; n_features = 10</span>
+<span class="sd">    &gt;&gt;&gt; n_tasks = 10</span>
+<span class="sd">    &gt;&gt;&gt; X = np.random.rand(n_samples, n_features)</span>
+<span class="sd">    &gt;&gt;&gt; y = np.random.rand(n_samples, n_tasks)</span>
+<span class="sd">    &gt;&gt;&gt; w = np.ones_like(y)</span>
+<span class="sd">    &gt;&gt;&gt; dataset = DiskDataset.from_numpy(np.ones((100,n_tasks)), np.ones((100,n_tasks)), verbose=False)</span>
+<span class="sd">    &gt;&gt;&gt; splitter = SingletaskStratifiedSplitter(task_number=5, verbose=False)</span>
+<span class="sd">    &gt;&gt;&gt; train_dataset, test_dataset = splitter.train_test_split(dataset)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates splitter object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        task_number: int (Optional, Default 0)</span>
+<span class="sd">          Task number for stratification.</span>
+<span class="sd">        verbose: bool (Optional, Default False)</span>
+<span class="sd">          Controls logging frequency.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">task_number</span> <span class="o">=</span> <span class="n">task_number</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+<div class="viewcode-block" id="SingletaskStratifiedSplitter.k_fold_split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.SingletaskStratifiedSplitter.k_fold_split">[docs]</a>  <span class="k">def</span> <span class="nf">k_fold_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">dataset</span><span class="p">,</span>
+                   <span class="n">k</span><span class="p">,</span>
+                   <span class="n">directories</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                   <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                   <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits compounds into k-folds using stratified sampling.</span>
+<span class="sd">        Overriding base class k_fold_split.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset: dc.data.Dataset object</span>
+<span class="sd">          Dataset.</span>
+<span class="sd">        k: int</span>
+<span class="sd">          Number of folds.</span>
+<span class="sd">        seed: int (Optional, Default None)</span>
+<span class="sd">          Random seed.</span>
+<span class="sd">        log_every_n: int (Optional, Default None)</span>
+<span class="sd">          Log every n examples (not currently used).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fold_datasets: List</span>
+<span class="sd">          List containing dc.data.Dataset objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Computing K-fold split&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">directories</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">directories</span> <span class="o">=</span> <span class="p">[</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="n">k</span>
+
+    <span class="n">y_s</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_number</span><span class="p">]</span>
+    <span class="n">sortidx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">y_s</span><span class="p">)</span>
+    <span class="n">sortidx_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">sortidx</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="n">fold_datasets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fold</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+      <span class="n">fold_dir</span> <span class="o">=</span> <span class="n">directories</span><span class="p">[</span><span class="n">fold</span><span class="p">]</span>
+      <span class="n">fold_ind</span> <span class="o">=</span> <span class="n">sortidx_list</span><span class="p">[</span><span class="n">fold</span><span class="p">]</span>
+      <span class="n">fold_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">fold_ind</span><span class="p">,</span> <span class="n">fold_dir</span><span class="p">)</span>
+      <span class="n">fold_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fold_dataset</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fold_datasets</span></div>
+
+<div class="viewcode-block" id="SingletaskStratifiedSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.SingletaskStratifiedSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits compounds into train/validation/test using stratified sampling.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset: dc.data.Dataset object</span>
+<span class="sd">          Dataset.</span>
+<span class="sd">        seed: int (Optional, Default None)</span>
+<span class="sd">          Random seed.</span>
+<span class="sd">        frac_train: float (Optional, Default .8)</span>
+<span class="sd">          Fraction of dataset put into training data.</span>
+<span class="sd">        frac_valid: float (Optional, Default .1)</span>
+<span class="sd">          Fraction of dataset put into validation data.</span>
+<span class="sd">        frac_test: float (Optional, Default .1)</span>
+<span class="sd">          Fraction of dataset put into test data.</span>
+<span class="sd">        log_every_n: int (Optional, Default None)</span>
+<span class="sd">          Log every n examples (not currently used).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        retval: Tuple</span>
+<span class="sd">          Tuple containing train indices, valid indices, and test indices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="c1"># JSG Assert that split fractions can be written as proper fractions over 10.</span>
+    <span class="c1"># This can be generalized in the future with some common demoninator determination.</span>
+    <span class="c1"># This will work for 80/20 train/test or 80/10/10 train/valid/test (most use cases).</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">frac_train</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">frac_test</span><span class="p">,</span>
+                            <span class="mf">10.</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">seed</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">y_s</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_number</span><span class="p">]</span>
+    <span class="n">sortidx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">y_s</span><span class="p">)</span>
+
+    <span class="n">split_cd</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">train_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">*</span> <span class="n">split_cd</span><span class="p">))</span>
+    <span class="n">valid_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">frac_valid</span> <span class="o">*</span> <span class="n">split_cd</span><span class="p">))</span> <span class="o">+</span> <span class="n">train_cutoff</span>
+    <span class="n">test_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">frac_test</span> <span class="o">*</span> <span class="n">split_cd</span><span class="p">))</span> <span class="o">+</span> <span class="n">valid_cutoff</span>
+
+    <span class="n">train_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">valid_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">test_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+    <span class="k">while</span> <span class="n">sortidx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">split_cd</span><span class="p">:</span>
+      <span class="n">sortidx_split</span><span class="p">,</span> <span class="n">sortidx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sortidx</span><span class="p">,</span> <span class="p">[</span><span class="n">split_cd</span><span class="p">])</span>
+      <span class="n">shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">split_cd</span><span class="p">))</span>
+      <span class="n">train_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">train_idx</span><span class="p">,</span> <span class="n">sortidx_split</span><span class="p">[</span><span class="n">shuffled</span><span class="p">[:</span><span class="n">train_cutoff</span><span class="p">]]])</span>
+      <span class="n">valid_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+          <span class="p">[</span><span class="n">valid_idx</span><span class="p">,</span> <span class="n">sortidx_split</span><span class="p">[</span><span class="n">shuffled</span><span class="p">[</span><span class="n">train_cutoff</span><span class="p">:</span><span class="n">valid_cutoff</span><span class="p">]]])</span>
+      <span class="n">test_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">test_idx</span><span class="p">,</span> <span class="n">sortidx_split</span><span class="p">[</span><span class="n">shuffled</span><span class="p">[</span><span class="n">valid_cutoff</span><span class="p">:]]])</span>
+
+    <span class="c1"># Append remaining examples to train</span>
+    <span class="k">if</span> <span class="n">sortidx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">train_idx</span><span class="p">,</span> <span class="n">sortidx</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">train_idx</span><span class="p">,</span> <span class="n">valid_idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MolecularWeightSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.MolecularWeightSplitter">[docs]</a><span class="k">class</span> <span class="nc">MolecularWeightSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for doing data splits by molecular weight.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MolecularWeightSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.MolecularWeightSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits internal compounds into train/validation/test using the MW calculated</span>
+<span class="sd">        by SMILES string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">seed</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">mws</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
+      <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+      <span class="n">mw</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">rdMolDescriptors</span><span class="o">.</span><span class="n">CalcExactMolWt</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+      <span class="n">mws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span>
+
+    <span class="c1"># Sort by increasing MW</span>
+    <span class="n">mws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mws</span><span class="p">)</span>
+    <span class="n">sortidx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">mws</span><span class="p">)</span>
+
+    <span class="n">train_cutoff</span> <span class="o">=</span> <span class="n">frac_train</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sortidx</span><span class="p">)</span>
+    <span class="n">valid_cutoff</span> <span class="o">=</span> <span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sortidx</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">sortidx</span><span class="p">[:</span><span class="n">train_cutoff</span><span class="p">],</span> <span class="n">sortidx</span><span class="p">[</span><span class="n">train_cutoff</span><span class="p">:</span><span class="n">valid_cutoff</span><span class="p">],</span>
+            <span class="n">sortidx</span><span class="p">[</span><span class="n">valid_cutoff</span><span class="p">:])</span></div></div>
+
+
+<div class="viewcode-block" id="RandomSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomSplitter">[docs]</a><span class="k">class</span> <span class="nc">RandomSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for doing random data splits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RandomSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.RandomSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits internal compounds randomly into train/validation/test.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">seed</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">train_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">valid_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span><span class="p">)</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">shuffled</span><span class="p">[:</span><span class="n">train_cutoff</span><span class="p">],</span> <span class="n">shuffled</span><span class="p">[</span><span class="n">train_cutoff</span><span class="p">:</span><span class="n">valid_cutoff</span><span class="p">],</span>
+            <span class="n">shuffled</span><span class="p">[</span><span class="n">valid_cutoff</span><span class="p">:])</span></div></div>
+
+
+<div class="viewcode-block" id="IndexSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.IndexSplitter">[docs]</a><span class="k">class</span> <span class="nc">IndexSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for simple order based splits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IndexSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.IndexSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits internal compounds into train/validation/test in provided order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">train_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">valid_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span><span class="p">)</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">indices</span><span class="p">[:</span><span class="n">train_cutoff</span><span class="p">],</span> <span class="n">indices</span><span class="p">[</span><span class="n">train_cutoff</span><span class="p">:</span><span class="n">valid_cutoff</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="n">valid_cutoff</span><span class="p">:])</span></div></div>
+
+
+<div class="viewcode-block" id="IndiceSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.IndiceSplitter">[docs]</a><span class="k">class</span> <span class="nc">IndiceSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for splits based on input order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">valid_indices</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">test_indices</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        valid_indices: list of int</span>
+<span class="sd">            indices of samples in the valid set</span>
+<span class="sd">        test_indices: list of int</span>
+<span class="sd">            indices of samples in the test set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">valid_indices</span> <span class="o">=</span> <span class="n">valid_indices</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">test_indices</span> <span class="o">=</span> <span class="n">test_indices</span>
+
+<div class="viewcode-block" id="IndiceSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.IndiceSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits internal compounds into train/validation/test in designated order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">train_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_indices</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">valid_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_indices</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">test_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">valid_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_indices</span>
+    <span class="n">valid_test</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_indices</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">indice</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">indice</span> <span class="ow">in</span> <span class="n">valid_test</span><span class="p">:</span>
+        <span class="n">train_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indice</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">train_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_indices</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ClusterFps"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.ClusterFps">[docs]</a><span class="k">def</span> <span class="nf">ClusterFps</span><span class="p">(</span><span class="n">fps</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+  <span class="c1"># (ytz): this is directly copypasta&#39;d from Greg Landrum&#39;s clustering example.</span>
+  <span class="n">dists</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">nfps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fps</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nfps</span><span class="p">):</span>
+    <span class="n">sims</span> <span class="o">=</span> <span class="n">DataStructs</span><span class="o">.</span><span class="n">BulkTanimotoSimilarity</span><span class="p">(</span><span class="n">fps</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fps</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">dists</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sims</span><span class="p">])</span>
+  <span class="n">cs</span> <span class="o">=</span> <span class="n">Butina</span><span class="o">.</span><span class="n">ClusterData</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">nfps</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">isDistData</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">cs</span></div>
+
+
+<div class="viewcode-block" id="ButinaSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.ButinaSplitter">[docs]</a><span class="k">class</span> <span class="nc">ButinaSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for doing data splits based on the butina clustering of a bulk tanimoto</span>
+<span class="sd">    fingerprint matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ButinaSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.ButinaSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+            <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.18</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits internal compounds into train and validation based on the butina</span>
+<span class="sd">        clustering algorithm. This splitting algorithm has an O(N^2) run time, where N</span>
+<span class="sd">        is the number of elements in the dataset. The dataset is expected to be a classification</span>
+<span class="sd">        dataset.</span>
+
+<span class="sd">        This algorithm is designed to generate validation data that are novel chemotypes.</span>
+
+<span class="sd">        Note that this function entirely disregards the ratios for frac_train, frac_valid,</span>
+<span class="sd">        and frac_test. Furthermore, it does not generate a test set, only a train and valid set.</span>
+
+<span class="sd">        Setting a small cutoff value will generate smaller, finer clusters of high similarity,</span>
+<span class="sd">        whereas setting a large cutoff value will generate larger, coarser clusters of low similarity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Performing butina clustering with cutoff of&quot;</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span>
+    <span class="n">mols</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">):</span>
+      <span class="n">mols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span>
+    <span class="n">n_mols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="p">[</span><span class="n">AllChem</span><span class="o">.</span><span class="n">GetMorganFingerprintAsBitVect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">]</span>
+
+    <span class="n">scaffold_sets</span> <span class="o">=</span> <span class="n">ClusterFps</span><span class="p">(</span><span class="n">fps</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">)</span>
+    <span class="n">scaffold_sets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">scaffold_sets</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">valid_inds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c_idx</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scaffold_sets</span><span class="p">):</span>
+      <span class="c1"># for m_idx in cluster:</span>
+      <span class="n">valid_inds</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+      <span class="c1"># continue until we find an active in all the tasks, otherwise we can&#39;t</span>
+      <span class="c1"># compute a meaningful AUC</span>
+      <span class="c1"># TODO (ytz): really, we want at least one active and inactive in both scenarios.</span>
+      <span class="c1"># TODO (Ytz): for regression tasks we&#39;d stop after only one cluster.</span>
+      <span class="n">active_populations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="n">valid_inds</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">active_populations</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;# of actives per task in valid:&quot;</span><span class="p">,</span> <span class="n">active_populations</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Total # of validation points:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_inds</span><span class="p">))</span>
+        <span class="k">break</span>
+
+    <span class="n">train_inds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">scaffold_sets</span><span class="p">[</span><span class="n">c_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]))</span>
+    <span class="n">test_inds</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">return</span> <span class="n">train_inds</span><span class="p">,</span> <span class="n">valid_inds</span><span class="p">,</span> <span class="p">[]</span></div></div>
+
+
+<div class="viewcode-block" id="ScaffoldSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.ScaffoldSplitter">[docs]</a><span class="k">class</span> <span class="nc">ScaffoldSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for doing data splits based on the scaffold of small molecules.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ScaffoldSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.ScaffoldSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits internal compounds into train/validation/test by scaffold.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">scaffolds</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;About to generate scaffolds&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">data_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">ind</span> <span class="o">%</span> <span class="n">log_every_n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Generating scaffold </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">data_len</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+      <span class="n">scaffold</span> <span class="o">=</span> <span class="n">generate_scaffold</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">scaffold</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scaffolds</span><span class="p">:</span>
+        <span class="n">scaffolds</span><span class="p">[</span><span class="n">scaffold</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">scaffolds</span><span class="p">[</span><span class="n">scaffold</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+    <span class="c1"># Sort from largest to smallest scaffold sets</span>
+    <span class="n">scaffolds</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">scaffolds</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">scaffold_sets</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">scaffold_set</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">scaffold</span><span class="p">,</span> <span class="n">scaffold_set</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">scaffolds</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">train_cutoff</span> <span class="o">=</span> <span class="n">frac_train</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">valid_cutoff</span> <span class="o">=</span> <span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">train_inds</span><span class="p">,</span> <span class="n">valid_inds</span><span class="p">,</span> <span class="n">test_inds</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;About to sort in scaffold sets&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">scaffold_set</span> <span class="ow">in</span> <span class="n">scaffold_sets</span><span class="p">:</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_inds</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">scaffold_set</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">train_cutoff</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_inds</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_inds</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">scaffold_set</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">valid_cutoff</span><span class="p">:</span>
+          <span class="n">test_inds</span> <span class="o">+=</span> <span class="n">scaffold_set</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">valid_inds</span> <span class="o">+=</span> <span class="n">scaffold_set</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">train_inds</span> <span class="o">+=</span> <span class="n">scaffold_set</span>
+    <span class="k">return</span> <span class="n">train_inds</span><span class="p">,</span> <span class="n">valid_inds</span><span class="p">,</span> <span class="n">test_inds</span></div></div>
+
+
+<div class="viewcode-block" id="FingerprintSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.FingerprintSplitter">[docs]</a><span class="k">class</span> <span class="nc">FingerprintSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for doing data splits based on the fingerprints of small molecules</span>
+<span class="sd">    O(N**2) algorithm</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FingerprintSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.FingerprintSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits internal compounds into train/validation/test by fingerprint.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">data_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">mols</span><span class="p">,</span> <span class="n">fingerprints</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">train_inds</span><span class="p">,</span> <span class="n">valid_inds</span><span class="p">,</span> <span class="n">test_inds</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">ids</span><span class="p">):</span>
+      <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+      <span class="n">mols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+      <span class="n">fp</span> <span class="o">=</span> <span class="n">FingerprintMols</span><span class="o">.</span><span class="n">FingerprintMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+      <span class="n">fingerprints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">data_len</span><span class="p">,</span> <span class="n">data_len</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_len</span><span class="p">):</span>
+      <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_len</span><span class="p">):</span>
+        <span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">DataStructs</span><span class="o">.</span><span class="n">FingerprintSimilarity</span><span class="p">(</span>
+            <span class="n">fingerprints</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fingerprints</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+    <span class="n">train_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+    <span class="n">valid_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frac_valid</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+
+    <span class="c1"># Pick the mol closest to everything as the first element of training</span>
+    <span class="n">closest_ligand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">train_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_ligand</span><span class="p">)</span>
+    <span class="n">cur_distances</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)]</span> <span class="o">*</span> <span class="n">data_len</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">update_distances</span><span class="p">(</span><span class="n">closest_ligand</span><span class="p">,</span> <span class="n">cur_distances</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">train_inds</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">train_cutoff</span><span class="p">):</span>
+      <span class="n">closest_ligand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">cur_distances</span><span class="p">)</span>
+      <span class="n">train_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_ligand</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">update_distances</span><span class="p">(</span><span class="n">closest_ligand</span><span class="p">,</span> <span class="n">cur_distances</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span>
+                            <span class="n">train_inds</span><span class="p">)</span>
+
+    <span class="c1"># Pick the closest mol from what is left</span>
+    <span class="n">index</span><span class="p">,</span> <span class="n">best_dist</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_len</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">train_inds</span><span class="p">:</span>
+        <span class="k">continue</span>
+      <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">best_dist</span><span class="p">:</span>
+        <span class="n">index</span><span class="p">,</span> <span class="n">best_dist</span> <span class="o">=</span> <span class="n">i</span><span class="p">,</span> <span class="n">dist</span>
+    <span class="n">valid_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="n">leave_out_indexes</span> <span class="o">=</span> <span class="n">train_inds</span> <span class="o">+</span> <span class="n">valid_inds</span>
+    <span class="n">cur_distances</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)]</span> <span class="o">*</span> <span class="n">data_len</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">update_distances</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">cur_distances</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">leave_out_indexes</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">valid_cutoff</span><span class="p">):</span>
+      <span class="n">closest_ligand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">cur_distances</span><span class="p">)</span>
+      <span class="n">valid_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_ligand</span><span class="p">)</span>
+      <span class="n">leave_out_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_ligand</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">update_distances</span><span class="p">(</span><span class="n">closest_ligand</span><span class="p">,</span> <span class="n">cur_distances</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span>
+                            <span class="n">leave_out_indexes</span><span class="p">)</span>
+
+    <span class="c1"># Test is everything else</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_len</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">leave_out_indexes</span><span class="p">:</span>
+        <span class="k">continue</span>
+      <span class="n">test_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">train_inds</span><span class="p">,</span> <span class="n">valid_inds</span><span class="p">,</span> <span class="n">test_inds</span></div>
+
+<div class="viewcode-block" id="FingerprintSplitter.update_distances"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.FingerprintSplitter.update_distances">[docs]</a>  <span class="k">def</span> <span class="nf">update_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_selected</span><span class="p">,</span> <span class="n">cur_distances</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span>
+                       <span class="n">dont_update</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cur_distances</span><span class="p">)):</span>
+      <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dont_update</span><span class="p">:</span>
+        <span class="n">cur_distances</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+        <span class="k">continue</span>
+      <span class="n">new_dist</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">last_selected</span><span class="p">]</span>
+      <span class="k">if</span> <span class="n">new_dist</span> <span class="o">&lt;</span> <span class="n">cur_distances</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+        <span class="n">cur_distances</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_dist</span></div></div>
+
+
+<div class="viewcode-block" id="SpecifiedSplitter"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.SpecifiedSplitter">[docs]</a><span class="k">class</span> <span class="nc">SpecifiedSplitter</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class that splits data according to user specification.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">split_field</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide input information for splits.&quot;&quot;&quot;</span>
+    <span class="n">raw_df</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">load_data</span><span class="p">([</span><span class="n">input_file</span><span class="p">],</span> <span class="n">shard_size</span><span class="o">=</span><span class="bp">None</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">splits</span> <span class="o">=</span> <span class="n">raw_df</span><span class="p">[</span><span class="n">split_field</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+<div class="viewcode-block" id="SpecifiedSplitter.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.SpecifiedSplitter.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits internal compounds into train/validation/test by user-specification.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">train_inds</span><span class="p">,</span> <span class="n">valid_inds</span><span class="p">,</span> <span class="n">test_inds</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">split</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">):</span>
+      <span class="n">split</span> <span class="o">=</span> <span class="n">split</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
+        <span class="n">train_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;validation&quot;</span><span class="p">]:</span>
+        <span class="n">valid_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span>
+        <span class="n">test_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing required split information.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">train_inds</span><span class="p">,</span> <span class="n">valid_inds</span><span class="p">,</span> <span class="n">test_inds</span></div></div>
+
+
+<div class="viewcode-block" id="TimeSplitterPDBbind"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.TimeSplitterPDBbind">[docs]</a><span class="k">class</span> <span class="nc">TimeSplitterPDBbind</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">year_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">year_file</span> <span class="o">=</span> <span class="n">year_file</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+<div class="viewcode-block" id="TimeSplitterPDBbind.split"><a class="viewcode-back" href="../../../deepchem.splits.html#deepchem.splits.splitters.TimeSplitterPDBbind.split">[docs]</a>  <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">frac_train</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">frac_valid</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">frac_test</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">log_every_n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits protein-ligand pairs in PDBbind into train/validation/test in time order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_file</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DEEPCHEM_DATA_DIR&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;pdbbind_year.csv&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year_file</span><span class="p">):</span>
+          <span class="n">dc</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_url</span><span class="p">(</span>
+              <span class="s1">&#39;http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/pdbbind_year.csv&#39;</span><span class="p">,</span>
+              <span class="n">dest_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">)</span>
+      <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Time description file should be specified&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year_file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">years</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span> <span class="o">+</span> <span class="n">frac_test</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">num_datapoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_datapoints</span>
+    <span class="n">train_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frac_train</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">valid_cutoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">frac_train</span> <span class="o">+</span> <span class="n">frac_valid</span><span class="p">)</span> <span class="o">*</span> <span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_datapoints</span><span class="p">)</span>
+    <span class="n">data_year</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+    <span class="n">new_indices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">data_year</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">new_indices</span><span class="p">[:</span><span class="n">train_cutoff</span><span class="p">],</span> <span class="n">new_indices</span><span class="p">[</span><span class="n">train_cutoff</span><span class="p">:</span><span class="n">valid_cutoff</span><span class="p">],</span>
+            <span class="n">new_indices</span><span class="p">[</span><span class="n">valid_cutoff</span><span class="p">:])</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

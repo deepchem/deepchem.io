@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.feat.atomic_coordinates &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.feat.atomic_coordinates</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Atomic coordinate featurizer.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Joseph Gomes and Bharath Ramsundar&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Stanford University&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;LGPL v2.1+&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">deepchem.feat</span> <span class="kn">import</span> <span class="n">Featurizer</span>
+<span class="kn">from</span> <span class="nn">deepchem.feat</span> <span class="kn">import</span> <span class="n">ComplexFeaturizer</span>
+<span class="kn">from</span> <span class="nn">deepchem.utils</span> <span class="kn">import</span> <span class="n">rdkit_util</span><span class="p">,</span> <span class="n">pad_array</span>
+
+
+<div class="viewcode-block" id="AtomicCoordinates"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.atomic_coordinates.AtomicCoordinates">[docs]</a><span class="k">class</span> <span class="nc">AtomicCoordinates</span><span class="p">(</span><span class="n">Featurizer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Nx3 matrix of Cartesian coordinates [Angstrom]</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;atomic_coordinates&#39;</span><span class="p">]</span>
+
+  <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate atomic coodinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : RDKit Mol</span>
+<span class="sd">          Molecule.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="c1"># RDKit stores atomic coordinates in Angstrom. Atomic unit of length is the</span>
+    <span class="c1"># bohr (1 bohr = 0.529177 Angstrom). Converting units makes gradient calculation</span>
+    <span class="c1"># consistent with most QM software packages.</span>
+    <span class="n">coords_in_bohr</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="fm">__idiv__</span><span class="p">(</span><span class="mf">0.52917721092</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+      <span class="n">coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_in_bohr</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">x</span>
+      <span class="n">coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_in_bohr</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+      <span class="n">coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_in_bohr</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">z</span>
+
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">coords</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">coords</span></div>
+
+
+<div class="viewcode-block" id="compute_neighbor_list"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.atomic_coordinates.compute_neighbor_list">[docs]</a><span class="k">def</span> <span class="nf">compute_neighbor_list</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">neighbor_cutoff</span><span class="p">,</span> <span class="n">max_num_neighbors</span><span class="p">,</span>
+                          <span class="n">periodic_box_size</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes a neighbor list from atom coordinates.&quot;&quot;&quot;</span>
+  <span class="n">N</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="kn">import</span> <span class="nn">mdtraj</span>
+  <span class="n">traj</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="bp">None</span><span class="p">)</span>
+  <span class="n">box_size</span> <span class="o">=</span> <span class="bp">None</span>
+  <span class="k">if</span> <span class="n">periodic_box_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">box_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">periodic_box_size</span><span class="p">)</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">unitcell_vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[[</span><span class="n">box_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">box_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">box_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]]]],</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+  <span class="n">neighbors</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">compute_neighborlist</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">neighbor_cutoff</span><span class="p">)</span>
+  <span class="n">neighbor_list</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">max_num_neighbors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">neighbors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">max_num_neighbors</span><span class="p">:</span>
+      <span class="n">delta</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">coords</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">neighbors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">box_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">delta</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">delta</span> <span class="o">/</span> <span class="n">box_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">box_size</span>
+      <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">sorted_neighbors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+      <span class="n">sorted_neighbors</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+      <span class="n">neighbor_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+          <span class="n">sorted_neighbors</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_num_neighbors</span><span class="p">)</span>
+      <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">neighbor_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">neighbors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+  <span class="k">return</span> <span class="n">neighbor_list</span></div>
+
+
+<div class="viewcode-block" id="get_coords"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.atomic_coordinates.get_coords">[docs]</a><span class="k">def</span> <span class="nf">get_coords</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Gets coordinates in Angstrom for RDKit mol.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">N</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+  <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+  <span class="n">coords_raw</span> <span class="o">=</span> <span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+  <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_raw</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_raw</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_raw</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">z</span>
+  <span class="k">return</span> <span class="n">coords</span></div>
+
+
+<div class="viewcode-block" id="NeighborListAtomicCoordinates"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.atomic_coordinates.NeighborListAtomicCoordinates">[docs]</a><span class="k">class</span> <span class="nc">NeighborListAtomicCoordinates</span><span class="p">(</span><span class="n">Featurizer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Adjacency List of neighbors in 3-space</span>
+
+<span class="sd">  Neighbors determined by user-defined distance cutoff [in Angstrom].</span>
+
+<span class="sd">  https://en.wikipedia.org/wiki/Cell_list</span>
+<span class="sd">  Ref: http://www.cs.cornell.edu/ron/references/1989/Calculations%20of%20a%20List%20of%20Neighbors%20in%20Molecular%20Dynamics%20Si.pdf</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  neighbor_cutoff: float</span>
+<span class="sd">    Threshold distance [Angstroms] for counting neighbors.</span>
+<span class="sd">  periodic_box_size: 3 element array</span>
+<span class="sd">    Dimensions of the periodic box in Angstroms, or None to not use periodic boundary conditions</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">max_num_neighbors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">neighbor_cutoff</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+               <span class="n">periodic_box_size</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">neighbor_cutoff</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;neighbor_cutoff must be positive value.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_num_neighbors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_num_neighbors</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_num_neighbors</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_num_neighbors must be positive integer.&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_num_neighbors</span> <span class="o">=</span> <span class="n">max_num_neighbors</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_cutoff</span> <span class="o">=</span> <span class="n">neighbor_cutoff</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">periodic_box_size</span> <span class="o">=</span> <span class="n">periodic_box_size</span>
+    <span class="c1"># Type of data created by this featurizer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="nb">object</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">coordinates_featurizer</span> <span class="o">=</span> <span class="n">AtomicCoordinates</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute neighbor list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">      mol: rdkit Mol</span>
+<span class="sd">        To be featurized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+    <span class="c1"># TODO(rbharath): Should this return a list?</span>
+    <span class="n">bohr_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates_featurizer</span><span class="o">.</span><span class="n">_featurize</span><span class="p">(</span><span class="n">mol</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">get_coords</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">neighbor_list</span> <span class="o">=</span> <span class="n">compute_neighbor_list</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_cutoff</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">max_num_neighbors</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">periodic_box_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">bohr_coords</span><span class="p">,</span> <span class="n">neighbor_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NeighborListComplexAtomicCoordinates"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.atomic_coordinates.NeighborListComplexAtomicCoordinates">[docs]</a><span class="k">class</span> <span class="nc">NeighborListComplexAtomicCoordinates</span><span class="p">(</span><span class="n">ComplexFeaturizer</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Adjacency list of neighbors for protein-ligand complexes in 3-space.</span>
+
+<span class="sd">  Neighbors dtermined by user-dfined distance cutoff.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_num_neighbors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">neighbor_cutoff</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">neighbor_cutoff</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;neighbor_cutoff must be positive value.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_num_neighbors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_num_neighbors</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_num_neighbors</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_num_neighbors must be positive integer.&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_num_neighbors</span> <span class="o">=</span> <span class="n">max_num_neighbors</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_cutoff</span> <span class="o">=</span> <span class="n">neighbor_cutoff</span>
+    <span class="c1"># Type of data created by this featurizer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="nb">object</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">coordinates_featurizer</span> <span class="o">=</span> <span class="n">AtomicCoordinates</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">_featurize_complex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol_pdb_file</span><span class="p">,</span> <span class="n">protein_pdb_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute neighbor list for complex.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol_pdb: list</span>
+<span class="sd">      Should be a list of lines of the PDB file.</span>
+<span class="sd">    complex_pdb: list</span>
+<span class="sd">      Should be a list of lines of the PDB file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mol_coords</span><span class="p">,</span> <span class="n">ob_mol</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span><span class="n">mol_pdb_file</span><span class="p">)</span>
+    <span class="n">protein_coords</span><span class="p">,</span> <span class="n">protein_mol</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span><span class="n">protein_pdb_file</span><span class="p">)</span>
+    <span class="n">system_coords</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">merge_molecules_xyz</span><span class="p">(</span><span class="n">mol_coords</span><span class="p">,</span> <span class="n">protein_coords</span><span class="p">)</span>
+
+    <span class="n">system_neighbor_list</span> <span class="o">=</span> <span class="n">compute_neighbor_list</span><span class="p">(</span>
+        <span class="n">system_coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_cutoff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_num_neighbors</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">system_coords</span><span class="p">,</span> <span class="n">system_neighbor_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ComplexNeighborListFragmentAtomicCoordinates"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.atomic_coordinates.ComplexNeighborListFragmentAtomicCoordinates">[docs]</a><span class="k">class</span> <span class="nc">ComplexNeighborListFragmentAtomicCoordinates</span><span class="p">(</span><span class="n">ComplexFeaturizer</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">frag1_num_atoms</span><span class="p">,</span>
+               <span class="n">frag2_num_atoms</span><span class="p">,</span>
+               <span class="n">complex_num_atoms</span><span class="p">,</span>
+               <span class="n">max_num_neighbors</span><span class="p">,</span>
+               <span class="n">neighbor_cutoff</span><span class="p">,</span>
+               <span class="n">strip_hydrogens</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">frag1_num_atoms</span> <span class="o">=</span> <span class="n">frag1_num_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">frag2_num_atoms</span> <span class="o">=</span> <span class="n">frag2_num_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">complex_num_atoms</span> <span class="o">=</span> <span class="n">complex_num_atoms</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_num_neighbors</span> <span class="o">=</span> <span class="n">max_num_neighbors</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_cutoff</span> <span class="o">=</span> <span class="n">neighbor_cutoff</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">strip_hydrogens</span> <span class="o">=</span> <span class="n">strip_hydrogens</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">neighborlist_featurizer</span> <span class="o">=</span> <span class="n">NeighborListComplexAtomicCoordinates</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_num_neighbors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_cutoff</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_featurize_complex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol_pdb_file</span><span class="p">,</span> <span class="n">protein_pdb_file</span><span class="p">):</span>
+    <span class="n">frag1_coords</span><span class="p">,</span> <span class="n">frag1_mol</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span><span class="n">mol_pdb_file</span><span class="p">)</span>
+    <span class="n">frag2_coords</span><span class="p">,</span> <span class="n">frag2_mol</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span><span class="n">protein_pdb_file</span><span class="p">)</span>
+    <span class="n">system_mol</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">merge_molecules</span><span class="p">(</span><span class="n">frag1_mol</span><span class="p">,</span> <span class="n">frag2_mol</span><span class="p">)</span>
+    <span class="n">system_coords</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">get_xyz_from_mol</span><span class="p">(</span><span class="n">system_mol</span><span class="p">)</span>
+
+    <span class="n">frag1_coords</span><span class="p">,</span> <span class="n">frag1_mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_hydrogens</span><span class="p">(</span><span class="n">frag1_coords</span><span class="p">,</span> <span class="n">frag1_mol</span><span class="p">)</span>
+    <span class="n">frag2_coords</span><span class="p">,</span> <span class="n">frag2_mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_hydrogens</span><span class="p">(</span><span class="n">frag2_coords</span><span class="p">,</span> <span class="n">frag2_mol</span><span class="p">)</span>
+    <span class="n">system_coords</span><span class="p">,</span> <span class="n">system_mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_hydrogens</span><span class="p">(</span><span class="n">system_coords</span><span class="p">,</span> <span class="n">system_mol</span><span class="p">)</span>
+
+    <span class="n">frag1_coords</span><span class="p">,</span> <span class="n">frag1_neighbor_list</span><span class="p">,</span> <span class="n">frag1_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize_mol</span><span class="p">(</span>
+        <span class="n">frag1_coords</span><span class="p">,</span> <span class="n">frag1_mol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frag1_num_atoms</span><span class="p">)</span>
+
+    <span class="n">frag2_coords</span><span class="p">,</span> <span class="n">frag2_neighbor_list</span><span class="p">,</span> <span class="n">frag2_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize_mol</span><span class="p">(</span>
+        <span class="n">frag2_coords</span><span class="p">,</span> <span class="n">frag2_mol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frag2_num_atoms</span><span class="p">)</span>
+
+    <span class="n">system_coords</span><span class="p">,</span> <span class="n">system_neighbor_list</span><span class="p">,</span> <span class="n">system_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize_mol</span><span class="p">(</span>
+        <span class="n">system_coords</span><span class="p">,</span> <span class="n">system_mol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_num_atoms</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">frag1_coords</span><span class="p">,</span> <span class="n">frag1_neighbor_list</span><span class="p">,</span> <span class="n">frag1_z</span><span class="p">,</span> <span class="n">frag2_coords</span><span class="p">,</span> <span class="n">frag2_neighbor_list</span><span class="p">,</span> <span class="n">frag2_z</span><span class="p">,</span> \
+           <span class="n">system_coords</span><span class="p">,</span> <span class="n">system_neighbor_list</span><span class="p">,</span> <span class="n">system_z</span>
+
+<div class="viewcode-block" id="ComplexNeighborListFragmentAtomicCoordinates.get_Z_matrix"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.atomic_coordinates.ComplexNeighborListFragmentAtomicCoordinates.get_Z_matrix">[docs]</a>  <span class="k">def</span> <span class="nf">get_Z_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">max_atoms</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pad_array</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]),</span> <span class="n">max_atoms</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplexNeighborListFragmentAtomicCoordinates.featurize_mol"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.atomic_coordinates.ComplexNeighborListFragmentAtomicCoordinates.featurize_mol">[docs]</a>  <span class="k">def</span> <span class="nf">featurize_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">max_num_atoms</span><span class="p">):</span>
+    <span class="n">neighbor_list</span> <span class="o">=</span> <span class="n">compute_neighbor_list</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_cutoff</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">max_num_neighbors</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Z_matrix</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">max_num_atoms</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">pad_array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">max_num_atoms</span><span class="p">)</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">pad_array</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="n">max_num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">coords</span><span class="p">,</span> <span class="n">neighbor_list</span><span class="p">,</span> <span class="n">z</span></div>
+
+  <span class="k">def</span> <span class="nf">_strip_hydrogens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+
+    <span class="k">class</span> <span class="nc">MoleculeShim</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Shim of a Molecule which supports #GetAtoms()</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+
+      <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">AtomShim</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+
+      <span class="k">def</span> <span class="nf">GetAtoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
+
+    <span class="k">class</span> <span class="nc">AtomShim</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+      <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_num</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomic_num</span> <span class="o">=</span> <span class="n">atomic_num</span>
+
+      <span class="k">def</span> <span class="nf">GetAtomicNum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomic_num</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">strip_hydrogens</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">coords</span><span class="p">,</span> <span class="n">mol</span>
+    <span class="n">indexes_to_keep</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">atomic_numbers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()):</span>
+      <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">indexes_to_keep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">atomic_numbers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">())</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">MoleculeShim</span><span class="p">(</span><span class="n">atomic_numbers</span><span class="p">)</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">indexes_to_keep</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">coords</span><span class="p">,</span> <span class="n">mol</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

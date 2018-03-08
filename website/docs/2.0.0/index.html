@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>deepchem package &mdash; deepchem 2.0.0 documentation</title>
+
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 2.0.0 documentation" href="index.html" />
+    <link rel="next" title="deepchem.data package" href="deepchem.data.html" />
+    <link rel="prev" title="DeepChem" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>2.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+
+                <li><a href="/docs/notebooks/index.html">Tutorials</a></li>
+
+
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/deepchem.html">master</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/2.0.0/deepchem.html">2.0.0</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/1.3.1/deepchem.html">1.3.1</a></li>
+</ul>
+</ul>
+</li>
+</ul>
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+
+        </div>
+    </div>
+  </div>  </div><div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem">
+<span id="id1"></span><h1>DeepChem<a class="headerlink" href="#deepchem" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-deepchem">
+<h2>What is DeepChem?<a class="headerlink" href="#what-is-deepchem" title="Permalink to this headline">¶</a></h2>
+<p>DeepChem is a python library that provides a high quality open-source toolchain
+for deep-learning in drug discovery, materials science, quantum chemistry, and
+biology.</p>
+</div>
+<div class="section" id="about-us">
+<h2>About Us<a class="headerlink" href="#about-us" title="Permalink to this headline">¶</a></h2>
+<p>DeepChem is possible due to notable contributions from many people including Peter Eastman, Evan Feinberg, Joe Gomes, Karl Leswing, Vijay Pande, Aneesh Pappu, Bharath Ramsundar and Michael Wu (alphabetical ordering). DeepChem was originally created by <a class="reference external" href="https://rbharath.github.io">Bharath Ramsundar</a> with encouragement and guidance from Vijay Pande.</p>
+<p>DeepChem started as a Pande group project at Stanford, and is now developed by many academic and industrial collaborators. DeepChem actively encourages new academic and industrial groups to contribute!</p>
+</div>
+<div class="section" id="licensing-and-commercial-uses">
+<h2>Licensing and Commercial Uses<a class="headerlink" href="#licensing-and-commercial-uses" title="Permalink to this headline">¶</a></h2>
+<p>DeepChem is licensed under the MIT License. We actively support
+commercial users. Note that any novel molecular entities found through DeepChem
+belong entirely to the user and not to DeepChem developers.</p>
+</div>
+<div class="section" id="getting-started-with-deepchem">
+<h2>Getting Started With DeepChem<a class="headerlink" href="#getting-started-with-deepchem" title="Permalink to this headline">¶</a></h2>
+<p>New users should check out <a class="reference external" href="https://github.com/deepchem/deepchem/blob/master/README.md#linux-64-bit-installation-from-source">installation</a> instructions and <a class="reference external" href="https://github.com/deepchem/deepchem/tree/master/examples">examples</a> on github.
+Feel free to browse the <a class="reference external" href="deepchem.html">docs</a> on this site as well.</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/index.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

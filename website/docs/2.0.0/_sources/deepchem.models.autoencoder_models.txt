@@ -1,0 +1,38 @@
+deepchem.models.autoencoder_models package
+==========================================
+
+Submodules
+----------
+
+deepchem.models.autoencoder_models.autoencoder module
+-----------------------------------------------------
+
+.. automodule:: deepchem.models.autoencoder_models.autoencoder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.autoencoder_models.model module
+-----------------------------------------------
+
+.. automodule:: deepchem.models.autoencoder_models.model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+deepchem.models.autoencoder_models.test_tensorflowEncoders module
+-----------------------------------------------------------------
+
+.. automodule:: deepchem.models.autoencoder_models.test_tensorflowEncoders
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.autoencoder_models
+    :members:
+    :undoc-members:
+    :show-inheritance:

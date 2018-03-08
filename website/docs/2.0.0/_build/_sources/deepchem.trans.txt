@@ -1,0 +1,29 @@
+deepchem.trans package
+======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    deepchem.trans.tests
+
+Submodules
+----------
+
+deepchem.trans.transformers module
+----------------------------------
+
+.. automodule:: deepchem.trans.transformers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: deepchem.trans
+    :members:
+    :undoc-members:
+    :show-inheritance:

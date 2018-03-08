@@ -1,0 +1,7 @@
+deepchem
+========
+
+.. toctree::
+   :maxdepth: 4
+
+   deepchem

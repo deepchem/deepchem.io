@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.feat.nnscore_utils &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.feat.nnscore_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Helper Classes and Functions for docking fingerprint computation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Bharath Ramsundar and Jacob Durrant&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">deepchem.utils.rdkit_util</span> <span class="kn">as</span> <span class="nn">rdkit_util</span>
+
+
+<div class="viewcode-block" id="force_partial_charge_computation"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.force_partial_charge_computation">[docs]</a><span class="k">def</span> <span class="nf">force_partial_charge_computation</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Force computation of partial charges for molecule.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  mol: Rdkit Mol</span>
+<span class="sd">    Molecule on which we compute partial charges.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">rdkit_util</span><span class="o">.</span><span class="n">compute_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pdbqt_to_pdb"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.pdbqt_to_pdb">[docs]</a><span class="k">def</span> <span class="nf">pdbqt_to_pdb</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">output_directory</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Convert pdbqt file to pdb file.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  input_file: String</span>
+<span class="sd">    Path to input file.</span>
+<span class="sd">  output_directory: String</span>
+<span class="sd">    Path to desired output directory.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">output_directory</span><span class="p">)</span>
+  <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not yet implemented&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hydrogenate_and_compute_partial_charges"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.hydrogenate_and_compute_partial_charges">[docs]</a><span class="k">def</span> <span class="nf">hydrogenate_and_compute_partial_charges</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span>
+                                            <span class="n">input_format</span><span class="p">,</span>
+                                            <span class="n">hyd_output</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                            <span class="n">pdbqt_output</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                            <span class="n">protein</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                            <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Outputs a hydrogenated pdb and a pdbqt with partial charges.</span>
+
+<span class="sd">  Takes an input file in specified format. Generates two outputs:</span>
+
+<span class="sd">  -) A pdb file that contains a hydrogenated (at pH 7.4) version of</span>
+<span class="sd">     original compound.</span>
+<span class="sd">  -) A pdbqt file that has computed Gasteiger partial charges. This pdbqt</span>
+<span class="sd">     file is build from the hydrogenated pdb.</span>
+
+<span class="sd">  TODO(rbharath): Can do a bit of refactoring between this function and</span>
+<span class="sd">  pdbqt_to_pdb.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  input_file: String</span>
+<span class="sd">    Path to input file.</span>
+<span class="sd">  input_format: String</span>
+<span class="sd">    Name of input format.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit_util</span><span class="o">.</span><span class="n">load_molecule</span><span class="p">(</span>
+      <span class="n">input_file</span><span class="p">,</span> <span class="n">add_hydrogens</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">calc_charges</span><span class="o">=</span><span class="bp">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Create pdb with hydrogens added&quot;</span><span class="p">)</span>
+  <span class="n">rdkit_util</span><span class="o">.</span><span class="n">write_molecule</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">hyd_output</span><span class="p">),</span> <span class="n">is_protein</span><span class="o">=</span><span class="n">protein</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Create a pdbqt file from the hydrogenated pdb above.&quot;</span><span class="p">)</span>
+  <span class="n">rdkit_util</span><span class="o">.</span><span class="n">write_molecule</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">pdbqt_output</span><span class="p">),</span> <span class="n">is_protein</span><span class="o">=</span><span class="n">protein</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">protein</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Removing ROOT/ENDROOT/TORSDOF&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pdbqt_output</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="n">pdbqt_lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">filtered_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">pdbqt_lines</span><span class="p">:</span>
+
+      <span class="n">filtered_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pdbqt_output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">filtered_lines</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AromaticRing"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.AromaticRing">[docs]</a><span class="k">class</span> <span class="nc">AromaticRing</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Holds information about an aromatic ring.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">plane_coeff</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initializes an aromatic.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    center: float</span>
+<span class="sd">      Center of the ring.</span>
+<span class="sd">    indices: list</span>
+<span class="sd">      List of the atom indices for ring atoms.</span>
+<span class="sd">    plane_coeff: list</span>
+<span class="sd">      A list of elements [a, b, c, d] that define a plane by equation</span>
+<span class="sd">      a x + b y + c z = d.</span>
+<span class="sd">    radius: float</span>
+<span class="sd">      Ring radius from center.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span>
+    <span class="c1"># a*x + b*y + c*z = dI think that</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">plane_coeff</span> <span class="o">=</span> <span class="n">plane_coeff</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span></div>
+
+
+<div class="viewcode-block" id="average_point"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.average_point">[docs]</a><span class="k">def</span> <span class="nf">average_point</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns the point with averaged coordinates of arguments.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  points: list</span>
+<span class="sd">    List of point objects.</span>
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  pavg: Point object</span>
+<span class="sd">    Has coordinates the arithmetic average of those of p1 and p2.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+  <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+    <span class="n">coords</span> <span class="o">+=</span> <span class="n">point</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">))</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Point"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Point">[docs]</a><span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Simple implementation for a point in 3-space.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inputs can be specified either by explicitly providing x, y, z coords</span>
+<span class="sd">    or by providing a numpy array of length 3.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: float</span>
+<span class="sd">      X-coord.</span>
+<span class="sd">    y: float</span>
+<span class="sd">      Y-coord.</span>
+<span class="sd">    z: float</span>
+<span class="sd">      Z-coord.</span>
+<span class="sd">    coords: np.ndarray</span>
+<span class="sd">      Should be of length 3 in format np.array([x, y, z])</span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError: If no arguments are provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">and</span> <span class="n">z</span><span class="p">:</span>
+      <span class="c1">#self.x, self.y, self.z = x, y, z</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># Implicit eval doesn&#39;t work on numpy arrays.</span>
+      <span class="c1">#self.x, self.y, self.z = coords[0], coords[1], coords[2]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must specify coordinates for Point!&quot;</span><span class="p">)</span>
+
+  <span class="c1"># TODO(bramsundar): Should this be __copy__?</span>
+<div class="viewcode-block" id="Point.copy_of"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Point.copy_of">[docs]</a>  <span class="k">def</span> <span class="nf">copy_of</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a copy of this point.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Point.dist_to"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Point.dist_to">[docs]</a>  <span class="k">def</span> <span class="nf">dist_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Distance (in 2-norm) from this point to another.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">-</span> <span class="n">point</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Point.magnitude"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Point.magnitude">[docs]</a>  <span class="k">def</span> <span class="nf">magnitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Magnitude of this point (in 2-norm).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span></div>
+    <span class="c1">#return self.dist_to(Point(coords=np.array([0, 0, 0])))</span>
+
+<div class="viewcode-block" id="Point.as_array"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Point.as_array">[docs]</a>  <span class="k">def</span> <span class="nf">as_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the coordinates of this point as array.&quot;&quot;&quot;</span>
+    <span class="c1">#return np.array([self.x, self.y, self.z])</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span></div></div>
+
+
+<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Implements a container class for atoms. This class contains useful</span>
+<span class="sd">  annotations about the atom.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">atomname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+               <span class="n">residue</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+               <span class="n">coordinates</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">99999</span><span class="p">,</span> <span class="mi">99999</span><span class="p">,</span> <span class="mi">99999</span><span class="p">])),</span>
+               <span class="n">element</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+               <span class="n">pdb_index</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+               <span class="n">line</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+               <span class="n">atomtype</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+               <span class="n">indices_of_atoms_connecting</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">charge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+               <span class="n">resid</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+               <span class="n">chain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+               <span class="n">structure</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+               <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initializes an atom.</span>
+
+<span class="sd">    Assumes that atom is loaded from a PDB file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atomname: string</span>
+<span class="sd">      Name of atom. Note that atomname is not the same as residue since</span>
+<span class="sd">      atomnames often have extra annotations (e.g., CG, NZ, etc).</span>
+<span class="sd">    residue: string:</span>
+<span class="sd">      Name of protein residue this atom belongs to.</span>
+<span class="sd">    element: string</span>
+<span class="sd">      Name of atom&#39;s element.</span>
+<span class="sd">    coordinate: point</span>
+<span class="sd">      A point object (x, y, z are in Angstroms).</span>
+<span class="sd">    pdb_index: string</span>
+<span class="sd">      Index of the atom in source PDB file.</span>
+<span class="sd">    line: string</span>
+<span class="sd">      The line in the PDB file which specifies this atom.</span>
+<span class="sd">    atomtype: string</span>
+<span class="sd">      Element of atom. This differs from atomname which typically has extra</span>
+<span class="sd">      annotations (e.g. CA, OA, HD, etc)</span>
+<span class="sd">    IndicesOfAtomConnecting: list</span>
+<span class="sd">      The indices (in a PDB object) of all atoms bonded to this one.</span>
+<span class="sd">    charge: float</span>
+<span class="sd">      Associated electrostatic charge.</span>
+<span class="sd">    resid: int</span>
+<span class="sd">      The residue number in the receptor (listing the protein as a chain from</span>
+<span class="sd">      N-Terminus to C-Terminus). Assumes this is a protein atom.</span>
+<span class="sd">    chain: string</span>
+<span class="sd">      Chain identifier for molecule. See PDB spec.</span>
+<span class="sd">    structure: string</span>
+<span class="sd">      One of ALPHA, BETA, or OTHER for the type of protein secondary</span>
+<span class="sd">      structure this atom resides in (assuming this is a receptor atom).</span>
+<span class="sd">    comment: string</span>
+<span class="sd">      Either LIGAND or RECEPTOR depending on whether this is a ligand or</span>
+<span class="sd">      receptor atom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span> <span class="o">=</span> <span class="n">atomname</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">residue</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coordinates</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">element</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pdb_index</span> <span class="o">=</span> <span class="n">pdb_index</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span> <span class="n">line</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atomtype</span> <span class="o">=</span> <span class="n">atomtype</span>
+    <span class="k">if</span> <span class="n">indices_of_atoms_connecting</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">indices_of_atoms_connecting</span> <span class="o">=</span> <span class="n">indices_of_atoms_connecting</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">indices_of_atoms_connecting</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">charge</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">resid</span> <span class="o">=</span> <span class="n">resid</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">chain</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span>
+
+<div class="viewcode-block" id="Atom.copy_of"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Atom.copy_of">[docs]</a>  <span class="k">def</span> <span class="nf">copy_of</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make a copy of this atom.&quot;&quot;&quot;</span>
+    <span class="n">theatom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">atomname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">copy_of</span><span class="p">()</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">pdb_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb_index</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">atomtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomtype</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">indices_of_atoms_connecting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices_of_atoms_connecting</span><span class="p">[:]</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">resid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resid</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span>
+    <span class="n">theatom</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span>
+
+    <span class="k">return</span> <span class="n">theatom</span></div>
+
+<div class="viewcode-block" id="Atom.create_pdb_line"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Atom.create_pdb_line">[docs]</a>  <span class="k">def</span> <span class="nf">create_pdb_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates appropriate ATOM line for pdb file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    index: int</span>
+<span class="sd">      Index in associated PDB file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;ATOM &quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">output</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>  <span class="c1"># [x, y, z]</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_neighbors"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Atom.number_of_neighbors">[docs]</a>  <span class="k">def</span> <span class="nf">number_of_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reports number of neighboring atoms.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indices_of_atoms_connecting</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Atom.add_neighbor_atom_indices"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Atom.add_neighbor_atom_indices">[docs]</a>  <span class="k">def</span> <span class="nf">add_neighbor_atom_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds atoms with provided PDB indices as neighbors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    index: list</span>
+<span class="sd">      List of indices of neighbors in PDB object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices_of_atoms_connecting</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indices_of_atoms_connecting</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Atom.side_chain_or_backbone"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Atom.side_chain_or_backbone">[docs]</a>  <span class="k">def</span> <span class="nf">side_chain_or_backbone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Determine whether receptor atom belongs to residue sidechain or backbone.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO(rbharath): Should this be an atom function?</span>
+    <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;CA&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span> <span class="ow">or</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;O&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;N&quot;</span><span class="p">):</span>
+      <span class="k">return</span> <span class="s2">&quot;BACKBONE&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="s2">&quot;SIDECHAIN&quot;</span></div>
+
+<div class="viewcode-block" id="Atom.read_atom_pdb_line"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Atom.read_atom_pdb_line">[docs]</a>  <span class="k">def</span> <span class="nf">read_atom_pdb_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TODO(rbharath): This method probably belongs in the PDB class, and not</span>
+<span class="sd">    in the Atom class.</span>
+
+<span class="sd">    Reads an ATOM or HETATM line from PDB and instantiates fields.</span>
+
+<span class="sd">    Atoms in PDBs are represented by ATOM or HETATM statements. ATOM and</span>
+<span class="sd">    HETATM statements follow the following record format:</span>
+
+<span class="sd">    (see ftp://ftp.wwpdb.org/pub/pdb/doc/format_descriptions/Format_v33_Letter.pdf)</span>
+
+<span class="sd">    COLUMNS   DATA TYPE       FIELD             DEFINITION</span>
+<span class="sd">    -------------------------------------------------------------------------------------</span>
+<span class="sd">    1 - 6     Record name     &quot;ATOM &quot;/&quot;HETATM&quot;</span>
+<span class="sd">    7 - 11    Integer         serial            Atom serial number.</span>
+<span class="sd">    13 - 16   Atom            name              Atom name.</span>
+<span class="sd">    17        Character       altLoc            Alternate location indicator.</span>
+<span class="sd">    18 - 20   Residue name    resName           Residue name.</span>
+<span class="sd">    22        Character       chainID           Chain identifier.</span>
+<span class="sd">    23 - 26   Integer         resSeq            Residue sequence number.</span>
+<span class="sd">    27        AChar           iCode             Code for insertion of residues.</span>
+<span class="sd">    31 - 38   Real(8.3)       x                 Orthogonal coordinates for X in Angstroms.</span>
+<span class="sd">    39 - 46   Real(8.3)       y                 Orthogonal coordinates for Y in Angstroms.</span>
+<span class="sd">    47 - 54   Real(8.3)       z                 Orthogonal coordinates for Z in Angstroms.</span>
+<span class="sd">    55 - 60   Real(6.2)       occupancy         Occupancy.</span>
+<span class="sd">    61 - 66   Real(6.2)       tempFactor        Temperature factor.</span>
+<span class="sd">    77 - 78   LString(2)      element           Element symbol, right-justified.</span>
+<span class="sd">    79 - 80   LString(2)      charge            Charge on the atom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span> <span class="n">line</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span> <span class="o">+</span> <span class="s2">&quot;  &quot;</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+      <span class="c1"># This line is necessary for babel to work, though many PDBs in</span>
+      <span class="c1"># the PDB would have this line commented out</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">30</span><span class="p">:</span><span class="mi">38</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">38</span><span class="p">:</span><span class="mi">46</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">])]))</span>
+
+    <span class="c1"># now atom type (for pdbqt)</span>
+    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">77</span><span class="p">:</span><span class="mi">79</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">atomtype</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">77</span><span class="p">:</span><span class="mi">79</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="p">:</span>
+      <span class="c1"># If atomtype is not specified, but atomname is, set atomtype to the</span>
+      <span class="c1"># first letter of atomname. This heuristic suffices for proteins,</span>
+      <span class="c1"># since no two-letter elements appear in standard amino acids.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">atomtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">atomtype</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">69</span><span class="p">:</span><span class="mi">76</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">69</span><span class="p">:</span><span class="mi">76</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>  <span class="c1"># try to guess at element from name</span>
+      <span class="n">two_letters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+      <span class="n">valid_two_letters</span> <span class="o">=</span> <span class="p">[</span>
+          <span class="s2">&quot;BR&quot;</span><span class="p">,</span> <span class="s2">&quot;CL&quot;</span><span class="p">,</span> <span class="s2">&quot;BI&quot;</span><span class="p">,</span> <span class="s2">&quot;AS&quot;</span><span class="p">,</span> <span class="s2">&quot;AG&quot;</span><span class="p">,</span> <span class="s2">&quot;LI&quot;</span><span class="p">,</span> <span class="s2">&quot;HG&quot;</span><span class="p">,</span> <span class="s2">&quot;MG&quot;</span><span class="p">,</span> <span class="s2">&quot;MN&quot;</span><span class="p">,</span> <span class="s2">&quot;RH&quot;</span><span class="p">,</span> <span class="s2">&quot;ZN&quot;</span><span class="p">,</span> <span class="s2">&quot;FE&quot;</span>
+      <span class="p">]</span>
+      <span class="k">if</span> <span class="n">two_letters</span> <span class="ow">in</span> <span class="n">valid_two_letters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">two_letters</span>
+      <span class="k">else</span><span class="p">:</span>  <span class="c1">#So, just assume it&#39;s the first letter.</span>
+        <span class="c1"># Any number needs to be removed from the element name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;4&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;5&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;6&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;7&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;8&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;9&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">pdb_index</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span>
+    <span class="c1"># this only uses the rightmost three characters, essentially</span>
+    <span class="c1"># removing unique rotamer identification</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
+
+    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="mi">26</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">resid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="mi">26</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">resid</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">21</span><span class="p">:</span><span class="mi">22</span><span class="p">]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="s2">&quot; MOL&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="Charged"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.Charged">[docs]</a><span class="k">class</span> <span class="nc">Charged</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  A class that represeents a charged atom.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">positive</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    coordinates: point</span>
+<span class="sd">      Coordinates of atom.</span>
+<span class="sd">    indices: list</span>
+<span class="sd">      Contains boolean true or false entries for self and neighbors to</span>
+<span class="sd">      specify if positive or negative charge</span>
+<span class="sd">    positive: bool</span>
+<span class="sd">      Whether this atom is positive or negative.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coordinates</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">positive</span> <span class="o">=</span> <span class="n">positive</span></div>
+
+
+<div class="viewcode-block" id="vector_subtraction"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.vector_subtraction">[docs]</a><span class="k">def</span> <span class="nf">vector_subtraction</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">):</span>  <span class="c1"># point1 - point2</span>
+  <span class="sd">&quot;&quot;&quot;Subtracts the coordinates of the provided points.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">point1</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">-</span> <span class="n">point2</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="cross_product"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.cross_product">[docs]</a><span class="k">def</span> <span class="nf">cross_product</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">):</span>  <span class="c1"># never tested</span>
+  <span class="sd">&quot;&quot;&quot;Calculates the cross-product of provided points.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">point1</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">point2</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="vector_scalar_multiply"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.vector_scalar_multiply">[docs]</a><span class="k">def</span> <span class="nf">vector_scalar_multiply</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Multiplies the provided point by scalar.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">scalar</span> <span class="o">*</span> <span class="n">point</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="dot_product"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.dot_product">[docs]</a><span class="k">def</span> <span class="nf">dot_product</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Dot product of points.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">point1</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">point2</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="dihedral"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.dihedral">[docs]</a><span class="k">def</span> <span class="nf">dihedral</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="n">point3</span><span class="p">,</span> <span class="n">point4</span><span class="p">):</span>  <span class="c1"># never tested</span>
+  <span class="sd">&quot;&quot;&quot;Compute dihedral angle between 4 points.</span>
+
+<span class="sd">    TODO(rbharath): Write a nontrivial test for this.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">b1</span> <span class="o">=</span> <span class="n">vector_subtraction</span><span class="p">(</span><span class="n">point2</span><span class="p">,</span> <span class="n">point1</span><span class="p">)</span>
+  <span class="n">b2</span> <span class="o">=</span> <span class="n">vector_subtraction</span><span class="p">(</span><span class="n">point3</span><span class="p">,</span> <span class="n">point2</span><span class="p">)</span>
+  <span class="n">b3</span> <span class="o">=</span> <span class="n">vector_subtraction</span><span class="p">(</span><span class="n">point4</span><span class="p">,</span> <span class="n">point3</span><span class="p">)</span>
+
+  <span class="n">b2Xb3</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">b2</span><span class="p">,</span> <span class="n">b3</span><span class="p">)</span>
+  <span class="n">b1Xb2</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
+
+  <span class="n">b1XMagb2</span> <span class="o">=</span> <span class="n">vector_scalar_multiply</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="o">.</span><span class="n">magnitude</span><span class="p">())</span>
+  <span class="n">radians</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dot_product</span><span class="p">(</span><span class="n">b1XMagb2</span><span class="p">,</span> <span class="n">b2Xb3</span><span class="p">),</span> <span class="n">dot_product</span><span class="p">(</span><span class="n">b1Xb2</span><span class="p">,</span> <span class="n">b2Xb3</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">radians</span></div>
+
+
+<div class="viewcode-block" id="angle_between_three_points"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.angle_between_three_points">[docs]</a><span class="k">def</span> <span class="nf">angle_between_three_points</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="n">point3</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes the angle (in radians) between the three provided points.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">angle_between_points</span><span class="p">(</span>
+      <span class="n">vector_subtraction</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">),</span> <span class="n">vector_subtraction</span><span class="p">(</span><span class="n">point3</span><span class="p">,</span> <span class="n">point2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="angle_between_points"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.angle_between_points">[docs]</a><span class="k">def</span> <span class="nf">angle_between_points</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes the angle (in radians) between two points.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span>
+      <span class="n">dot_product</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">point1</span><span class="o">.</span><span class="n">magnitude</span><span class="p">()</span> <span class="o">*</span> <span class="n">point2</span><span class="o">.</span><span class="n">magnitude</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="normalized_vector"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.normalized_vector">[docs]</a><span class="k">def</span> <span class="nf">normalized_vector</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Normalize provided point.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">point</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="distance"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.distance">[docs]</a><span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Computes distance between two points.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">point1</span><span class="o">.</span><span class="n">dist_to</span><span class="p">(</span><span class="n">point2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="project_point_onto_plane"><a class="viewcode-back" href="../../../deepchem.feat.html#deepchem.feat.nnscore_utils.project_point_onto_plane">[docs]</a><span class="k">def</span> <span class="nf">project_point_onto_plane</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">plane_coefficients</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Finds nearest point on specified plane to given point.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  point: Point</span>
+<span class="sd">    Given point</span>
+<span class="sd">  plane_coefficients: list</span>
+<span class="sd">    [a, b, c, d] where place equation is ax + by + cz = d</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1"># The normal vector to plane is n = [a, b, c]</span>
+  <span class="n">offset</span> <span class="o">=</span> <span class="n">plane_coefficients</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+  <span class="n">normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">plane_coefficients</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+  <span class="c1"># We first shift by basepoint (a point on given plane) to make math</span>
+  <span class="c1"># simpler. basepoint is given by d/||n||^2 * n</span>
+  <span class="n">basepoint</span> <span class="o">=</span> <span class="p">(</span><span class="n">offset</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">normal</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">normal</span>
+  <span class="n">diff</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">-</span> <span class="n">basepoint</span>
+  <span class="c1"># The perpendicular component of diff to plane is</span>
+  <span class="c1"># (n^T diff / ||n||^2) * n</span>
+  <span class="n">perp</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">normal</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">normal</span>
+  <span class="n">closest</span> <span class="o">=</span> <span class="n">basepoint</span> <span class="o">+</span> <span class="p">(</span><span class="n">diff</span> <span class="o">-</span> <span class="n">perp</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">closest</span><span class="p">))</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

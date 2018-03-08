@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>deepchem package &mdash; deepchem 2.0.0 documentation</title>
+
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 2.0.0 documentation" href="index.html" />
+    <link rel="next" title="deepchem.data package" href="deepchem.data.html" />
+    <link rel="prev" title="DeepChem" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>2.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+
+                <li><a href="/docs/notebooks/index.html">Tutorials</a></li>
+
+
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/deepchem.html">master</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/2.0.0/deepchem.html">2.0.0</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/1.3.1/deepchem.html">1.3.1</a></li>
+</ul>
+</ul>
+</li>
+</ul>
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+
+        </div>
+    </div>
+  </div>  </div><div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-models-xgboost-models-package">
+<h1>deepchem.models.xgboost_models package<a class="headerlink" href="#deepchem-models-xgboost-models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-deepchem.models.xgboost_models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.models.xgboost_models" title="Permalink to this headline">¶</a></h2>
+<p>Scikit-learn wrapper interface of xgboost</p>
+<dl class="class">
+<dt id="deepchem.models.xgboost_models.XGBoostModel">
+<em class="property">class </em><code class="descclassname">deepchem.models.xgboost_models.</code><code class="descname">XGBoostModel</code><span class="sig-paren">(</span><em>model_instance=None</em>, <em>model_dir=None</em>, <em>verbose=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/xgboost_models.html#XGBoostModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="deepchem.models.sklearn_models.html#deepchem.models.sklearn_models.SklearnModel" title="deepchem.models.sklearn_models.SklearnModel"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.sklearn_models.SklearnModel</span></code></a></p>
+<p>Abstract base class for XGBoost model.</p>
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/xgboost_models.html#XGBoostModel.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits XGBoost model to data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of tasks for this model. Defaults to 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>X</em>, <em>transformers=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions on dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>pad_batch=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions on batch of data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</li>
+<li><strong>pad_batch</strong> (<em>bool, optional</em>) &#8211; Ignored for Sklearn Model. Only used for Tensorflow models
+with rigid batch-size requirements.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Do transformers even make sense here?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples, n_classes*n_tasks)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>pad_batch=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes per-class predictions on batch of data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</li>
+<li><strong>pad_batch</strong> (<em>bool, optional</em>) &#8211; Ignored for Sklearn Model. Only used for Tensorflow models
+with rigid batch-size requirements.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads sklearn model from joblib file on disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves sklearn model to disk using joblib.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.xgboost_models.XGBoostModel.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.xgboost_models.XGBoostModel.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.models.xgboost_models.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

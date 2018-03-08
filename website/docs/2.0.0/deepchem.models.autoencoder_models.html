@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>deepchem package &mdash; deepchem 2.0.0 documentation</title>
+
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 2.0.0 documentation" href="index.html" />
+    <link rel="next" title="deepchem.data package" href="deepchem.data.html" />
+    <link rel="prev" title="DeepChem" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>2.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+
+                <li><a href="/docs/notebooks/index.html">Tutorials</a></li>
+
+
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/deepchem.html">master</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/2.0.0/deepchem.html">2.0.0</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/1.3.1/deepchem.html">1.3.1</a></li>
+</ul>
+</ul>
+</li>
+</ul>
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+
+        </div>
+    </div>
+  </div>  </div><div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="deepchem-models-autoencoder-models-package">
+<h1>deepchem.models.autoencoder_models package<a class="headerlink" href="#deepchem-models-autoencoder-models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deepchem.models.autoencoder_models.autoencoder">
+<span id="deepchem-models-autoencoder-models-autoencoder-module"></span><h2>deepchem.models.autoencoder_models.autoencoder module<a class="headerlink" href="#module-deepchem.models.autoencoder_models.autoencoder" title="Permalink to this headline">¶</a></h2>
+<p>TODO(LESWING) Remove h5py dependency
+TODO(LESWING) Remove keras dependency and replace with functional keras API</p>
+<dl class="class">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder">
+<em class="property">class </em><code class="descclassname">deepchem.models.autoencoder_models.autoencoder.</code><code class="descname">TensorflowMoleculeDecoder</code><span class="sig-paren">(</span><em>model_dir=None</em>, <em>weights_file='model.h5'</em>, <em>verbose=True</em>, <em>charset_length=35</em>, <em>latent_rep_size=292</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/autoencoder.html#TensorflowMoleculeDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="deepchem.models.html#deepchem.models.models.Model" title="deepchem.models.models.Model"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.models.Model</span></code></a></p>
+<p>Transform molecules from a latent space feature vector into
+a one hot encoding.
+<a class="reference external" href="https://arxiv.org/abs/1610.02415">https://arxiv.org/abs/1610.02415</a></p>
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>nb_epoch=10</em>, <em>batch_size=50</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/autoencoder.html#TensorflowMoleculeDecoder.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of tasks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses self to make predictions on provided Dataset object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples,)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/autoencoder.html#TensorflowMoleculeDecoder.predict_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Do transformers even make sense here?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples, n_classes*n_tasks)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions of class probabilities on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispatcher function for saving.</p>
+<p>Each subclass is responsible for overriding this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.zinc_decoder">
+<em class="property">static </em><code class="descname">zinc_decoder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/autoencoder.html#TensorflowMoleculeDecoder.zinc_decoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeDecoder.zinc_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A Decoder with weights that were trained on the zinc dataset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder">
+<em class="property">class </em><code class="descclassname">deepchem.models.autoencoder_models.autoencoder.</code><code class="descname">TensorflowMoleculeEncoder</code><span class="sig-paren">(</span><em>model_dir=None</em>, <em>weights_file='model.h5'</em>, <em>verbose=True</em>, <em>charset_length=35</em>, <em>latent_rep_size=292</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/autoencoder.html#TensorflowMoleculeEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="deepchem.models.html#deepchem.models.models.Model" title="deepchem.models.models.Model"><code class="xref py py-class docutils literal"><span class="pre">deepchem.models.models.Model</span></code></a></p>
+<p>Transform molecules from one hot encoding into a latent vector
+representation.
+<a class="reference external" href="https://arxiv.org/abs/1610.02415">https://arxiv.org/abs/1610.02415</a></p>
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>dataset</em>, <em>metrics</em>, <em>transformers=[]</em>, <em>per_task_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the performance of this model on specified dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataset</strong> (<em>dc.data.Dataset</em>) &#8211; Dataset object.</li>
+<li><strong>metric</strong> (<a class="reference internal" href="deepchem.metrics.html#deepchem.metrics.Metric" title="deepchem.metrics.Metric"><em>deepchem.metrics.Metric</em></a>) &#8211; Evaluation metric</li>
+<li><strong>transformers</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of deepchem.transformers.Transformer</li>
+<li><strong>per_task_metrics</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If True, return per-task scores.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maps tasks to scores under metric.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>dataset</em>, <em>nb_epoch=10</em>, <em>batch_size=50</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/autoencoder.html#TensorflowMoleculeEncoder.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.fit_on_batch">
+<code class="descname">fit_on_batch</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.fit_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing model with new information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_model_filename">
+<code class="descname">get_model_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_model_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_num_tasks">
+<code class="descname">get_num_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_num_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of tasks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deep</strong> (<em>boolean, optional</em>) &#8211; If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>params</strong> &#8211;
+Parameter names mapped to their values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mapping of string to any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_params_filename">
+<code class="descname">get_params_filename</code><span class="sig-paren">(</span><em>model_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_params_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given model directory, obtain filename for the model itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_task_type">
+<code class="descname">get_task_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.get_task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently models can only be classifiers or regressors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses self to make predictions on provided Dataset object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples,)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.predict_on_batch">
+<code class="descname">predict_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/autoencoder.html#TensorflowMoleculeEncoder.predict_on_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.predict_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>dataset</em>, <em>transformers=[]</em>, <em>batch_size=None</em>, <em>n_classes=2</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Do transformers even make sense here?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy ndarray of shape (n_samples, n_classes*n_tasks)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">y_pred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.predict_proba_on_batch">
+<code class="descname">predict_proba_on_batch</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.predict_proba_on_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes predictions of class probabilities on given batch of new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>np.ndarray</em>) &#8211; Features</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload trained model from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispatcher function for saving.</p>
+<p>Each subclass is responsible for overriding this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.zinc_encoder">
+<em class="property">static </em><code class="descname">zinc_encoder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/autoencoder.html#TensorflowMoleculeEncoder.zinc_encoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.autoencoder.TensorflowMoleculeEncoder.zinc_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">An Encoder with weights that were trained on the zinc dataset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.autoencoder_models.model">
+<span id="deepchem-models-autoencoder-models-model-module"></span><h2>deepchem.models.autoencoder_models.model module<a class="headerlink" href="#module-deepchem.models.autoencoder_models.model" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="deepchem.models.autoencoder_models.model.MoleculeVAE">
+<em class="property">class </em><code class="descclassname">deepchem.models.autoencoder_models.model.</code><code class="descname">MoleculeVAE</code><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/model.html#MoleculeVAE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.model.MoleculeVAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="deepchem.models.autoencoder_models.model.MoleculeVAE.autoencoder">
+<code class="descname">autoencoder</code><em class="property"> = None</em><a class="headerlink" href="#deepchem.models.autoencoder_models.model.MoleculeVAE.autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.model.MoleculeVAE.create">
+<code class="descname">create</code><span class="sig-paren">(</span><em>charset_length</em>, <em>max_length=120</em>, <em>latent_rep_size=292</em>, <em>weights_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/model.html#MoleculeVAE.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.model.MoleculeVAE.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.model.MoleculeVAE.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>charset_length</em>, <em>weights_file</em>, <em>latent_rep_size=292</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/model.html#MoleculeVAE.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.model.MoleculeVAE.load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.model.MoleculeVAE.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/model.html#MoleculeVAE.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.model.MoleculeVAE.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.autoencoder_models.test_tensorflowEncoders">
+<span id="deepchem-models-autoencoder-models-test-tensorflowencoders-module"></span><h2>deepchem.models.autoencoder_models.test_tensorflowEncoders module<a class="headerlink" href="#module-deepchem.models.autoencoder_models.test_tensorflowEncoders" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders">
+<em class="property">class </em><code class="descclassname">deepchem.models.autoencoder_models.test_tensorflowEncoders.</code><code class="descname">TestTensorflowEncoders</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/test_tensorflowEncoders.html#TestTensorflowEncoders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.addCleanup">
+<code class="descname">addCleanup</code><span class="sig-paren">(</span><em>function</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.addCleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function, with arguments, to be called when the test is
+completed. Functions added are called on a LIFO basis and are
+called after tearDown on test failure or success.</p>
+<p>Cleanup items are called even if setUp fails (unlike tearDown).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.addTypeEqualityFunc">
+<code class="descname">addTypeEqualityFunc</code><span class="sig-paren">(</span><em>typeobj</em>, <em>function</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.addTypeEqualityFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a type specific assertEqual style function to compare a type.</p>
+<p>This method is for use by TestCase subclasses that need to register
+their own type equality functions to provide nicer error messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>typeobj</strong> &#8211; The data type to call this function on when both values
+are of the same type in assertEqual().</li>
+<li><strong>function</strong> &#8211; The callable taking two arguments and an optional
+msg= argument that raises self.failureException with a
+useful error message when the two arguments are not equal.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertAlmostEqual">
+<code class="descname">assertAlmostEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>places=None</em>, <em>msg=None</em>, <em>delta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+between the two objects is more than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>If the two objects compare equal then they will automatically
+compare almost equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertAlmostEquals">
+<code class="descname">assertAlmostEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertAlmostEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertCountEqual">
+<code class="descname">assertCountEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertCountEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An unordered sequence comparison asserting that the same elements,
+regardless of order.  If the same element occurs more than once,
+it verifies that the elements occur the same number of times.</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="docutils">
+<dt>self.assertEqual(Counter(list(first)),</dt>
+<dd>Counter(list(second)))</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Example:</dt>
+<dd><ul class="first last simple">
+<li>[0, 1, 1] and [1, 0, 1] compare equal.</li>
+<li>[0, 0, 1] and [0, 1] compare unequal.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertDictContainsSubset">
+<code class="descname">assertDictContainsSubset</code><span class="sig-paren">(</span><em>subset</em>, <em>dictionary</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertDictContainsSubset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether dictionary is a superset of subset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertDictEqual">
+<code class="descname">assertDictEqual</code><span class="sig-paren">(</span><em>d1</em>, <em>d2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertDictEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertEqual">
+<code class="descname">assertEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by the &#8216;==&#8217;
+operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertEquals">
+<code class="descname">assertEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertFalse">
+<code class="descname">assertFalse</code><span class="sig-paren">(</span><em>expr</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertFalse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertGreater">
+<code class="descname">assertGreater</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertGreater" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertGreaterEqual">
+<code class="descname">assertGreaterEqual</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertGreaterEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIn">
+<code class="descname">assertIn</code><span class="sig-paren">(</span><em>member</em>, <em>container</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIs">
+<code class="descname">assertIs</code><span class="sig-paren">(</span><em>expr1</em>, <em>expr2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIsInstance">
+<code class="descname">assertIsInstance</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(isinstance(obj, cls)), with a nicer
+default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIsNone">
+<code class="descname">assertIsNone</code><span class="sig-paren">(</span><em>obj</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIsNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(obj is None), with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIsNot">
+<code class="descname">assertIsNot</code><span class="sig-paren">(</span><em>expr1</em>, <em>expr2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIsNot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is not b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIsNotNone">
+<code class="descname">assertIsNotNone</code><span class="sig-paren">(</span><em>obj</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertIsNotNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsNone.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertLess">
+<code class="descname">assertLess</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertLess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertLessEqual">
+<code class="descname">assertLessEqual</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertLessEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertListEqual">
+<code class="descname">assertListEqual</code><span class="sig-paren">(</span><em>list1</em>, <em>list2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertListEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>list1</strong> &#8211; The first list to compare.</li>
+<li><strong>list2</strong> &#8211; The second list to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertLogs">
+<code class="descname">assertLogs</code><span class="sig-paren">(</span><em>logger=None</em>, <em>level=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertLogs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a log message of level <em>level</em> or higher is emitted
+on <em>logger_name</em> or its children.  If omitted, <em>level</em> defaults to
+INFO and <em>logger</em> defaults to the root logger.</p>
+<p>This method must be used as a context manager, and will yield
+a recording object with two attributes: <cite>output</cite> and <cite>records</cite>.
+At the end of the context manager, the <cite>output</cite> attribute will
+be a list of the matching formatted log messages and the
+<cite>records</cite> attribute will be a list of the corresponding LogRecord
+objects.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertLogs</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;first message&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo.bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;second message&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;INFO:foo:first message&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;ERROR:foo.bar:second message&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertMultiLineEqual">
+<code class="descname">assertMultiLineEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertMultiLineEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two multi-line strings are equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotAlmostEqual">
+<code class="descname">assertNotAlmostEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>places=None</em>, <em>msg=None</em>, <em>delta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+between the two objects is less than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>Objects that are equal automatically fail.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotAlmostEquals">
+<code class="descname">assertNotAlmostEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotAlmostEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotEqual">
+<code class="descname">assertNotEqual</code><span class="sig-paren">(</span><em>first</em>, <em>second</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by the &#8216;!=&#8217;
+operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotEquals">
+<code class="descname">assertNotEquals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotIn">
+<code class="descname">assertNotIn</code><span class="sig-paren">(</span><em>member</em>, <em>container</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a not in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotIsInstance">
+<code class="descname">assertNotIsInstance</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsInstance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotRegex">
+<code class="descname">assertNotRegex</code><span class="sig-paren">(</span><em>text</em>, <em>unexpected_regex</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test if the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotRegexpMatches">
+<code class="descname">assertNotRegexpMatches</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertNotRegexpMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRaises">
+<code class="descname">assertRaises</code><span class="sig-paren">(</span><em>expected_exception</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRaises" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless an exception of class expected_exception is raised
+by the callable when invoked with specified positional and
+keyword arguments. If a different type of exception is
+raised, it will not be caught, and the test case will be
+deemed to have suffered an error, exactly as for an
+unexpected exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument &#8216;msg&#8217; can be provided when assertRaises
+is used as a context object.</p>
+<p>The context manager keeps a reference to the exception as
+the &#8216;exception&#8217; attribute. This allows you to inspect the
+exception after the assertion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_exception</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">exception</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_exception</span><span class="o">.</span><span class="n">error_code</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRaisesRegex">
+<code class="descname">assertRaisesRegex</code><span class="sig-paren">(</span><em>expected_exception</em>, <em>expected_regex</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRaisesRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a raised exception matches a regex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected_exception</strong> &#8211; Exception class expected to be raised.</li>
+<li><strong>expected_regex</strong> &#8211; Regex (re pattern object or string) expected
+to be found in error message.</li>
+<li><strong>args</strong> &#8211; Function to be called and extra positional args.</li>
+<li><strong>kwargs</strong> &#8211; Extra kwargs.</li>
+<li><strong>msg</strong> &#8211; Optional message used in case of failure. Can only be used
+when assertRaisesRegex is used as a context manager.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRaisesRegexp">
+<code class="descname">assertRaisesRegexp</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRaisesRegexp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRegex">
+<code class="descname">assertRegex</code><span class="sig-paren">(</span><em>text</em>, <em>expected_regex</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test unless the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRegexpMatches">
+<code class="descname">assertRegexpMatches</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertRegexpMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertSequenceEqual">
+<code class="descname">assertSequenceEqual</code><span class="sig-paren">(</span><em>seq1</em>, <em>seq2</em>, <em>msg=None</em>, <em>seq_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertSequenceEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An equality assertion for ordered sequences (like lists and tuples).</p>
+<p>For the purposes of this function, a valid ordered sequence type is one
+which can be indexed, has a length, and has an equality operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>seq1</strong> &#8211; The first sequence to compare.</li>
+<li><strong>seq2</strong> &#8211; The second sequence to compare.</li>
+<li><strong>seq_type</strong> &#8211; The expected datatype of the sequences, or None if no
+datatype should be enforced.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertSetEqual">
+<code class="descname">assertSetEqual</code><span class="sig-paren">(</span><em>set1</em>, <em>set2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertSetEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A set-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>set1</strong> &#8211; The first set to compare.</li>
+<li><strong>set2</strong> &#8211; The second set to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>assertSetEqual uses ducktyping to support different types of sets, and
+is optimized for sets specifically (parameters must support a
+difference method).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertTrue">
+<code class="descname">assertTrue</code><span class="sig-paren">(</span><em>expr</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertTrue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is true.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertTupleEqual">
+<code class="descname">assertTupleEqual</code><span class="sig-paren">(</span><em>tuple1</em>, <em>tuple2</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertTupleEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple-specific equality assertion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tuple1</strong> &#8211; The first tuple to compare.</li>
+<li><strong>tuple2</strong> &#8211; The second tuple to compare.</li>
+<li><strong>msg</strong> &#8211; Optional message to use on failure instead of a list of
+differences.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertWarns">
+<code class="descname">assertWarns</code><span class="sig-paren">(</span><em>expected_warning</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertWarns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a warning of class warnClass is triggered
+by the callable when invoked with specified positional and
+keyword arguments.  If a different type of warning is
+triggered, it will not be handled: depending on the other
+warning filtering rules in effect, it might be silenced, printed
+out, or raised as an exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument &#8216;msg&#8217; can be provided when assertWarns
+is used as a context object.</p>
+<p>The context manager keeps a reference to the first matching
+warning as the &#8216;warning&#8217; attribute; similarly, the &#8216;filename&#8217;
+and &#8216;lineno&#8217; attributes give you information about the line
+of Python code from which the warning was triggered.
+This allows you to inspect the warning after the assertion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_warning</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">warning</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_warning</span><span class="o">.</span><span class="n">some_attribute</span><span class="p">,</span> <span class="mi">147</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertWarnsRegex">
+<code class="descname">assertWarnsRegex</code><span class="sig-paren">(</span><em>expected_warning</em>, <em>expected_regex</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assertWarnsRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a triggered warning matches a regexp.
+Basic functioning is similar to assertWarns() with the addition
+that only warnings whose messages also match the regular expression
+are considered successful matches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected_warning</strong> &#8211; Warning class expected to be triggered.</li>
+<li><strong>expected_regex</strong> &#8211; Regex (re pattern object or string) expected
+to be found in error message.</li>
+<li><strong>args</strong> &#8211; Function to be called and extra positional args.</li>
+<li><strong>kwargs</strong> &#8211; Extra kwargs.</li>
+<li><strong>msg</strong> &#8211; Optional message used in case of failure. Can only be used
+when assertWarnsRegex is used as a context manager.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assert_">
+<code class="descname">assert_</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.assert_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.countTestCases">
+<code class="descname">countTestCases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.countTestCases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the test without collecting errors in a TestResult</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.defaultTestResult">
+<code class="descname">defaultTestResult</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.defaultTestResult" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.doCleanups">
+<code class="descname">doCleanups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.doCleanups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute all cleanup functions. Normally called for you after
+tearDown.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.fail">
+<code class="descname">fail</code><span class="sig-paren">(</span><em>msg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail immediately, with the given message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failIf">
+<code class="descname">failIf</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failIf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failIfAlmostEqual">
+<code class="descname">failIfAlmostEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failIfAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failIfEqual">
+<code class="descname">failIfEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failIfEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failUnless">
+<code class="descname">failUnless</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failUnless" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failUnlessAlmostEqual">
+<code class="descname">failUnlessAlmostEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failUnlessAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failUnlessEqual">
+<code class="descname">failUnlessEqual</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failUnlessEqual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failUnlessRaises">
+<code class="descname">failUnlessRaises</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failUnlessRaises" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failureException">
+<code class="descname">failureException</code><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.failureException" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/library/exceptions.html#AssertionError" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">AssertionError</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.id">
+<code class="descname">id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.longMessage">
+<code class="descname">longMessage</code><em class="property"> = True</em><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.longMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.maxDiff">
+<code class="descname">maxDiff</code><em class="property"> = 640</em><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.maxDiff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>result=None</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.setUpClass">
+<code class="descname">setUpClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.shortDescription">
+<code class="descname">shortDescription</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.shortDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a one-line description of the test, or None if no
+description has been provided.</p>
+<p>The default implementation of this method returns the first line of
+the specified test method&#8217;s docstring.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.skipTest">
+<code class="descname">skipTest</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.skipTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skip this test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.subTest">
+<code class="descname">subTest</code><span class="sig-paren">(</span><em>msg=&lt;object object&gt;</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.subTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a context manager that will return the enclosed block
+of code in a subtest identified by the optional message and
+keyword parameters.  A failure in the subtest marks the test
+case as failed but resumes execution at the end of the enclosed
+block, allowing further test code to be executed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.tearDown">
+<code class="descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.tearDownClass">
+<code class="descname">tearDownClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.tearDownClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.test_fit">
+<code class="descname">test_fit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deepchem/models/autoencoder_models/test_tensorflowEncoders.html#TestTensorflowEncoders.test_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deepchem.models.autoencoder_models.test_tensorflowEncoders.TestTensorflowEncoders.test_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deepchem.models.autoencoder_models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deepchem.models.autoencoder_models" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/deepchem.models.autoencoder_models.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

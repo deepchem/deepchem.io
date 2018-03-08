@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.molnet.load_function.kaggle_datasets &mdash; deepchem 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.2 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html"><span><img src="../../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.molnet.load_function.kaggle_datasets</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">KAGGLE dataset loader.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">deepchem</span>
+<span class="kn">from</span> <span class="nn">deepchem.molnet.load_function.kaggle_features</span> <span class="kn">import</span> <span class="n">merck_descriptors</span>
+
+
+<div class="viewcode-block" id="remove_missing_entries"><a class="viewcode-back" href="../../../../deepchem.molnet.load_function.html#deepchem.molnet.load_function.kaggle_datasets.remove_missing_entries">[docs]</a><span class="k">def</span> <span class="nf">remove_missing_entries</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Remove missing entries.</span>
+
+<span class="sd">  Some of the datasets have missing entries that sneak in as zero&#39;d out</span>
+<span class="sd">  feature vectors. Get rid of them.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">itershards</span><span class="p">()):</span>
+    <span class="n">available_rows</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Shard </span><span class="si">%d</span><span class="s2"> has </span><span class="si">%d</span><span class="s2"> missing entries.&quot;</span> <span class="o">%</span>
+          <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="o">~</span><span class="n">available_rows</span><span class="p">)))</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">available_rows</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">available_rows</span><span class="p">]</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">available_rows</span><span class="p">]</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="n">available_rows</span><span class="p">]</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">set_shard</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_transformers"><a class="viewcode-back" href="../../../../deepchem.molnet.load_function.html#deepchem.molnet.load_function.kaggle_datasets.get_transformers">[docs]</a><span class="k">def</span> <span class="nf">get_transformers</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Get transformers applied to datasets.&quot;&quot;&quot;</span>
+  <span class="n">transformers</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="c1">#transformers = [</span>
+  <span class="c1">#    deepchem.trans.LogTransformer(transform_X=True),</span>
+  <span class="c1">#    deepchem.trans.NormalizationTransformer(transform_y=True,</span>
+  <span class="c1">#                                      dataset=train_dataset)]</span>
+  <span class="k">return</span> <span class="n">transformers</span></div>
+
+
+<span class="c1"># Set shard size low to avoid memory problems.</span>
+<div class="viewcode-block" id="gen_kaggle"><a class="viewcode-back" href="../../../../deepchem.molnet.load_function.html#deepchem.molnet.load_function.kaggle_datasets.gen_kaggle">[docs]</a><span class="k">def</span> <span class="nf">gen_kaggle</span><span class="p">(</span><span class="n">KAGGLE_tasks</span><span class="p">,</span>
+               <span class="n">train_dir</span><span class="p">,</span>
+               <span class="n">valid_dir</span><span class="p">,</span>
+               <span class="n">test_dir</span><span class="p">,</span>
+               <span class="n">data_dir</span><span class="p">,</span>
+               <span class="n">shard_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Load KAGGLE datasets. Does not do train/test split&quot;&quot;&quot;</span>
+  <span class="c1">############################################################## TIMING</span>
+  <span class="n">time1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="c1">############################################################## TIMING</span>
+  <span class="c1"># Set some global variables up top</span>
+  <span class="n">train_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span>
+                             <span class="s2">&quot;KAGGLE_training_disguised_combined_full.csv.gz&quot;</span><span class="p">)</span>
+  <span class="n">valid_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span>
+                             <span class="s2">&quot;KAGGLE_test1_disguised_combined_full.csv.gz&quot;</span><span class="p">)</span>
+  <span class="n">test_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span>
+                            <span class="s2">&quot;KAGGLE_test2_disguised_combined_full.csv.gz&quot;</span><span class="p">)</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">train_files</span><span class="p">):</span>
+    <span class="n">deepchem</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_url</span><span class="p">(</span>
+        <span class="s1">&#39;http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/KAGGLE_training_disguised_combined_full.csv.gz&#39;</span>
+    <span class="p">)</span>
+    <span class="n">deepchem</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_url</span><span class="p">(</span>
+        <span class="s1">&#39;http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/KAGGLE_test1_disguised_combined_full.csv.gz&#39;</span>
+    <span class="p">)</span>
+    <span class="n">deepchem</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_url</span><span class="p">(</span>
+        <span class="s1">&#39;http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/KAGGLE_test2_disguised_combined_full.csv.gz&#39;</span>
+    <span class="p">)</span>
+
+  <span class="c1"># Featurize KAGGLE dataset</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;About to featurize KAGGLE dataset.&quot;</span><span class="p">)</span>
+  <span class="n">featurizer</span> <span class="o">=</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">feat</span><span class="o">.</span><span class="n">UserDefinedFeaturizer</span><span class="p">(</span><span class="n">merck_descriptors</span><span class="p">)</span>
+
+  <span class="n">loader</span> <span class="o">=</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">UserCSVLoader</span><span class="p">(</span>
+      <span class="n">tasks</span><span class="o">=</span><span class="n">KAGGLE_tasks</span><span class="p">,</span> <span class="n">id_field</span><span class="o">=</span><span class="s2">&quot;Molecule&quot;</span><span class="p">,</span> <span class="n">featurizer</span><span class="o">=</span><span class="n">featurizer</span><span class="p">)</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Featurizing train datasets&quot;</span><span class="p">)</span>
+  <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">train_files</span><span class="p">,</span> <span class="n">shard_size</span><span class="o">=</span><span class="n">shard_size</span><span class="p">)</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Featurizing valid datasets&quot;</span><span class="p">)</span>
+  <span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">valid_files</span><span class="p">,</span> <span class="n">shard_size</span><span class="o">=</span><span class="n">shard_size</span><span class="p">)</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Featurizing test datasets&quot;</span><span class="p">)</span>
+  <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">test_files</span><span class="p">,</span> <span class="n">shard_size</span><span class="o">=</span><span class="n">shard_size</span><span class="p">)</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Remove missing entries from datasets.&quot;</span><span class="p">)</span>
+  <span class="n">remove_missing_entries</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+  <span class="n">remove_missing_entries</span><span class="p">(</span><span class="n">valid_dataset</span><span class="p">)</span>
+  <span class="n">remove_missing_entries</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Shuffling order of train dataset.&quot;</span><span class="p">)</span>
+  <span class="n">train_dataset</span><span class="o">.</span><span class="n">sparse_shuffle</span><span class="p">()</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Transforming datasets with transformers.&quot;</span><span class="p">)</span>
+  <span class="n">transformers</span> <span class="o">=</span> <span class="n">get_transformers</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+
+  <span class="k">for</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="n">transformers</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Performing transformations with </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">transformer</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Transforming datasets&quot;</span><span class="p">)</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+    <span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">valid_dataset</span><span class="p">)</span>
+    <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Moving directories&quot;</span><span class="p">)</span>
+  <span class="n">train_dataset</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">train_dir</span><span class="p">)</span>
+  <span class="n">valid_dataset</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">valid_dir</span><span class="p">)</span>
+  <span class="n">test_dataset</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">test_dir</span><span class="p">)</span>
+
+  <span class="c1">############################################################## TIMING</span>
+  <span class="n">time2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;TIMING: KAGGLE fitting took </span><span class="si">%0.3f</span><span class="s2"> s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time2</span> <span class="o">-</span> <span class="n">time1</span><span class="p">))</span>
+  <span class="c1">############################################################## TIMING</span>
+
+  <span class="k">return</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span></div>
+
+
+<div class="viewcode-block" id="load_kaggle"><a class="viewcode-back" href="../../../../deepchem.molnet.load_function.html#deepchem.molnet.load_function.kaggle_datasets.load_kaggle">[docs]</a><span class="k">def</span> <span class="nf">load_kaggle</span><span class="p">(</span><span class="n">shard_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">featurizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">reload</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Loads kaggle datasets. Generates if not stored already.&quot;&quot;&quot;</span>
+  <span class="n">KAGGLE_tasks</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="s1">&#39;3A4&#39;</span><span class="p">,</span> <span class="s1">&#39;CB1&#39;</span><span class="p">,</span> <span class="s1">&#39;DPP4&#39;</span><span class="p">,</span> <span class="s1">&#39;HIVINT&#39;</span><span class="p">,</span> <span class="s1">&#39;HIV_PROT&#39;</span><span class="p">,</span> <span class="s1">&#39;LOGD&#39;</span><span class="p">,</span> <span class="s1">&#39;METAB&#39;</span><span class="p">,</span> <span class="s1">&#39;NK1&#39;</span><span class="p">,</span> <span class="s1">&#39;OX1&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;OX2&#39;</span><span class="p">,</span> <span class="s1">&#39;PGP&#39;</span><span class="p">,</span> <span class="s1">&#39;PPB&#39;</span><span class="p">,</span> <span class="s1">&#39;RAT_F&#39;</span><span class="p">,</span> <span class="s1">&#39;TDI&#39;</span><span class="p">,</span> <span class="s1">&#39;THROMBIN&#39;</span>
+  <span class="p">]</span>
+  <span class="n">data_dir</span> <span class="o">=</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_data_dir</span><span class="p">()</span>
+
+  <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;kaggle&quot;</span><span class="p">)</span>
+  <span class="n">train_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;train_dir&quot;</span><span class="p">)</span>
+  <span class="n">valid_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;valid_dir&quot;</span><span class="p">)</span>
+  <span class="n">test_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;test_dir&quot;</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">train_dir</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">valid_dir</span><span class="p">)</span> <span class="ow">and</span>
+      <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">test_dir</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Reloading existing datasets&quot;</span><span class="p">)</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="p">(</span><span class="n">train_dir</span><span class="p">)</span>
+    <span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="p">(</span><span class="n">valid_dir</span><span class="p">)</span>
+    <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">deepchem</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DiskDataset</span><span class="p">(</span><span class="n">test_dir</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Featurizing datasets&quot;</span><span class="p">)</span>
+    <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> \
+      <span class="n">gen_kaggle</span><span class="p">(</span><span class="n">KAGGLE_tasks</span><span class="p">,</span> <span class="n">train_dir</span><span class="p">,</span> <span class="n">valid_dir</span><span class="p">,</span> <span class="n">test_dir</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span>
+                  <span class="n">shard_size</span><span class="o">=</span><span class="n">shard_size</span><span class="p">)</span>
+
+  <span class="n">transformers</span> <span class="o">=</span> <span class="n">get_transformers</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">KAGGLE_tasks</span><span class="p">,</span> <span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span>
+                        <span class="n">test_dataset</span><span class="p">),</span> <span class="n">transformers</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

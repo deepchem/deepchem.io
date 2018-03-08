@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>deepchem.metalearning.maml &mdash; deepchem 1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem 1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../notebooks/index.html">Notebooks</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepchem.html">deepchem package</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for deepchem.metalearning.maml</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Model-Agnostic Meta-Learning (MAML) algorithm for low data learning.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.layers</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.optimizers</span> <span class="kn">import</span> <span class="n">Adam</span><span class="p">,</span> <span class="n">GradientDescent</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="MetaLearner"><a class="viewcode-back" href="../../../deepchem.metalearning.html#deepchem.metalearning.maml.MetaLearner">[docs]</a><span class="k">class</span> <span class="nc">MetaLearner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Model and data to which the MAML algorithm can be applied.</span>
+<span class="sd">  </span>
+<span class="sd">  To use MAML, create a subclass of this defining the learning problem to solve.</span>
+<span class="sd">  It consists of a model that can be trained to perform many different tasks, and</span>
+<span class="sd">  data for training it on a large (possibly infinite) set of different tasks.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the model&#39;s loss function, represented as a Layer or Tensor.&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s2">&quot;Subclasses must implement this&quot;</span><span class="p">)</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the list of Tensorflow variables to train.</span>
+
+<span class="sd">    The default implementation returns all trainable variables in the graph.  This is usually</span>
+<span class="sd">    what you want, but subclasses can customize it if needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">Layer</span><span class="p">):</span>
+      <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">out_tensor</span>
+    <span class="k">with</span> <span class="n">loss</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">GraphKeys</span><span class="o">.</span><span class="n">TRAINABLE_VARIABLES</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MetaLearner.select_task"><a class="viewcode-back" href="../../../deepchem.metalearning.html#deepchem.metalearning.maml.MetaLearner.select_task">[docs]</a>  <span class="k">def</span> <span class="nf">select_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Select a new task to train on.</span>
+
+<span class="sd">    If there is a fixed set of training tasks, this will typically cycle through them.</span>
+<span class="sd">    If there are infinitely many training tasks, this can simply select a new one each</span>
+<span class="sd">    time it is called.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s2">&quot;Subclasses must implement this&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetaLearner.get_batch"><a class="viewcode-back" href="../../../deepchem.metalearning.html#deepchem.metalearning.maml.MetaLearner.get_batch">[docs]</a>  <span class="k">def</span> <span class="nf">get_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a batch of data for training.</span>
+
+<span class="sd">    This should return the data in the form of a Tensorflow feed dict, that is, a dict</span>
+<span class="sd">    mapping tensors to values.  This will usually be called twice for each task, and should</span>
+<span class="sd">    return a different batch on each call.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s2">&quot;Subclasses must implement this&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MAML"><a class="viewcode-back" href="../../../deepchem.metalearning.html#deepchem.metalearning.maml.MAML">[docs]</a><span class="k">class</span> <span class="nc">MAML</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Implements the Model-Agnostic Meta-Learning algorithm for low data learning.</span>
+
+<span class="sd">  The algorithm is described in Finn et al., &quot;Model-Agnostic Meta-Learning for Fast</span>
+<span class="sd">  Adaptation of Deep Networks&quot; (https://arxiv.org/abs/1703.03400).  It is used for</span>
+<span class="sd">  training models that can perform a variety of tasks, depending on what data they</span>
+<span class="sd">  are trained on.  It assumes you have training data for many tasks, but only a small</span>
+<span class="sd">  amount for each one.  It performs &quot;meta-learning&quot; by looping over tasks and trying</span>
+<span class="sd">  to minimize the loss on each one *after* one or a few steps of gradient descent.</span>
+<span class="sd">  That is, it does not try to create a model that can directly solve the tasks, but</span>
+<span class="sd">  rather tries to create a model that is very easy to train.</span>
+
+<span class="sd">  To use this class, create a subclass of MetaLearner that encapsulates the model</span>
+<span class="sd">  and data for your learning problem.  Pass it to a MAML object and call fit().</span>
+<span class="sd">  You can then use train_on_current_task() to fine tune the model for a particular</span>
+<span class="sd">  task.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">learner</span><span class="p">,</span>
+               <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+               <span class="n">optimization_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+               <span class="n">meta_batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+               <span class="n">optimizer</span><span class="o">=</span><span class="n">Adam</span><span class="p">(),</span>
+               <span class="n">model_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an object for performing meta-optimization.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    learner: MetaLearner</span>
+<span class="sd">      defines the meta-learning problem</span>
+<span class="sd">    learning_rate: float, Layer, or Tensor</span>
+<span class="sd">      the learning rate to use for optimizing each task (not to be confused with the one used</span>
+<span class="sd">      for meta-learning).  This can optionally be made a variable (represented as a Layer or</span>
+<span class="sd">      Tensor), in which case the learning rate will itself be learnable.</span>
+<span class="sd">    optimization_steps: int</span>
+<span class="sd">      the number of steps of gradient descent to perform for each task</span>
+<span class="sd">    meta_batch_size: int</span>
+<span class="sd">      the number of tasks to use for each step of meta-learning</span>
+<span class="sd">    optimizer: Optimizer</span>
+<span class="sd">      the optimizer to use for meta-learning (not to be confused with the gradient descent</span>
+<span class="sd">      optimization performed for each task)</span>
+<span class="sd">    model_dir: str</span>
+<span class="sd">      the directory in which the model will be saved.  If None, a temporary directory will be created.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Record inputs.</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">learner</span> <span class="o">=</span> <span class="n">learner</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">learner</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">Layer</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">out_tensor</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">loss</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">Layer</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_learning_rate</span> <span class="o">=</span> <span class="n">learning_rate</span><span class="o">.</span><span class="n">out_tensor</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_learning_rate</span> <span class="o">=</span> <span class="n">learning_rate</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">meta_batch_size</span> <span class="o">=</span> <span class="n">meta_batch_size</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span><span class="o">.</span><span class="n">graph</span>
+
+    <span class="c1"># Create the output directory if necessary.</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_model_dir_is_temp</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">model_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">model_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_model_dir_is_temp</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">=</span> <span class="n">model_dir</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="c1"># Create duplicate placeholders for meta-optimization.</span>
+
+      <span class="n">learner</span><span class="o">.</span><span class="n">select_task</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_meta_placeholders</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">learner</span><span class="o">.</span><span class="n">get_batch</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;meta/&#39;</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_meta_placeholders</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+      <span class="c1"># Create the loss function for meta-optimization.</span>
+
+      <span class="n">updated_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span>
+      <span class="n">updated_variables</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">variables</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optimization_steps</span><span class="p">):</span>
+        <span class="n">gradients</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gradients</span><span class="p">(</span><span class="n">updated_loss</span><span class="p">,</span> <span class="n">updated_variables</span><span class="p">)</span>
+        <span class="n">updated_variables</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">v</span> <span class="k">if</span> <span class="n">g</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">v</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_learning_rate</span> <span class="o">*</span> <span class="n">g</span>
+            <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">updated_variables</span><span class="p">,</span> <span class="n">gradients</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">replacements</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span> <span class="n">v2</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">learner</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">updated_variables</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">optimization_steps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="c1"># In the final loss, use different placeholders for all inputs so the loss will be</span>
+          <span class="c1"># computed from a different batch.</span>
+
+          <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_placeholders</span><span class="p">:</span>
+            <span class="n">replacements</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_placeholders</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+        <span class="n">updated_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">graph_editor</span><span class="o">.</span><span class="n">graph_replace</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span><span class="p">,</span> <span class="n">replacements</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_meta_loss</span> <span class="o">=</span> <span class="n">updated_loss</span>
+
+      <span class="c1"># Create variables for accumulating the gradients.</span>
+
+      <span class="n">gradients</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gradients</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_meta_loss</span><span class="p">,</span> <span class="n">learner</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+      <span class="n">zero_gradients</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gradients</span><span class="p">]</span>
+      <span class="n">summed_gradients</span> <span class="o">=</span> <span class="p">[</span>
+          <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">trainable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">zero_gradients</span>
+      <span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_clear_gradients</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">group</span><span class="p">(</span>
+          <span class="o">*</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">summed_gradients</span><span class="p">,</span> <span class="n">zero_gradients</span><span class="p">)])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_add_gradients</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">group</span><span class="p">(</span>
+          <span class="o">*</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">assign_add</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">summed_gradients</span><span class="p">,</span> <span class="n">gradients</span><span class="p">)])</span>
+
+      <span class="c1"># Create the optimizers for meta-optimization and task optimization.</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">_global_step</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[])</span>
+      <span class="n">grads_and_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">summed_gradients</span><span class="p">,</span> <span class="n">learner</span><span class="o">.</span><span class="n">variables</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_meta_train_op</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">_create_optimizer</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_global_step</span><span class="p">)</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="n">grads_and_vars</span><span class="p">)</span>
+      <span class="n">task_optimizer</span> <span class="o">=</span> <span class="n">GradientDescent</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_learning_rate</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_task_train_op</span> <span class="o">=</span> <span class="n">task_optimizer</span><span class="o">.</span><span class="n">_create_optimizer</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_global_step</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loss</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;_model_dir_is_temp&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_dir_is_temp</span><span class="p">:</span>
+      <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MAML.fit"><a class="viewcode-back" href="../../../deepchem.metalearning.html#deepchem.metalearning.maml.MAML.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+          <span class="n">steps</span><span class="p">,</span>
+          <span class="n">max_checkpoints_to_keep</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+          <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+          <span class="n">restore</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform meta-learning to train the model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    steps: int</span>
+<span class="sd">      the number of steps of meta-learning to perform</span>
+<span class="sd">    max_checkpoints_to_keep: int</span>
+<span class="sd">      the maximum number of checkpoint files to keep.  When this number is reached, older</span>
+<span class="sd">      files are deleted.</span>
+<span class="sd">    checkpoint_interval: float</span>
+<span class="sd">      the time interval at which to save checkpoints, measured in seconds</span>
+<span class="sd">    restore: bool</span>
+<span class="sd">      if True, restore the model from the most recent checkpoint and continue training</span>
+<span class="sd">      from there.  If False, retrain the model from scratch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+      <span class="k">if</span> <span class="n">restore</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+      <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">max_to_keep</span><span class="o">=</span><span class="n">max_checkpoints_to_keep</span><span class="p">)</span>
+      <span class="n">checkpoint_index</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="n">checkpoint_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+      <span class="c1"># Main optimization loop.</span>
+
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_clear_gradients</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_batch_size</span><span class="p">):</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">select_task</span><span class="p">()</span>
+          <span class="n">feed_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">get_batch</span><span class="p">()</span>
+          <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_global_step</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+          <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">get_batch</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">feed_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_meta_placeholders</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_add_gradients</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_meta_train_op</span><span class="p">)</span>
+
+        <span class="c1"># Do checkpointing.</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">steps</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(</span>
+        <span class="p">)</span> <span class="o">&gt;=</span> <span class="n">checkpoint_time</span> <span class="o">+</span> <span class="n">checkpoint_interval</span><span class="p">:</span>
+          <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="n">checkpoint_index</span><span class="p">)</span>
+          <span class="n">checkpoint_index</span> <span class="o">+=</span> <span class="mi">1</span>
+          <span class="n">checkpoint_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MAML.restore"><a class="viewcode-back" href="../../../deepchem.metalearning.html#deepchem.metalearning.maml.MAML.restore">[docs]</a>  <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reload the model parameters from the most recent checkpoint file.&quot;&quot;&quot;</span>
+    <span class="n">last_checkpoint</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">latest_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">last_checkpoint</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No checkpoint found&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+      <span class="n">saver</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">,</span> <span class="n">last_checkpoint</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MAML.train_on_current_task"><a class="viewcode-back" href="../../../deepchem.metalearning.html#deepchem.metalearning.maml.MAML.train_on_current_task">[docs]</a>  <span class="k">def</span> <span class="nf">train_on_current_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optimization_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">restore</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform a few steps of gradient descent to fine tune the model on the current task.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optimization_steps: int</span>
+<span class="sd">      the number of steps of gradient descent to perform</span>
+<span class="sd">    restore: bool</span>
+<span class="sd">      if True, restore the model from the most recent checkpoint before optimizing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">restore</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+      <span class="n">feed_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">get_batch</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optimization_steps</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_task_train_op</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

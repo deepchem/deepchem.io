@@ -1,0 +1,10 @@
+deepchem.models.sklearn_models package
+======================================
+
+Module contents
+---------------
+
+.. automodule:: deepchem.models.sklearn_models
+    :members:
+    :undoc-members:
+    :show-inheritance:
