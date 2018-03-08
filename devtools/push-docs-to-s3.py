@@ -11,6 +11,8 @@ if not any(d.project_name == 's3cmd'
 
 # The secret key is available as a secure environment variable
 # on travis-ci to push the build documentation to Amazon S3.
+# NOTE This script does not work with subprocess for css and js mime types
+# Need to call with bash due to ' characters
 with tempfile.NamedTemporaryFile('w') as f:
   f.write('''[default]
 access_key = {AWS_ACCESS_KEY_ID}
@@ -24,15 +26,11 @@ no_mime_magic = True
   cmd = template.format(config=f.name, bucket=BUCKET_NAME)
   subprocess.call(cmd.split())
 
-  # Perform recursive modification to set css mime types.
-  template = ("s3cmd --recursive modify --add-header='content-type':'text/css'"
-              "--exclude '' --include '.css' --config {config} s3://{bucket}/")
+  template = "s3cmd --recursive modify --add-header='content-type':'text/css' --exclude '' --include '.css' --config {config} s3://{bucket}/"
   cmd = template.format(config=f.name, bucket=BUCKET_NAME)
+  print(cmd)
   subprocess.call(cmd.split())
 
-  # Perform recursive modification to set js mime types.
-  template = (
-      "s3cmd --recursive modify --add-header='content-type':'application/javascript'"
-      "--exclude '' --include '.js' --config {config} s3://{bucket}/")
+  template = "s3cmd --recursive modify --add-header='content-type':'application/javascript' --exclude '' --include '.js' --config {config} s3://{bucket}/"
   cmd = template.format(config=f.name, bucket=BUCKET_NAME)
   subprocess.call(cmd.split())
