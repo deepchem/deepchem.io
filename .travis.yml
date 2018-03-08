@@ -7,7 +7,7 @@ install:
 - pip install delegator.py
 script:
 - python devtools/create_key_file.py
-- python devtools/push-docs-to-s3
+- python devtools/push-docs-to-s3.py
 - rm keys.crt
 after_success:
 - echo "Website Updated"
