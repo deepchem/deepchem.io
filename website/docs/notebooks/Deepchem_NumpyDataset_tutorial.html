@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>deepchem package &mdash; deepchem master documentation</title>
+
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'master',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem master documentation" href="../index.html" />
+    <link rel="next" title="deepchem.data package" href="../deepchem.data.html" />
+    <link rel="prev" title="DeepChem" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>master</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+
+                <li><a href="/docs/notebooks/index.html">Tutorials</a></li>
+
+
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/deepchem.html">master</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/2.0.0/deepchem.html">2.0.0</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/1.3.1/deepchem.html">1.3.1</a></li>
+</ul>
+</ul>
+</li>
+</ul>
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+
+        </div>
+    </div>
+    <div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="using-deepchem-datasets">
+<h1>Using Deepchem Datasets<a class="headerlink" href="#using-deepchem-datasets" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will have a look at various deepchem <code class="docutils literal"><span class="pre">dataset</span></code>
+methods present in <code class="docutils literal"><span class="pre">deepchem.datasets</span></code>.</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+/home/skand/anaconda2/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from <cite>float</cite> to <cite>np.floating</cite> is deprecated. In future, it will be treated as <cite>np.float64 == np.dtype(float).type</cite>.
+  from ._conv import register_converters as _register_converters
+</pre>
+</div>
+<div class="section" id="using-numpydatasets">
+<h1>Using NumpyDatasets<a class="headerlink" href="#using-numpydatasets" title="Permalink to this headline">¶</a></h1>
+<p>This is used when you have your data in numpy arrays.</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="c1"># data is your dataset in numpy array of size : 20x20.</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">4</span><span class="p">,))</span> <span class="c1"># labels of size 20x1</span>
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deepchem.data.datasets</span> <span class="kn">import</span> <span class="n">NumpyDataset</span> <span class="c1"># import NumpyDataset</span>
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="c1"># creates numpy dataset object</span>
+</pre></div>
+</div>
+<div class="section" id="extracting-x-y-from-numpydataset-object">
+<h2>Extracting X, y from NumpyDataset Object<a class="headerlink" href="#extracting-x-y-from-numpydataset-object" title="Permalink to this headline">¶</a></h2>
+<p>Extracting the data and labels from the NumpyDataset is very easy.</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">X</span> <span class="c1"># Extracts the data (X) from the NumpyDataset Object</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mf">0.63188616</span><span class="p">,</span> <span class="mf">0.24690483</span><span class="p">,</span> <span class="mf">0.85294168</span><span class="p">,</span> <span class="mf">0.15512774</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.62009111</span><span class="p">,</span> <span class="mf">0.00525149</span><span class="p">,</span> <span class="mf">0.56082693</span><span class="p">,</span> <span class="mf">0.0649767</span> <span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.57476389</span><span class="p">,</span> <span class="mf">0.92047762</span><span class="p">,</span> <span class="mf">0.36311505</span><span class="p">,</span> <span class="mf">0.53421993</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.5768823</span> <span class="p">,</span> <span class="mf">0.51945064</span><span class="p">,</span> <span class="mf">0.9655427</span> <span class="p">,</span> <span class="mf">0.82099216</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">y</span> <span class="c1"># Extracts the labels (y) from the NumpyDataset Object</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5102078</span> <span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.76199464</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.77398379</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.09498917</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="weights-of-a-dataset-w">
+<h2>Weights of a dataset - w<a class="headerlink" href="#weights-of-a-dataset-w" title="Permalink to this headline">¶</a></h2>
+<p>So apart from <code class="docutils literal"><span class="pre">X</span></code> and <code class="docutils literal"><span class="pre">y</span></code> which are the data and the labels, you can
+also assign weights <code class="docutils literal"><span class="pre">w</span></code> to each data instance. The dimension of <code class="docutils literal"><span class="pre">w</span></code>
+is same as that of <code class="docutils literal"><span class="pre">y</span></code>(which is Nx1 where N is the number of data
+instances).</p>
+<p><strong>NOTE:</strong> By default <code class="docutils literal"><span class="pre">w</span></code> is a vector initialized with equal weights
+(all being 1).</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">w</span> <span class="c1"># printing the weights that are assigned by default. Notice that they are a vector of 1&#39;s</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">4</span><span class="p">,))</span> <span class="c1"># initializing weights with random vector of size 20x1</span>
+<span class="n">dataset_with_weights</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="c1"># creates numpy dataset object</span>
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset_with_weights</span><span class="o">.</span><span class="n">w</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mf">0.85432113</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.91847254</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.59774769</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.36659207</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="iterating-over-numpydataset">
+<h2>Iterating over NumpyDataset<a class="headerlink" href="#iterating-over-numpydataset" title="Permalink to this headline">¶</a></h2>
+<p>In order to iterate over NumpyDataset, we use <code class="docutils literal"><span class="pre">itersamples</span></code> method. We
+iterate over 4 quantities, namely <code class="docutils literal"><span class="pre">X</span></code>, <code class="docutils literal"><span class="pre">y</span></code>, <code class="docutils literal"><span class="pre">w</span></code> and <code class="docutils literal"><span class="pre">ids</span></code>. The
+first three quantities are the same as discussed above and <code class="docutils literal"><span class="pre">ids</span></code> is
+the id of the data instance. By default the id is given in order
+starting from <code class="docutils literal"><span class="pre">1</span></code></p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">itersamples</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">array</span><span class="p">([</span><span class="mf">0.63188616</span><span class="p">,</span> <span class="mf">0.24690483</span><span class="p">,</span> <span class="mf">0.85294168</span><span class="p">,</span> <span class="mf">0.15512774</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.5102078</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">(</span><span class="n">array</span><span class="p">([</span><span class="mf">0.62009111</span><span class="p">,</span> <span class="mf">0.00525149</span><span class="p">,</span> <span class="mf">0.56082693</span><span class="p">,</span> <span class="mf">0.0649767</span> <span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.76199464</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">]),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">(</span><span class="n">array</span><span class="p">([</span><span class="mf">0.57476389</span><span class="p">,</span> <span class="mf">0.92047762</span><span class="p">,</span> <span class="mf">0.36311505</span><span class="p">,</span> <span class="mf">0.53421993</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.77398379</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">(</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5768823</span> <span class="p">,</span> <span class="mf">0.51945064</span><span class="p">,</span> <span class="mf">0.9655427</span> <span class="p">,</span> <span class="mf">0.82099216</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.09498917</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also extract the ids by <code class="docutils literal"><span class="pre">dataset.ids</span></code>. This would return a
+numpy array consisting of the ids of the data instances.</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">ids</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="mnist-example">
+<h2>MNIST Example<a class="headerlink" href="#mnist-example" title="Permalink to this headline">¶</a></h2>
+<p>Just to get a better understanding, lets take read MNIST data and use
+<code class="docutils literal"><span class="pre">NumpyDataset</span></code> to store the data.</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tensorflow.examples.tutorials.mnist</span> <span class="kn">import</span> <span class="n">input_data</span>
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s2">&quot;MNIST_data/&quot;</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Extracting MNIST_data/train-images-idx3-ubyte.gz
+Extracting MNIST_data/train-labels-idx1-ubyte.gz
+Extracting MNIST_data/t10k-images-idx3-ubyte.gz
+Extracting MNIST_data/t10k-labels-idx1-ubyte.gz
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Load the numpy data of MNIST into NumpyDataset</span>
+<span class="n">train</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">mnist</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">images</span><span class="p">,</span> <span class="n">mnist</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">valid</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">mnist</span><span class="o">.</span><span class="n">validation</span><span class="o">.</span><span class="n">images</span><span class="p">,</span> <span class="n">mnist</span><span class="o">.</span><span class="n">validation</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Visualize one sample</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">train</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/Deepchem_NumpyDataset_tutorial_22_0.png" src="../_images/Deepchem_NumpyDataset_tutorial_22_0.png" />
+</div>
+<div class="section" id="numpy-array-to-tf-data-dataset">
+<h2>Numpy Array to tf.data.dataset()<a class="headerlink" href="#numpy-array-to-tf-data-dataset" title="Permalink to this headline">¶</a></h2>
+<p>This is quite similar to getting a <code class="docutils literal"><span class="pre">NumpyDataset</span></code> object from numpy
+arrays.</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="n">data_small</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">label_small</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">4</span><span class="p">,))</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">((</span><span class="n">data_small</span><span class="p">,</span> <span class="n">label_small</span><span class="p">))</span>
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;Data</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="p">(</span><span class="n">data_small</span><span class="p">)</span>
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Labels&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="p">(</span><span class="n">label_small</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Data
+
+[[0.78574579 0.79398959 0.64737371 0.20447343 0.55009141]
+ [0.39201333 0.12299678 0.69700424 0.57494847 0.59895521]
+ [0.711899   0.22786574 0.6436164  0.49713391 0.31487844]
+ [0.95354154 0.67493395 0.84554228 0.15894518 0.0154379 ]]
+
+ Labels
+[0.61605796 0.07695742 0.1084755  0.30322915]
+</pre></div>
+</div>
+</div>
+<div class="section" id="extracting-the-numpy-dataset-from-tf-data">
+<h2>Extracting the numpy dataset from tf.data<a class="headerlink" href="#extracting-the-numpy-dataset-from-tf-data" title="Permalink to this headline">¶</a></h2>
+<p>In order to extract the numpy array from the <code class="docutils literal"><span class="pre">tf.data</span></code>, you first need
+to define an <code class="docutils literal"><span class="pre">iterator</span></code> to iterate over the <code class="docutils literal"><span class="pre">tf.data.Dataset</span></code> object
+and then in the tensorflow session, run over the iterator to get the
+data instances. Let’s have a look at how it’s done.</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">iterator</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">make_one_shot_iterator</span><span class="p">()</span> <span class="c1"># iterator</span>
+<span class="n">next_element</span> <span class="o">=</span> <span class="n">iterator</span><span class="o">.</span><span class="n">get_next</span><span class="p">()</span>
+<span class="n">numpy_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">numpy_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,))</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="c1"># tensorflow session</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">data_</span><span class="p">,</span> <span class="n">label_</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">next_element</span><span class="p">)</span> <span class="c1"># data_ contains the data and label_ contains the labels that we fed in the previous step</span>
+    <span class="n">numpy_data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">data_</span>
+    <span class="n">numpy_label</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_</span>
+
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;Numpy Data&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">numpy_data</span><span class="p">)</span>
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Numpy Label&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">numpy_label</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Numpy Data
+[[0.78574579 0.79398959 0.64737371 0.20447343 0.55009141]
+ [0.39201333 0.12299678 0.69700424 0.57494847 0.59895521]
+ [0.711899   0.22786574 0.6436164  0.49713391 0.31487844]
+ [0.95354154 0.67493395 0.84554228 0.15894518 0.0154379 ]]
+
+ Numpy Label
+[0.61605796 0.07695742 0.1084755  0.30322915]
+</pre></div>
+</div>
+<p>Now that you have the numpy arrays of <code class="docutils literal"><span class="pre">data</span></code> and <code class="docutils literal"><span class="pre">labels</span></code>, you can
+convert it to <code class="docutils literal"><span class="pre">NumpyDataset</span></code>.</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset_</span> <span class="o">=</span> <span class="n">NumpyDataset</span><span class="p">(</span><span class="n">numpy_data</span><span class="p">,</span> <span class="n">numpy_label</span><span class="p">)</span> <span class="c1"># convert to NumpyDataset</span>
+<span class="n">dataset_</span><span class="o">.</span><span class="n">X</span>  <span class="c1"># printing just to check if the data is same!!</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mf">0.78574579</span><span class="p">,</span> <span class="mf">0.79398959</span><span class="p">,</span> <span class="mf">0.64737371</span><span class="p">,</span> <span class="mf">0.20447343</span><span class="p">,</span> <span class="mf">0.55009141</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.39201333</span><span class="p">,</span> <span class="mf">0.12299678</span><span class="p">,</span> <span class="mf">0.69700424</span><span class="p">,</span> <span class="mf">0.57494847</span><span class="p">,</span> <span class="mf">0.59895521</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.711899</span>  <span class="p">,</span> <span class="mf">0.22786574</span><span class="p">,</span> <span class="mf">0.6436164</span> <span class="p">,</span> <span class="mf">0.49713391</span><span class="p">,</span> <span class="mf">0.31487844</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.95354154</span><span class="p">,</span> <span class="mf">0.67493395</span><span class="p">,</span> <span class="mf">0.84554228</span><span class="p">,</span> <span class="mf">0.15894518</span><span class="p">,</span> <span class="mf">0.0154379</span> <span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="converting-numpydataset-to-tf-data">
+<h2>Converting NumpyDataset to <code class="docutils literal"><span class="pre">tf.data</span></code><a class="headerlink" href="#converting-numpydataset-to-tf-data" title="Permalink to this headline">¶</a></h2>
+<p>This can be easily done by the <code class="docutils literal"><span class="pre">make_iterator()</span></code> method of
+<code class="docutils literal"><span class="pre">NumpyDataset</span></code>. This converts the <code class="docutils literal"><span class="pre">NumpyDataset</span></code> to <code class="docutils literal"><span class="pre">tf.data</span></code>.
+Let’s look how it’s done!</p>
+<div class="code ipython2 highlight-python"><div class="highlight"><pre><span></span><span class="n">iterator_</span> <span class="o">=</span> <span class="n">dataset_</span><span class="o">.</span><span class="n">make_iterator</span><span class="p">()</span> <span class="c1"># Using make_iterator for converting NumpyDataset to tf.data</span>
+<span class="n">next_element_</span> <span class="o">=</span> <span class="n">iterator_</span><span class="o">.</span><span class="n">get_next</span><span class="p">()</span>
+
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="c1"># tensorflow session</span>
+<span class="n">data_and_labels</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">next_element_</span><span class="p">)</span> <span class="c1"># data_ contains the data and label_ contains the labels that we fed in the previous step</span>
+
+
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;Numpy Data&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">data_and_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># Data in the first index</span>
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Numpy Label&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">data_and_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Labels in the second index</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Numpy Data
+[[0.78574579 0.79398959 0.64737371 0.20447343 0.55009141]
+ [0.95354154 0.67493395 0.84554228 0.15894518 0.0154379 ]
+ [0.711899   0.22786574 0.6436164  0.49713391 0.31487844]
+ [0.39201333 0.12299678 0.69700424 0.57494847 0.59895521]]
+
+ Numpy Label
+[[0.61605796]
+ [0.30322915]
+ [0.1084755 ]
+ [0.07695742]]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/notebooks/Deepchem_NumpyDataset_tutorial.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
