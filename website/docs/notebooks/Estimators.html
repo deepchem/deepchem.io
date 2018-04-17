@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>deepchem package &mdash; deepchem master documentation</title>
+
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'master',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem master documentation" href="../index.html" />
+    <link rel="next" title="deepchem.data package" href="../deepchem.data.html" />
+    <link rel="prev" title="DeepChem" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>master</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+
+                <li><a href="/docs/notebooks/index.html">Tutorials</a></li>
+
+
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/deepchem.html">master</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/2.0.0/deepchem.html">2.0.0</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/1.3.1/deepchem.html">1.3.1</a></li>
+</ul>
+</ul>
+</li>
+</ul>
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+
+        </div>
+    </div>
+  </div><div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="using-deepchem-with-tensorflow-data-and-estimators">
+<h1>Using DeepChem with Tensorflow Data and Estimators<a class="headerlink" href="#using-deepchem-with-tensorflow-data-and-estimators" title="Permalink to this headline">¶</a></h1>
+<p>When DeepChem was first created, Tensorflow had no standard interface
+for datasets or models. We created the Dataset and Model classes to fill
+this hole. More recently, Tensorflow has added the <code class="docutils literal"><span class="pre">tf.data</span></code> module as
+a standard interface for datasets, and the <code class="docutils literal"><span class="pre">tf.estimator</span></code> module as a
+standard interface for models. To enable easy interoperability with
+other tools, we have added features to Dataset and Model to support
+these new standards.</p>
+<p>This example demonstrates how to use these features. Let’s begin by
+loading a dataset and creating a model to analyze it. We’ll use a simple
+MultiTaskClassifier with one hidden layer.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">tasks</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transformers</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_tox21</span><span class="p">()</span>
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">datasets</span>
+<span class="n">n_tasks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
+<span class="n">n_features</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">MultiTaskClassifier</span><span class="p">(</span><span class="n">n_tasks</span><span class="p">,</span> <span class="n">n_features</span><span class="p">,</span> <span class="n">layer_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">1000</span><span class="p">],</span> <span class="n">dropouts</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Loading dataset from disk.
+Loading dataset from disk.
+Loading dataset from disk.
+</pre></div>
+</div>
+<p>We want to train the model using the training set, then evaluate it on
+the test set. As our evaluation metric we will use the ROC AUC, averaged
+over the 12 tasks included in the dataset. First let’s see how to do
+this with the DeepChem API.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">nb_epoch</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">metric</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Metric</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="p">[</span><span class="n">metric</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>computed_metrics: [0.7081719239992621, 0.865129545326814, 0.836842947009276, 0.7701224617961064, 0.7081635765485087, 0.7911911911911912, 0.7207671300893743, 0.6592307518932563, 0.7976869777868352, 0.7409154581410679, 0.8243317675424011, 0.7112435328898743]
+{&#39;mean-roc_auc_score&#39;: 0.7611497720178306}
+</pre></div>
+</div>
+<p>Simple enough. Now let’s see how to do the same thing with the
+Tensorflow APIs. Fair warning: this is going to take a lot more code!</p>
+<p>To begin with, Tensorflow doesn’t allow a dataset to be passed directly
+to a model. Instead, you need to write an “input function” to construct
+a particular set of tensors and return them in a particular format.
+Fortunately, Dataset’s <code class="docutils literal"><span class="pre">make_iterator()</span></code> method provides exactly the
+tensors we need in the form of a <code class="docutils literal"><span class="pre">tf.data.Iterator</span></code>. This allows our
+input function to be very simple.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">input_fn</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">epochs</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">make_iterator</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">)</span><span class="o">.</span><span class="n">get_next</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="n">weights</span><span class="p">},</span> <span class="n">y</span>
+</pre></div>
+</div>
+<p>Next, you have to use the functions in the <code class="docutils literal"><span class="pre">tf.feature_column</span></code> module
+to create an object representing each feature and weight column (but
+curiously, <em>not</em> the label column—don’t ask me why!). These objects
+describe the data type and shape of each column, and give each one a
+name. The names must match the keys in the dict returned by the input
+function.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">x_col</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">feature_column</span><span class="o">.</span><span class="n">numeric_column</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_features</span><span class="p">,))</span>
+<span class="n">weight_col</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">feature_column</span><span class="o">.</span><span class="n">numeric_column</span><span class="p">(</span><span class="s1">&#39;weights&#39;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_tasks</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p>Unlike DeepChem models, which allow arbitrary metrics to be passed to
+<code class="docutils literal"><span class="pre">evaluate()</span></code>, estimators require all metrics to be defined up front
+when you create the estimator. Unfortunately, Tensorflow doesn’t have
+very good support for multitask models. It provides an AUC metric, but
+no easy way to average this metric over tasks. We therefore must create
+a separate metric for every task, then define our own metric function to
+compute the average of them.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">mean_auc</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="n">metric_ops</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">update_ops</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_tasks</span><span class="p">):</span>
+        <span class="n">metric</span><span class="p">,</span> <span class="n">update</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">auc</span><span class="p">(</span><span class="n">labels</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">predictions</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">weights</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">metric_ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+        <span class="n">update_ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+    <span class="n">mean_metric</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">metric_ops</span><span class="p">))</span>
+    <span class="n">update_all</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="o">*</span><span class="n">update_ops</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mean_metric</span><span class="p">,</span> <span class="n">update_all</span>
+</pre></div>
+</div>
+<p>Now we create our <code class="docutils literal"><span class="pre">Estimator</span></code> by calling <code class="docutils literal"><span class="pre">make_estimator()</span></code> on the
+DeepChem model. We provide as arguments the objects created above to
+represent the feature and weight columns, as well as our metric
+function.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">estimator</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">make_estimator</span><span class="p">(</span><span class="n">feature_columns</span><span class="o">=</span><span class="p">[</span><span class="n">x_col</span><span class="p">],</span>
+                                 <span class="n">weight_column</span><span class="o">=</span><span class="n">weight_col</span><span class="p">,</span>
+                                 <span class="n">metrics</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mean_auc&#39;</span><span class="p">:</span> <span class="n">mean_auc</span><span class="p">},</span>
+                                 <span class="n">model_dir</span><span class="o">=</span><span class="s1">&#39;estimator&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>INFO:tensorflow:Using default config.
+INFO:tensorflow:Using config: {&#39;_model_dir&#39;: &#39;estimator&#39;, &#39;_tf_random_seed&#39;: None, &#39;_save_summary_steps&#39;: 100, &#39;_save_checkpoints_steps&#39;: None, &#39;_save_checkpoints_secs&#39;: 600, &#39;_session_config&#39;: None, &#39;_keep_checkpoint_max&#39;: 5, &#39;_keep_checkpoint_every_n_hours&#39;: 10000, &#39;_log_step_count_steps&#39;: 100, &#39;_service&#39;: None, &#39;_cluster_spec&#39;: &lt;tensorflow.python.training.server_lib.ClusterSpec object at 0x12d39bef0&gt;, &#39;_task_type&#39;: &#39;worker&#39;, &#39;_task_id&#39;: 0, &#39;_master&#39;: &#39;&#39;, &#39;_is_chief&#39;: True, &#39;_num_ps_replicas&#39;: 0, &#39;_num_worker_replicas&#39;: 1}
+</pre></div>
+</div>
+<p>We are finally ready to train and evaluate it! Notice how the input
+function passed to each method is actually a lambda. This allows us to
+write a single function, then use it with different datasets and numbers
+of epochs.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">estimator</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">input_fn</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">input_fn</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>INFO:tensorflow:Create CheckpointSaverHook.
+INFO:tensorflow:Saving checkpoints for 1 into estimator/model.ckpt.
+INFO:tensorflow:loss = 1716.8385, step = 1
+INFO:tensorflow:global_step/sec: 63.5117
+INFO:tensorflow:loss = 804.13416, step = 101 (1.576 sec)
+INFO:tensorflow:global_step/sec: 41.9688
+INFO:tensorflow:loss = 682.90265, step = 201 (2.383 sec)
+INFO:tensorflow:global_step/sec: 65.7841
+INFO:tensorflow:loss = 805.00336, step = 301 (1.520 sec)
+INFO:tensorflow:global_step/sec: 42.4989
+INFO:tensorflow:loss = 466.05975, step = 401 (2.353 sec)
+INFO:tensorflow:global_step/sec: 65.1989
+INFO:tensorflow:loss = 704.69446, step = 501 (1.534 sec)
+INFO:tensorflow:global_step/sec: 40.9395
+INFO:tensorflow:loss = 450.0899, step = 601 (2.443 sec)
+INFO:tensorflow:global_step/sec: 41.2419
+INFO:tensorflow:loss = 349.05804, step = 701 (2.424 sec)
+INFO:tensorflow:global_step/sec: 60.7104
+INFO:tensorflow:loss = 338.63837, step = 801 (1.647 sec)
+INFO:tensorflow:global_step/sec: 40.4742
+INFO:tensorflow:loss = 351.22452, step = 901 (2.471 sec)
+INFO:tensorflow:global_step/sec: 63.2702
+INFO:tensorflow:loss = 325.0889, step = 1001 (1.581 sec)
+INFO:tensorflow:global_step/sec: 42.8089
+INFO:tensorflow:loss = 334.04944, step = 1101 (2.336 sec)
+INFO:tensorflow:global_step/sec: 41.0803
+INFO:tensorflow:loss = 299.88806, step = 1201 (2.434 sec)
+INFO:tensorflow:global_step/sec: 62.1056
+INFO:tensorflow:loss = 301.3775, step = 1301 (1.610 sec)
+INFO:tensorflow:global_step/sec: 41.056
+INFO:tensorflow:loss = 345.18347, step = 1401 (2.436 sec)
+INFO:tensorflow:global_step/sec: 61.8764
+INFO:tensorflow:loss = 220.67397, step = 1501 (1.616 sec)
+INFO:tensorflow:global_step/sec: 39.5263
+INFO:tensorflow:loss = 232.79745, step = 1601 (2.529 sec)
+INFO:tensorflow:global_step/sec: 63.3011
+INFO:tensorflow:loss = 185.26181, step = 1701 (1.580 sec)
+INFO:tensorflow:global_step/sec: 40.9611
+INFO:tensorflow:loss = 188.3253, step = 1801 (2.441 sec)
+INFO:tensorflow:global_step/sec: 41.6845
+INFO:tensorflow:loss = 190.70108, step = 1901 (2.399 sec)
+INFO:tensorflow:global_step/sec: 64.629
+INFO:tensorflow:loss = 162.53293, step = 2001 (1.547 sec)
+INFO:tensorflow:global_step/sec: 42.2537
+INFO:tensorflow:loss = 161.35915, step = 2101 (2.367 sec)
+INFO:tensorflow:global_step/sec: 64.5807
+INFO:tensorflow:loss = 145.4078, step = 2201 (1.548 sec)
+INFO:tensorflow:global_step/sec: 41.9227
+INFO:tensorflow:loss = 120.111115, step = 2301 (2.385 sec)
+INFO:tensorflow:global_step/sec: 42.6787
+INFO:tensorflow:loss = 151.61371, step = 2401 (2.343 sec)
+INFO:tensorflow:global_step/sec: 63.3021
+INFO:tensorflow:loss = 136.98262, step = 2501 (1.580 sec)
+INFO:tensorflow:global_step/sec: 42.6588
+INFO:tensorflow:loss = 89.13097, step = 2601 (2.344 sec)
+INFO:tensorflow:global_step/sec: 64.7405
+INFO:tensorflow:loss = 101.06474, step = 2701 (1.545 sec)
+INFO:tensorflow:global_step/sec: 43.2237
+INFO:tensorflow:loss = 116.96815, step = 2801 (2.314 sec)
+INFO:tensorflow:global_step/sec: 43.4182
+INFO:tensorflow:loss = 84.83482, step = 2901 (2.303 sec)
+INFO:tensorflow:global_step/sec: 65.1042
+INFO:tensorflow:loss = 145.16194, step = 3001 (1.536 sec)
+INFO:tensorflow:global_step/sec: 42.3864
+INFO:tensorflow:loss = 92.99321, step = 3101 (2.359 sec)
+INFO:tensorflow:global_step/sec: 64.7556
+INFO:tensorflow:loss = 65.05712, step = 3201 (1.544 sec)
+INFO:tensorflow:global_step/sec: 42.6498
+INFO:tensorflow:loss = 78.92055, step = 3301 (2.345 sec)
+INFO:tensorflow:global_step/sec: 65.4527
+INFO:tensorflow:loss = 77.93735, step = 3401 (1.528 sec)
+INFO:tensorflow:global_step/sec: 42.8958
+INFO:tensorflow:loss = 57.02035, step = 3501 (2.332 sec)
+INFO:tensorflow:global_step/sec: 43.3849
+INFO:tensorflow:loss = 95.91443, step = 3601 (2.305 sec)
+INFO:tensorflow:global_step/sec: 65.1448
+INFO:tensorflow:loss = 75.03122, step = 3701 (1.535 sec)
+INFO:tensorflow:global_step/sec: 42.6941
+INFO:tensorflow:loss = 62.8435, step = 3801 (2.342 sec)
+INFO:tensorflow:global_step/sec: 65.2233
+INFO:tensorflow:loss = 45.883224, step = 3901 (1.533 sec)
+INFO:tensorflow:global_step/sec: 43.4815
+INFO:tensorflow:loss = 57.56656, step = 4001 (2.300 sec)
+INFO:tensorflow:global_step/sec: 41.5674
+INFO:tensorflow:loss = 70.33858, step = 4101 (2.406 sec)
+INFO:tensorflow:global_step/sec: 58.5978
+INFO:tensorflow:loss = 67.34745, step = 4201 (1.707 sec)
+INFO:tensorflow:global_step/sec: 39.8156
+INFO:tensorflow:loss = 46.03079, step = 4301 (2.511 sec)
+INFO:tensorflow:global_step/sec: 60.5059
+INFO:tensorflow:loss = 40.959454, step = 4401 (1.653 sec)
+INFO:tensorflow:global_step/sec: 41.7228
+INFO:tensorflow:loss = 36.393044, step = 4501 (2.397 sec)
+INFO:tensorflow:global_step/sec: 42.4976
+INFO:tensorflow:loss = 46.14415, step = 4601 (2.353 sec)
+INFO:tensorflow:global_step/sec: 66.1396
+INFO:tensorflow:loss = 41.93784, step = 4701 (1.512 sec)
+INFO:tensorflow:global_step/sec: 42.5402
+INFO:tensorflow:loss = 29.39001, step = 4801 (2.351 sec)
+INFO:tensorflow:global_step/sec: 65.0227
+INFO:tensorflow:loss = 29.608704, step = 4901 (1.538 sec)
+INFO:tensorflow:global_step/sec: 43.692
+INFO:tensorflow:loss = 43.265915, step = 5001 (2.289 sec)
+INFO:tensorflow:global_step/sec: 65.8827
+INFO:tensorflow:loss = 41.69668, step = 5101 (1.518 sec)
+INFO:tensorflow:global_step/sec: 42.4384
+INFO:tensorflow:loss = 28.208687, step = 5201 (2.356 sec)
+INFO:tensorflow:global_step/sec: 42.4864
+INFO:tensorflow:loss = 34.643417, step = 5301 (2.354 sec)
+INFO:tensorflow:global_step/sec: 66.223
+INFO:tensorflow:loss = 46.616447, step = 5401 (1.510 sec)
+INFO:tensorflow:global_step/sec: 42.0575
+INFO:tensorflow:loss = 42.339645, step = 5501 (2.378 sec)
+INFO:tensorflow:global_step/sec: 65.1812
+INFO:tensorflow:loss = 94.012146, step = 5601 (1.534 sec)
+INFO:tensorflow:global_step/sec: 43.1405
+INFO:tensorflow:loss = 25.879742, step = 5701 (2.318 sec)
+INFO:tensorflow:global_step/sec: 43.209
+INFO:tensorflow:loss = 35.351685, step = 5801 (2.314 sec)
+INFO:tensorflow:global_step/sec: 65.5692
+INFO:tensorflow:loss = 12.110611, step = 5901 (1.525 sec)
+INFO:tensorflow:global_step/sec: 42.3864
+INFO:tensorflow:loss = 19.612688, step = 6001 (2.359 sec)
+INFO:tensorflow:global_step/sec: 65.1961
+INFO:tensorflow:loss = 31.003126, step = 6101 (1.534 sec)
+INFO:tensorflow:global_step/sec: 42.9087
+INFO:tensorflow:loss = 21.030697, step = 6201 (2.330 sec)
+INFO:tensorflow:Saving checkpoints for 6300 into estimator/model.ckpt.
+INFO:tensorflow:Loss for final step: 19.216248.
+INFO:tensorflow:Starting evaluation at 2018-03-06-22:55:47
+INFO:tensorflow:Restoring parameters from estimator/model.ckpt-6300
+INFO:tensorflow:Finished evaluation at 2018-03-06-22:55:49
+INFO:tensorflow:Saving dict for global step 6300: global_step = 6300, loss = 6348.7153, mean_auc = 0.7047531
+{&#39;loss&#39;: 6348.7153, &#39;mean_auc&#39;: 0.7047531, &#39;global_step&#39;: 6300}
+</pre></div>
+</div>
+<p>That’s a lot of code for something DeepChem can do in three lines. The
+Tensorflow API is verbose and somewhat confusing. It has seemingly
+arbitrary limitations, like assuming a model will only ever have one
+output, and therefore only allowing one label. But for better or worse,
+it’s a standard.</p>
+<p>Of course, if you just want to use a DeepChem model with a DeepChem
+dataset, there is no need for any of this. Just use the DeepChem API.
+But perhaps you want to use a DeepChem dataset with a model that has
+been implemented as an estimator. In that case,
+<code class="docutils literal"><span class="pre">Dataset.make_iterator()</span></code> allows you to easily do that. Or perhaps you
+have higher level workflow code that is written to work with estimators.
+In that case, <code class="docutils literal"><span class="pre">make_estimator()</span></code> allows DeepChem models to easily fit
+into that workflow.</p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/notebooks/Estimators.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

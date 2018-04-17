@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>deepchem package &mdash; deepchem master documentation</title>
+
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'master',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="deepchem master documentation" href="../index.html" />
+    <link rel="next" title="deepchem.data package" href="../deepchem.data.html" />
+    <link rel="prev" title="DeepChem" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="../_static/logo.png"></span>
+          deepchem</a>
+        <span class="navbar-text navbar-version pull-left"><b>master</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+
+                <li><a href="/docs/notebooks/index.html">Tutorials</a></li>
+
+
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/deepchem.html">master</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/2.0.0/deepchem.html">2.0.0</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="/docs/1.3.1/deepchem.html">1.3.1</a></li>
+</ul>
+</ul>
+</li>
+</ul>
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+
+        </div>
+    </div>
+  </div><div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="uncertainty-in-deep-learning">
+<h1>Uncertainty in Deep Learning<a class="headerlink" href="#uncertainty-in-deep-learning" title="Permalink to this headline">¶</a></h1>
+<p>A common criticism of deep learning models is that they tend to act as
+black boxes. A model produces outputs, but doesn’t given enough context
+to interpret them properly. How reliable are the model’s predictions?
+Are some predictions more reliable than others? If a model predicts a
+value of 5.372 for some quantity, should you assume the true value is
+between 5.371 and 5.373? Or that it’s between 2 and 8? In some fields
+this situation might be good enough, but not in science. For every value
+predicted by a model, we also want an estimate of the uncertainty in
+that value so we can know what conclusions to draw based on it.</p>
+<p>DeepChem makes it very easy to estimate the uncertainty of predicted
+outputs (at least for the models that support it—not all of them do).
+Let’s start by seeing an example of how to generate uncertainty
+estimates. We load a dataset, create a model, train it on the training
+set, and predict the output on the test set.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plot</span>
+
+<span class="n">tasks</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transformers</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">molnet</span><span class="o">.</span><span class="n">load_sampl</span><span class="p">()</span>
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">datasets</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">MultiTaskRegressor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">),</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">uncertainty</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">nb_epoch</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">y_pred</span><span class="p">,</span> <span class="n">y_std</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_uncertainty</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Loading dataset from disk.
+Loading dataset from disk.
+Loading dataset from disk.
+</pre></div>
+</div>
+<p>All of this looks exactly like any other example, with just two
+differences. First, we add the option <code class="docutils literal"><span class="pre">uncertainty=True</span></code> when creating
+the model. This instructs it to add features to the model that are
+needed for estimating uncertainty. Second, we call
+<code class="docutils literal"><span class="pre">predict_uncertainty()</span></code> instead of <code class="docutils literal"><span class="pre">predict()</span></code> to produce the
+output. <code class="docutils literal"><span class="pre">y_pred</span></code> is the predicted outputs. <code class="docutils literal"><span class="pre">y_std</span></code> is another array
+of the same shape, where each element is an estimate of the uncertainty
+(standard deviation) of the corresponding element in <code class="docutils literal"><span class="pre">y_pred</span></code>. And
+that’s all there is to it! Simple, right?</p>
+<p>Of course, it isn’t really that simple at all. DeepChem is doing a lot
+of work to come up with those uncertainties. So now let’s pull back the
+curtain and see what is really happening. (For the full mathematical
+details of calculating uncertainty, see
+<a class="reference external" href="https://arxiv.org/abs/1703.04977">https://arxiv.org/abs/1703.04977</a>)</p>
+<p>To begin with, what does “uncertainty” mean? Intuitively, it is a
+measure of how much we can trust the predictions. More formally, we
+expect that the true value of whatever we are trying to predict should
+usually be within a few standard deviations of the predicted value. But
+uncertainty comes from many sources, ranging from noisy training data to
+bad modelling choices, and different sources behave in different ways.
+It turns out there are two fundamental types of uncertainty we need to
+take into account.</p>
+<div class="section" id="aleatoric-uncertainty">
+<h2>Aleatoric Uncertainty<a class="headerlink" href="#aleatoric-uncertainty" title="Permalink to this headline">¶</a></h2>
+<p>Consider the following graph. It shows the best fit linear regression to
+a set of ten data points.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Generate some fake data and plot a regression line.</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">0.15</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">line_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">line_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">fit</span><span class="p">)(</span><span class="n">line_x</span><span class="p">))</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/Uncertainty_3_0.png" src="../_images/Uncertainty_3_0.png" />
+<p>The line clearly does not do a great job of fitting the data. There are
+many possible reasons for this. Perhaps the measuring device used to
+capture the data was not very accurate. Perhaps <code class="docutils literal"><span class="pre">y</span></code> depends on some
+other factor in addition to <code class="docutils literal"><span class="pre">x</span></code>, and if we knew the value of that
+factor for each data point we could predict <code class="docutils literal"><span class="pre">y</span></code> more accurately. Maybe
+the relationship between <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code> simply isn’t linear, and we
+need a more complicated model to capture it. Regardless of the cause,
+the model clearly does a poor job of predicting the training data, and
+we need to keep that in mind. We cannot expect it to be any more
+accurate on test data than on training data. This is known as <em>aleatoric
+uncertainty</em>.</p>
+<p>How can we estimate the size of this uncertainty? By training a model to
+do it, of course! At the same time it is learning to predict the
+outputs, it is also learning to predict how accurately each output
+matches the training data. For every output of the model, we add a
+second output that produces the corresponding uncertainty. Then we
+modify the loss function to make it learn both outputs at the same time.</p>
+</div>
+<div class="section" id="epistemic-uncertainty">
+<h2>Epistemic Uncertainty<a class="headerlink" href="#epistemic-uncertainty" title="Permalink to this headline">¶</a></h2>
+<p>Now consider these three curves. They are fit to the same data points as
+before, but this time we are using 10th degree polynomials.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">line_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="p">]]),</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">line_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">fit</span><span class="p">)(</span><span class="n">line_x</span><span class="p">))</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/Uncertainty_5_0.png" src="../_images/Uncertainty_5_0.png" />
+<p>Each of them perfectly interpolates the data points, yet they clearly
+are different models. (In fact, there are infinitely many 10th degree
+polynomials that exactly interpolate any ten data points.) They make
+identical predictions for the data we fit them to, but for any other
+value of <code class="docutils literal"><span class="pre">x</span></code> they produce different predictions. This is called
+<em>epistemic uncertainty</em>. It means the data does not fully constrain the
+model. Given the training data, there are many different models we could
+have found, and those models make different predictions.</p>
+<p>The ideal way to measure epistemic uncertainty is to train many
+different models, each time using a different random seed and possibly
+varying hyperparameters. Then use all of them for each input and see how
+much the predictions vary. This is very expensive to do, since it
+involves repeating the whole training process many times. Fortunately,
+we can approximate the same effect in a less expensive way: by using
+dropout.</p>
+<p>Recall that when you train a model with dropout, you are effectively
+training a huge ensemble of different models all at once. Each training
+sample is evaluated with a different dropout mask, corresponding to a
+different random subset of the connections in the full model. Usually we
+only perform dropout during training and use a single averaged mask for
+prediction. But instead, let’s use dropout for prediction too. We can
+compute the output for lots of different dropout masks, then see how
+much the predictions vary. This turns out to give a reasonable estimate
+of the epistemic uncertainty in the outputs.</p>
+</div>
+<div class="section" id="uncertain-uncertainty">
+<h2>Uncertain Uncertainty?<a class="headerlink" href="#uncertain-uncertainty" title="Permalink to this headline">¶</a></h2>
+<p>Now we can combine the two types of uncertainty to compute an overall
+estimate of the error in each output:</p>
+<div class="math">
+\[\sigma_\text{total} = \sqrt{\sigma_\text{aleatoric}^2 + \sigma_\text{epistemic}^2}\]</div>
+<p>This is the value DeepChem reports. But how much can you trust it?
+Remember how I started this tutorial: deep learning models should not be
+used as black boxes. We want to know how reliable the outputs are.
+Adding uncertainty estimates does not completely eliminate the problem;
+it just adds a layer of indirection. Now we have estimates of how
+reliable the outputs are, but no guarantees that those estimates are
+themselves reliable.</p>
+<p>Let’s go back to the example we started with. We trained a model on the
+SAMPL training set, then generated predictions and uncertainties for the
+test set. Since we know the correct outputs for all the test samples, we
+can evaluate how well we did. Here is a plot of the absolute error in
+the predicted output versus the predicted uncertainty.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">abs_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_pred</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">-</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_std</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">abs_error</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Standard Deviation&#39;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Absolute Error&#39;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/Uncertainty_7_0.png" src="../_images/Uncertainty_7_0.png" />
+<p>The first thing we notice is that the axes have similar ranges. The
+model clearly has learned the overall magnitude of errors in the
+predictions. There also is clearly a correlation between the axes.
+Values with larger uncertainties tend on average to have larger errors.</p>
+<p>Now let’s see how well the values satisfy the expected distribution. If
+the standard deviations are correct, and if the errors are normally
+distributed (which is certainly not guaranteed to be true!), we expect
+95% of the values to be within two standard deviations, and 99% to be
+within three standard deviations. Here is a histogram of errors as
+measured in standard deviations.</p>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">abs_error</span><span class="o">/</span><span class="n">y_std</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/Uncertainty_9_0.png" src="../_images/Uncertainty_9_0.png" />
+<p>Most of the values are in the expected range, but there are a handful of
+outliers at much larger values. Perhaps this indicates the errors are
+not normally distributed, but it may also mean a few of the
+uncertainties are too low. This is an important reminder: the
+uncertainties are just estimates, not rigorous measurements. Most of
+them are pretty good, but you should not put too much confidence in any
+single value.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/notebooks/Uncertainty.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Stanford University and the Authors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

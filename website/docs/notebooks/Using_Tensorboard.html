@@ -103,7 +103,7 @@ model performance over.</p>
 <div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
 <span class="kn">from</span> <span class="nn">deepchem.molnet</span> <span class="kn">import</span> <span class="n">load_tox21</span>
-<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.models.graph_models</span> <span class="kn">import</span> <span class="n">GraphConvTensorGraph</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.models.graph_models</span> <span class="kn">import</span> <span class="n">GraphConvModel</span>
 
 <span class="c1"># Load Tox21 dataset</span>
 <span class="n">tox21_tasks</span><span class="p">,</span> <span class="n">tox21_datasets</span><span class="p">,</span> <span class="n">transformers</span> <span class="o">=</span> <span class="n">load_tox21</span><span class="p">(</span><span class="n">featurizer</span><span class="o">=</span><span class="s1">&#39;GraphConv&#39;</span><span class="p">)</span>
@@ -123,7 +123,7 @@ Loading dataset from disk.
 turn tensorboard on is pass the tensorboard=True flag to the constructor
 of our model</p>
 <div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Construct the model with tensorbaord on</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">GraphConvTensorGraph</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tox21_tasks</span><span class="p">),</span>  <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;classification&#39;</span><span class="p">,</span> <span class="n">tensorboard</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GraphConvModel</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tox21_tasks</span><span class="p">),</span>  <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;classification&#39;</span><span class="p">,</span> <span class="n">tensorboard</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="c1"># Fit the model</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">nb_epoch</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -169,7 +169,7 @@ loss function over time or to find out if your gradients are exploding!.</p>
 </div>
 <img alt="../_images/Using_Tensorboard_7_0.png" src="../_images/Using_Tensorboard_7_0.png" />
 <p>If you click “GRAPHS” at the top you can see a visual layout of the
-model. Here is what our GraphConvTensorGraph Model looks like</p>
+model. Here is what our GraphConvModel Model looks like</p>
 <div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;assets/GraphConvArch.png&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
