@@ -21,7 +21,7 @@ Let’s start with some basic imports.
 
 Now, let’s use MoleculeNet to load the Tox21 dataset. We need to make
 sure to process the data in a way that graph convolutional networks can
-use For that, we make sure to set the featurizer option to ‘GraphConv’.
+use. For that, we make sure to set the featurizer option to `GraphConv`.
 The MoleculeNet call will return a training set, an validation set, and
 a test set for us to use. The call also returns ``transformers``, a list
 of data transformations that were applied to preprocess the dataset.
