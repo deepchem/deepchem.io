@@ -101,7 +101,7 @@ convolutional network on the Tox21 dataset.</p>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
 <span class="kn">import</span> <span class="nn">deepchem</span> <span class="kn">as</span> <span class="nn">dc</span>
-<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.models.graph_models</span> <span class="kn">import</span> <span class="n">GraphConvTensorGraph</span>
+<span class="kn">from</span> <span class="nn">deepchem.models.tensorgraph.models.graph_models</span> <span class="kn">import</span> <span class="n">GraphConvModel</span>
 </pre></div>
 </div>
 <p>Now, let’s use MoleculeNet to load the Tox21 dataset. We need to make
@@ -123,10 +123,10 @@ Loading dataset from disk.
 </pre></div>
 </div>
 <p>Let’s now train a graph convolutional network on this dataset. DeepChem
-has the class <code class="docutils literal"><span class="pre">GraphConvTensorGraph</span></code> that wraps a standard graph
+has the class <code class="docutils literal"><span class="pre">GraphConvModel</span></code> that wraps a standard graph
 convolutional architecture underneath the hood for user convenience.
 Let’s instantiate an object of this class and train it on our dataset.</p>
-<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">GraphConvTensorGraph</span><span class="p">(</span>
+<div class="code ipython3 highlight-python"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">GraphConvModel</span><span class="p">(</span>
     <span class="nb">len</span><span class="p">(</span><span class="n">tox21_tasks</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;classification&#39;</span><span class="p">)</span>
 <span class="c1"># Set nb_epoch=10 for better results.</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">nb_epoch</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -170,7 +170,7 @@ computed_metrics: [0.71533171721169553, 0.74090608465608465, 0.81106357802757933
 Validation ROC-AUC Score: 0.681129
 </pre></div>
 </div>
-<p>What’s going on under the hood? Could we build <code class="docutils literal"><span class="pre">GraphConvTensorGraph</span></code>
+<p>What’s going on under the hood? Could we build <code class="docutils literal"><span class="pre">GraphConvModel</span></code>
 ourselves? Of course! The first step is to create a <code class="docutils literal"><span class="pre">TensorGraph</span></code>
 object. This object will hold the “computational graph” that defines the
 computation that a graph convolutional network will perform.</p>
@@ -358,9 +358,9 @@ Valid ROC-AUC Score: 0.732455
 </pre></div>
 </div>
 <p>Success! The model we’ve constructed behaves nearly identically to
-<code class="docutils literal"><span class="pre">GraphConvTensorGraph</span></code>. If you’re looking to build your own custom
-models, you can follow the example we’ve provided here to do so. We hope
-to see exciting constructions from your end soon!</p>
+<code class="docutils literal"><span class="pre">GraphConvModel</span></code>. If you’re looking to build your own custom models,
+you can follow the example we’ve provided here to do so. We hope to see
+exciting constructions from your end soon!</p>
 </div>
 
 
