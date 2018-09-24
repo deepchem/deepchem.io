@@ -106,7 +106,7 @@ convolutional network on the Tox21 dataset.</p>
 </div>
 <p>Now, let’s use MoleculeNet to load the Tox21 dataset. We need to make
 sure to process the data in a way that graph convolutional networks can
-use For that, we make sure to set the featurizer option to ‘GraphConv’.
+use. For that, we make sure to set the featurizer option to ‘GraphConv’.
 The MoleculeNet call will return a training set, an validation set, and
 a test set for us to use. The call also returns <code class="docutils literal"><span class="pre">transformers</span></code>, a list
 of data transformations that were applied to preprocess the dataset.
@@ -180,7 +180,7 @@ computation that a graph convolutional network will perform.</p>
 </pre></div>
 </div>
 <p>Let’s now define the inputs to our model. Conceptually, graph
-convolutions just requires a the structure of the molecule in question
+convolutions just requires the structure of the molecule in question
 and a vector of features for every atom that describes the local
 chemical environment. However in practice, due to TensorFlow’s
 limitations as a general programming environment, we have to have some
@@ -191,7 +191,7 @@ other feature inputs are required to support minibatching in TensorFlow.
 atoms from all molecules with a given degree. <code class="docutils literal"><span class="pre">membership</span></code> determines
 the membership of atoms in molecules (atom <code class="docutils literal"><span class="pre">i</span></code> belongs to molecule
 <code class="docutils literal"><span class="pre">membership[i]</span></code>). <code class="docutils literal"><span class="pre">deg_adjs</span></code> is a list that contains adjacency lists
-grouped by atom degree For more details, check out the
+grouped by atom degree. For more details, check out the
 <a class="reference external" href="https://github.com/deepchem/deepchem/blob/master/deepchem/feat/mol_graphs.py">code</a>.</p>
 <p>To define feature inputs in <code class="docutils literal"><span class="pre">TensorGraph</span></code>, we use the <code class="docutils literal"><span class="pre">Feature</span></code>
 layer. Conceptually, a <code class="docutils literal"><span class="pre">TensorGraph</span></code> is a mathematical graph composed
