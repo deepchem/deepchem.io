@@ -239,7 +239,7 @@ Loading dataset from disk.
 
 <span class="n">n_features</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">get_data_shape</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="k">def</span> <span class="nf">model_builder</span><span class="p">(</span><span class="n">model_params</span><span class="p">,</span> <span class="n">model_dir</span><span class="p">):</span>
-  <span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">MultiTaskClassifier</span><span class="p">(</span>
+  <span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">fcnet</span><span class="o">.</span><span class="n">MultitaskClassifier</span><span class="p">(</span>
     <span class="nb">len</span><span class="p">(</span><span class="n">MUV_tasks</span><span class="p">),</span> <span class="n">n_features</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">model</span>
 
