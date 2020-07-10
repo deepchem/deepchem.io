@@ -140,9 +140,6 @@
           }
           function updateCommand() {
               var match = cmdMap[buildMatcher(opts)];
-              if (typeof match === 'undefined') {
-                  match = 'Follow instructions at our github: <br/> https://github.com/deepchem/deepchem';
-              }
               cmdTxt.html(match);
           }
           function selectOption(ev) {
