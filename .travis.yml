@@ -3,8 +3,8 @@ python:
 - '3.5'
 dist: trusty
 install:
-- pip install s3cmd
-- pip install delegator.py
+- pip install s3cmd==2.0.2
+- pip install delegator.py==0.1.1
 script:
 - python devtools/create_key_file.py
 - python devtools/push-docs-to-s3.py
