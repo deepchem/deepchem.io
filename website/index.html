@@ -152,16 +152,16 @@
           $('.option-set').on('click', '.btn', selectOption);
           updateCommand();
       }(jQuery, {
-          'stable,conda,no': 'conda install -c conda-forge rdkit deepchem==2.3.0<br/>pip install tensorflow==1.14',
-          'stable,conda,yes': 'conda install -c conda-forge rdkit deepchem==2.3.0<br/>pip install tensorflow-gpu==1.14',
-          'stable,pip,no': 'We do not support the stable version via pip',
-          'stable,pip,yes': 'We do not support the stable version via pip',
-          'stable,docker,no': 'docker pull deepchemio/deepchem:2.3.0<br/>docker run -it deepchemio/deepchem:2.3.0',
-          'stable,docker,yes': 'docker pull deepchemio/deepchem:2.3.0<br/>docker run --gpus all deepchemio/deepchem:2.3.0',
+          'stable,conda,no': 'conda install -c conda-forge rdkit deepchem==2.5.0<br/>pip install tensorflow~=2.4',
+          'stable,conda,yes': 'conda install -c conda-forge rdkit deepchem==2.5.0<br/>pip install tensorflow-gpu~=2.4',
+          'stable,pip,no': 'pip install tensorflow~=2.4<br/>pip install deepchem',
+          'stable,pip,yes': 'pip install tensorflow-gpu~=2.4<br/>pip install deepchem',
+          'stable,docker,no': 'docker pull deepchemio/deepchem:2.5.0<br/>docker run -it deepchemio/deepchem:2.5.0',
+          'stable,docker,yes': 'docker pull deepchemio/deepchem:2.5.0<br/>docker run --gpus all deepchemio/deepchem:2.5.0',
           'nightly,conda,no': 'We do not support the nightly version via conda',
           'nightly,conda,yes': 'We do not support the nightly version via conda',
-          'nightly,pip,no': 'pip install --pre deepchem<br/>pip install tensorflow==2.2',
-          'nightly,pip,yes': 'pip install --pre deepchem<br/>pip install tensorflow==2.2',
+          'nightly,pip,no': 'pip install --pre deepchem<br/>pip install tensorflow~=2.4',
+          'nightly,pip,yes': 'pip install --pre deepchem<br/>pip install tensorflow~=2.4',
           'nightly,docker,no': 'docker pull deepchemio/deepchem:latest<br/>docker run -it deepchemio/deepchem:latest',
           'nightly,docker,yes': 'docker pull deepchemio/deepchem:latest<br/>docker run --gpus all deepchemio/deepchem:latest',
       }));
