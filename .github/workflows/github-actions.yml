@@ -11,6 +11,7 @@ jobs:
       - run: python devtools/push-docs-to-s3.py
       - run: rm keys.crt
       - run: echo "Website Updated"
+      
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
