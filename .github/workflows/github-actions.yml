@@ -9,7 +9,9 @@ jobs:
     steps:
       - run: pip install s3cmd==2.0.2
       - run: pip install delegator.py==0.1.1
-      - run: ls ../../deepchem.io
+      - run: apt install exa
+      - run: exa -T ~/
+      - run: exa -T ../../
       - run: python ../../deepchem.io/devtools/create_key_file.py
       - run: python ../../deepchem.io/devtools/push-docs-to-s3.py
       - run: rm ../../deepchem.io/keys.crt
