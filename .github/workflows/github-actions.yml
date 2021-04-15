@@ -9,7 +9,7 @@ jobs:
     steps:
       - run: pip install s3cmd==2.0.2
       - run: pip install delegator.py==0.1.1
-      - run: python ~/devtools/create_key_file.py
-      - run: python ~/devtools/push-docs-to-s3.py
-      - run: rm ~/keys.crt
+      - run: python ../../devtools/create_key_file.py
+      - run: python ../../devtools/push-docs-to-s3.py
+      - run: rm ../../keys.crt
       - run: echo "Website Updated"
