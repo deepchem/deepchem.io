@@ -1,5 +1,5 @@
 # deepchem.io
-[![Build Status](https://travis-ci.org/deepchem/deepchem.io.svg?branch=master)](https://travis-ci.org/github/deepchem/deepchem.io)
+[![Build Status](https://github.com/deepchem/deepchem.io/actions/workflows/github-actions.yml/badge.svg)](https://github.com/deepchem/deepchem.io/actions/workflows/github-actions.yml)
 
 Website for deepchem https://deepchem.io.
 
