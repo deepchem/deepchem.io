@@ -26,6 +26,13 @@ c = delegator.run(cmd)
 c.block()
 print(c.out)
 
+template = "s3cmd --recursive modify --add-headers='content-type':'text/html' --exclude '' --include '.html' --config {config} s3://{bucket}/"
+cmd = template.format(config='keys.crt', bucket=BUCKET_NAME)
+print(cmd)
+c = delegator.run(cmd)
+c.block()
+print(c.out)
+
 template = "s3cmd --recursive modify --add-header='content-type':'application/javascript' --exclude '' --include '.js' --config {config} s3://{bucket}/"
 cmd = template.format(config='keys.crt', bucket=BUCKET_NAME)
 c = delegator.run(cmd)
