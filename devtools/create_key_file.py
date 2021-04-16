@@ -1,5 +1,7 @@
 import os
 
+print(len(os.environ["AWS_ACCESS_KEY_ID"]))
+print(len(os.environ["AWS_SECRET_ACCESS_KEY_ID"]))
 
 with open('keys.crt', 'w') as f:
   f.write('''[default]
